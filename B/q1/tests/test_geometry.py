@@ -18,6 +18,22 @@ def rectangle(x0, x1, y0, y1):
     return solve_halfplanes([[1, 0], [-1, 0], [0, 1], [0, -1]], [x1, -x0, y1, -y0])
 
 
+def triangle_halfplanes(points):
+    """Independent conversion from three vertices to their three edge half-planes."""
+    points = np.asarray(points, dtype=float)
+    u, v = points[1] - points[0], points[2] - points[0]
+    signed_double_area = u[0] * v[1] - u[1] * v[0]
+    if signed_double_area < 0:
+        points = points[[0, 2, 1]]
+    normals, bounds = [], []
+    for p, q in zip(points, np.roll(points, -1, axis=0)):
+        edge = q - p
+        normal = np.array([edge[1], -edge[0]])
+        normals.append(normal)
+        bounds.append(float(normal @ p))
+    return normals, bounds
+
+
 def clip_polygon(polygon, normal, bound):
     """Independent Sutherland-Hodgman reference used ONLY for bounded tests."""
     out = []
@@ -55,6 +71,32 @@ class GeometryTests(unittest.TestCase):
         self.assertFalse(result["diameter_circle_covers"])
         self.assertAlmostEqual(result["minimum_enclosing_circle"]["radius_m"], 2 / h)
         self.assertAlmostEqual(result["diameter_circle"]["coverage_gap_m"], h - 1)
+
+    def test_random_triangle_coverage_matches_pythagorean_oracle(self):
+        """For a triangle, the opposite angle independently decides diameter-disk coverage."""
+        rng = np.random.default_rng(20260911)
+        checked = 0
+        while checked < 200:
+            points = rng.uniform(-100, 100, (3, 2))
+            u, v = points[1] - points[0], points[2] - points[0]
+            if abs(u[0] * v[1] - u[1] * v[0]) < 1:
+                continue
+            pairs = [(0, 1), (0, 2), (1, 2)]
+            squared = [float(np.sum((points[i] - points[j]) ** 2)) for i, j in pairs]
+            order = np.argsort(squared)
+            if squared[order[-1]] - squared[order[-2]] < 1e-5:
+                continue
+            i, j = pairs[order[-1]]
+            k = 3 - i - j
+            thales_dot = float((points[k] - points[i]) @ (points[k] - points[j]))
+            if abs(thales_dot) < 1e-5:
+                continue
+            A, b = triangle_halfplanes(points)
+            result = solve_halfplanes(A, b)
+            self.assertEqual(result["status"], "BOUNDED")
+            self.assertAlmostEqual(result["diameter_m"] ** 2, squared[order[-1]], places=7)
+            self.assertEqual(result["diameter_circle_covers"], thales_dot < 0)
+            checked += 1
 
     def test_six_station_case_covered_by_diameter_circle(self):
         case, observations = load_multi_station_case("multi_station_covers.json")
