@@ -2,8 +2,8 @@
 
 The safe candidate region is continuous and guaranteed: every candidate is at
 most the minimum possible reception radius from every point in a conservative
-outer localization polygon. Ranking inside that region is a documented finite
-scenario approximation, not a proof of the continuous minimax optimum.
+outer localization polygon. Bearing-interval envelopes bound every possible
+direction response. Candidate search remains finite, not globally optimal.
 """
 
 from dataclasses import asdict, dataclass
@@ -25,14 +25,14 @@ class Q2Config:
     safety_margin_m: float = 0.1
     near_radius_m: float = 5.0
     movement_speed_mps: float = 5.0
-    movement_weight_m_per_s: float = 1.0
+    movement_weight_m_per_s: float = 0.0
     circle_sides: int = 128
     coarse_spacing_m: float = 100.0
     fine_spacing_m: float = 20.0
-    scenario_spacing_m: float = 100.0
     max_coarse_candidates: int = 24
     max_fine_candidates: int = 24
-    max_source_scenarios: int = 32
+    response_bound_tolerance_m: float = 0.5
+    max_response_intervals: int = 64
     near_best_epsilon_m: float = 10.0
     repeated_position_tolerance_m: float = 1e-6
     calculation_time_limit_s: float | None = None
@@ -60,15 +60,15 @@ def _validate_config(config):
     numeric_positive = (
         "target_radius_m", "maximum_reception_radius_m", "minimum_reception_radius_m",
         "movement_speed_mps", "circle_sides", "coarse_spacing_m", "fine_spacing_m",
-        "scenario_spacing_m", "max_coarse_candidates", "max_fine_candidates",
-        "max_source_scenarios", "near_best_epsilon_m",
+        "max_coarse_candidates", "max_fine_candidates",
+        "response_bound_tolerance_m", "max_response_intervals", "near_best_epsilon_m",
     )
     for name in numeric_positive:
         if _finite_number(getattr(config, name), name) <= 0:
             raise ValueError(f"{name} must be positive")
     if config.circle_sides < 16 or int(config.circle_sides) != config.circle_sides:
         raise ValueError("circle_sides must be an integer >= 16")
-    for name in ("max_coarse_candidates", "max_fine_candidates", "max_source_scenarios"):
+    for name in ("max_coarse_candidates", "max_fine_candidates", "max_response_intervals"):
         if int(getattr(config, name)) != getattr(config, name):
             raise ValueError(f"{name} must be an integer")
     safety_margin = _finite_number(config.safety_margin_m, "safety_margin_m")
@@ -254,157 +254,210 @@ def _candidate_points(vertices, safe_region, current, spacing, limit, used_posit
     return _deduplicate(closest + _diverse_subset(filtered, limit - len(closest), witness))[:limit]
 
 
-def _physical_source(point, station, target_center, config, A_wedge, b_wedge):
-    return (np.linalg.norm(point - target_center) <= config.target_radius_m + 1e-8
-            and config.near_radius_m < np.linalg.norm(point - station) <= config.maximum_reception_radius_m + 1e-8
-            and np.all(A_wedge @ point <= b_wedge + 1e-8))
+def _expired(deadline):
+    return deadline is not None and time.monotonic() >= deadline
 
 
-def _center_ray_scenarios(station, bearing_deg, target_center, config):
-    angle = math.radians(bearing_deg)
-    direction = np.array([math.cos(angle), math.sin(angle)])
-    relative = station - target_center
-    discriminant = float((relative @ direction) ** 2 - (relative @ relative - config.target_radius_m ** 2))
-    if discriminant < 0:
-        return []
-    root = math.sqrt(max(0.0, discriminant))
-    lo = max(config.near_radius_m + 1e-6, -float(relative @ direction) - root)
-    hi = min(config.maximum_reception_radius_m, -float(relative @ direction) + root)
-    if lo > hi:
-        return []
-    return [station + t * direction for t in np.linspace(lo, hi, 9)]
+def _response_domain(vertices, candidate, error_deg):
+    """An unwrapped interval containing all possible measured bearings.
+
+    If vertex rays lie in an open semicircle, convex combinations stay in that
+    cone. Otherwise use the full circle (also handles a station inside P).
+    """
+    relative = np.asarray(vertices) - candidate
+    if np.min(np.linalg.norm(relative, axis=1)) <= 1e-7:
+        return 0.0, 360.0
+    angles = np.sort(np.degrees(np.arctan2(relative[:, 1], relative[:, 0])) % 360)
+    gaps = np.diff(np.r_[angles, angles[0] + 360])
+    index = int(np.argmax(gaps))
+    width = 360.0 - gaps[index]
+    if width >= 180.0 - 1e-8:
+        return 0.0, 360.0
+    start = angles[(index + 1) % len(angles)]
+    # Include rounding margin and measurement error at both ends.
+    return float(start - error_deg - 1e-8), float(start + width + error_deg + 1e-8)
 
 
-def _source_scenarios(vertices, station, bearing_deg, error_deg, config):
-    target_center = np.array([config.target_center_x, config.target_center_y])
-    observation = {"position": {"x": station[0], "y": station[1]}, "svd_deg": bearing_deg}
-    A_wedge, b_wedge = bearing_halfplanes([observation], error_deg)
-    raw = [np.mean(vertices, axis=0)]
-    raw.extend(_center_ray_scenarios(station, bearing_deg, target_center, config))
-    for p, q in zip(vertices, np.roll(vertices, -1, axis=0)):
-        raw.extend(p + fraction * (q - p) for fraction in (0, 0.25, 0.5, 0.75))
-    bounds = {"x_min": float(np.min(vertices[:, 0])), "x_max": float(np.max(vertices[:, 0])),
-              "y_min": float(np.min(vertices[:, 1])), "y_max": float(np.max(vertices[:, 1]))}
-    raw.extend(_grid(bounds, config.scenario_spacing_m, np.mean(vertices, axis=0)))
-    feasible = [p for p in _deduplicate(raw)
-                if _physical_source(p, station, target_center, config, A_wedge, b_wedge)]
-    return _diverse_subset(feasible, config.max_source_scenarios)
+def response_radius_bound(vertices, candidate, error_deg=1.0, config=None,
+                          deadline=None, initial_radius=None):
+    """Bound MEC(P intersect W(candidate, theta, delta)) for EVERY theta.
 
+    For theta in [mid-h,mid+h], W(theta,delta) is contained in
+    W(mid,delta+h). Its intersection with P supplies a covering circle for all
+    responses in that interval. The maximum envelope radius is therefore an
+    upper bound, even if refinement stops early. Numerical margins are explicit;
+    this is floating-point geometry, not an interval-arithmetic certificate.
+    """
+    config = config or Q2Config()
+    vertices = np.asarray(vertices, dtype=float)
+    candidate = np.asarray(candidate, dtype=float)
+    initial_radius = (minimum_enclosing_circle(vertices)['radius_m']
+                      if initial_radius is None else initial_radius)
+    numeric_margin = 1e-6
+    whole_upper = initial_radius + numeric_margin
+    lo, hi = _response_domain(vertices, candidate, error_deg)
+    # Start with a valid bound BEFORE evaluating or checking time.
+    cells = [(lo, hi, whole_upper)]
+    sampled_max = 0.0
+    evaluations = 0
 
-def _score_candidate(candidate, source_scenarios, vertices, current, error_deg, config, deadline):
-    worst_radius, worst_case, evaluations, near_scenarios = -math.inf, None, 0, 0
-    for source_index, source in enumerate(source_scenarios):
-        if deadline is not None and time.monotonic() >= deadline:
-            return None
-        distance = float(np.linalg.norm(source - candidate))
-        if distance <= config.near_radius_m:
-            radii = [(None, 0.0)]
-            near_scenarios += 1
+    def interval(a, b):
+        nonlocal sampled_max, evaluations
+        mid = (a + b) / 2
+        halfwidth = error_deg + (b - a) / 2
+        if halfwidth >= 90:
+            upper = whole_upper
         else:
-            true_bearing = math.degrees(math.atan2(source[1] - candidate[1], source[0] - candidate[0]))
-            radii = []
-            for error in (-error_deg, 0.0, error_deg):
-                updated = _clip_with_bearing(vertices, candidate, true_bearing + error, error_deg)
-                radius = math.inf if not len(updated) else minimum_enclosing_circle(updated)["radius_m"]
-                radii.append((error, radius))
-        for error, radius in radii:
-            evaluations += 1
-            if radius > worst_radius:
-                worst_radius = radius
-                worst_case = {"source_scenario_index": source_index,
-                              "bearing_error_deg": error, "updated_cover_radius_m": radius}
-    movement_distance = float(np.linalg.norm(candidate - current))
-    movement_time = movement_distance / config.movement_speed_mps
+            outer = _clip_with_bearing(vertices, candidate, mid, halfwidth)
+            upper = (min(whole_upper, minimum_enclosing_circle(outer)['radius_m'] + numeric_margin)
+                     if len(outer) else 0.0)
+        exact = _clip_with_bearing(vertices, candidate, mid, error_deg)
+        if len(exact):
+            sampled_max = max(sampled_max, minimum_enclosing_circle(exact)['radius_m'])
+        evaluations += 1
+        return a, b, upper
+
+    while len(cells) < config.max_response_intervals and not _expired(deadline):
+        k = max(range(len(cells)), key=lambda i: cells[i][2])
+        a, b, upper = cells[k]
+        if upper - sampled_max <= config.response_bound_tolerance_m:
+            break
+        midpoint = (a + b) / 2
+        if midpoint == a or midpoint == b:
+            break
+        left = interval(a, midpoint)
+        if _expired(deadline):
+            # Keep the unsplit parent: a partial partition is not a bound.
+            break
+        right = interval(midpoint, b)
+        cells[k:k+1] = [left, right]
+    upper = max(c[2] for c in cells)
     return {
-        "position": {"x": float(candidate[0]), "y": float(candidate[1])},
-        "worst_updated_cover_radius_m": worst_radius,
-        "movement_distance_m": movement_distance,
-        "movement_time_s": movement_time,
-        "objective_m": worst_radius + config.movement_weight_m_per_s * movement_time,
-        "worst_case": worst_case,
-        "scenario_evaluations": evaluations,
-        "near_source_scenarios": near_scenarios,
+        'worst_updated_cover_radius_m': float(upper),
+        'sampled_direction_radius_m': float(sampled_max),
+        'response_bound_gap_m': float(max(0., upper - sampled_max)),
+        'response_bound_converged': bool(upper - sampled_max <= config.response_bound_tolerance_m),
+        'response_interval_count': len(cells),
+        'response_evaluations': evaluations,
+        'radius_bound_scope': 'all_direction_responses_over_initial_outer_polygon',
+        'numerical_margin_m': numeric_margin,
     }
+
+
+def _safe_fallback(vertices, safe, used, tolerance):
+    """Construct a safe unused point without depending on a source/grid sample."""
+    center = np.asarray(safe['witness_center'])
+    radius = safe['guaranteed_radius_m']
+    slack = radius - float(np.linalg.norm(vertices-center, axis=1).max())
+    points = [center]
+    # The ball of radius slack around the witness lies in the safe region.
+    if slack > 2*tolerance:
+        for angle in np.linspace(0, 2*math.pi, 2*len(used)+8, endpoint=False):
+            points.append(center + slack/2*np.array([math.cos(angle), math.sin(angle)]))
+    return next((p for p in points if is_safe_candidate(p, vertices, radius)
+                 and all(np.linalg.norm(p-old) > tolerance for old in used)), None)
+
+
+def _score_candidate(candidate, vertices, current, error_deg, config, deadline, initial_radius):
+    bound = response_radius_bound(vertices, candidate, error_deg, config, deadline, initial_radius)
+    distance = float(np.linalg.norm(candidate-current))
+    move_time = distance/config.movement_speed_mps
+    return {'position': {'x': float(candidate[0]), 'y': float(candidate[1])},
+            'movement_distance_m': distance, 'movement_time_s': move_time,
+            'objective_m': bound['worst_updated_cover_radius_m'] + config.movement_weight_m_per_s*move_time,
+            **bound}
 
 
 def choose_second_detection(first_observation, error_deg=1.0, current_position=None,
                             used_positions=None, config=None):
-    """Return a safe second point and approximate minimax ranking diagnostics.
+    """Return a safe second point, using precision-first conservative ranking.
 
-    The returned point has a continuous reception guarantee for an
-    omnidirectional source under the configured 1000m minimum radius. The
-    objective is evaluated on finite source/error scenarios and is approximate.
+    calculation_time_limit_s is a cooperative whole-call budget: geometry and
+    individual operations cannot be preempted. Expiry skips further ranking and
+    returns the best safe point available, with elapsed time and overrun exposed.
     """
+    started = time.monotonic()
     config = config or Q2Config()
     _validate_config(config)
-    error_deg = _finite_number(error_deg, "error_deg")
+    deadline = started + config.calculation_time_limit_s if config.calculation_time_limit_s is not None else None
+    error_deg = _finite_number(error_deg, 'error_deg')
     if not 0 < error_deg < 90:
-        raise ValueError("error_deg must be strictly between 0 and 90 degrees")
-    initial, _, _ = build_initial_outer_region(first_observation, error_deg, config)
-    if initial["status"] != "BOUNDED":
-        return {"status": "GEOMETRY_ERROR", "reason": initial["status"],
-                "initial_region": initial, "selected": None}
-    vertices = np.asarray(initial["vertices"])
-    station = _point(first_observation["position"], "first_observation.position")
-    bearing_deg = _finite_number(first_observation["svd_deg"], "first_observation.svd_deg")
-    current = station if current_position is None else _point(current_position, "current_position")
+        raise ValueError('error_deg must be strictly between 0 and 90 degrees')
+    # Validate caller inputs even if the geometry later has no solution.
+    if not isinstance(first_observation, dict) or set(first_observation) != {'position', 'svd_deg'}:
+        raise ValueError('first_observation requires exactly position and svd_deg')
+    station = _point(first_observation['position'], 'first_observation.position')
+    _finite_number(first_observation['svd_deg'], 'first_observation.svd_deg')
+    current = station if current_position is None else _point(current_position, 'current_position')
     used = [station]
     if used_positions is not None:
         if not isinstance(used_positions, (list, tuple)):
-            raise ValueError("used_positions must be an array or None")
-        used.extend(_point(point, f"used_positions[{i}]") for i, point in enumerate(used_positions))
-    guaranteed_radius = config.minimum_reception_radius_m - config.safety_margin_m
+            raise ValueError('used_positions must be an array or None')
+        used.extend(_point(p, f'used_positions[{i}]') for i, p in enumerate(used_positions))
+
+    def finish(result):
+        elapsed = time.monotonic() - started
+        result.update(elapsed_s=elapsed, timed_out=_expired(deadline),
+                      budget_overrun_s=max(0., elapsed-config.calculation_time_limit_s)
+                      if deadline is not None else 0.,
+                      time_budget_semantics='cooperative_whole_call_not_hard_deadline')
+        return result
+
+    initial, _, _ = build_initial_outer_region(first_observation, error_deg, config)
+    if initial['status'] != 'BOUNDED':
+        return finish({'status': 'GEOMETRY_ERROR', 'reason': initial['status'],
+                       'initial_region': initial, 'selected': None})
+    vertices = np.asarray(initial['vertices'])
+    initial_radius = initial['minimum_enclosing_circle']['radius_m']
+    guaranteed_radius = config.minimum_reception_radius_m-config.safety_margin_m
     safe = safe_candidate_region(vertices, guaranteed_radius)
-    base = {"initial_region": initial, "safe_candidate_region": safe,
-            "config": asdict(config), "error_deg": error_deg,
-            "ranking_is_discrete_approximation": True,
-            "reception_guarantee_scope": "omnidirectional_source_only"}
-    if not safe["nonempty"]:
-        return {"status": "NO_CANDIDATE", "reason": "SAFE_REGION_EMPTY", "selected": None, **base}
-    scenarios = _source_scenarios(vertices, station, bearing_deg, error_deg, config)
-    if not scenarios:
-        return {"status": "NO_CANDIDATE", "reason": "NO_PHYSICAL_SOURCE_SCENARIOS", "selected": None, **base}
-    deadline = (time.monotonic() + config.calculation_time_limit_s
-                if config.calculation_time_limit_s is not None else None)
-    coarse = _candidate_points(vertices, safe, current, config.coarse_spacing_m,
-                               config.max_coarse_candidates, used,
-                               config.repeated_position_tolerance_m)
-    scored = []
-    timed_out = False
-    for candidate in coarse:
-        score = _score_candidate(candidate, scenarios, vertices, current, error_deg, config, deadline)
-        if score is None:
-            timed_out = True
-            break
-        scored.append(score)
-    if not scored:
-        return {"status": "NO_CANDIDATE", "reason": "NO_EVALUATED_CANDIDATE", "selected": None,
-                "timed_out": timed_out, **base}
-    coarse_best = min(scored, key=lambda row: (row["objective_m"], row["movement_distance_m"],
-                                                row["position"]["x"], row["position"]["y"]))
-    best_point = np.array([coarse_best["position"]["x"], coarse_best["position"]["y"]])
-    local_bounds = {"x_min": best_point[0] - config.coarse_spacing_m,
-                    "x_max": best_point[0] + config.coarse_spacing_m,
-                    "y_min": best_point[1] - config.coarse_spacing_m,
-                    "y_max": best_point[1] + config.coarse_spacing_m}
-    fine_raw = _grid(local_bounds, config.fine_spacing_m, best_point)
-    fine = [p for p in _diverse_subset(
-        [p for p in fine_raw if is_safe_candidate(p, vertices, guaranteed_radius)
-         and not any(np.linalg.norm(p - old) <= config.repeated_position_tolerance_m for old in used)],
-        config.max_fine_candidates, best_point)
-        if not any(np.linalg.norm(p - np.array([row["position"]["x"], row["position"]["y"]]))
-                   <= config.repeated_position_tolerance_m for row in scored)]
-    if not timed_out:
-        for candidate in fine:
-            score = _score_candidate(candidate, scenarios, vertices, current, error_deg, config, deadline)
-            if score is None:
-                timed_out = True
+    base = {'initial_region': initial, 'safe_candidate_region': safe, 'config': asdict(config),
+            'error_deg': error_deg, 'algorithm_version': 2,
+            'ranking_is_discrete_approximation': True,
+            'ranking_description': 'finite_candidate_search_with_continuous_response_upper_bounds',
+            'reception_guarantee_scope': 'omnidirectional_source_only'}
+    if not safe['nonempty']:
+        return finish({'status': 'NO_CANDIDATE', 'reason': 'SAFE_REGION_EMPTY', 'selected': None, **base})
+    fallback = _safe_fallback(vertices, safe, used, config.repeated_position_tolerance_m)
+    if fallback is None:
+        return finish({'status': 'NO_CANDIDATE', 'reason': 'NO_UNUSED_SAFE_WITNESS', 'selected': None, **base})
+    # Universal initial-region cover is available even with zero ranking budget.
+    fallback_score = _score_candidate(fallback, vertices, current, error_deg, config,
+                                      -math.inf, initial_radius)
+    scored = [fallback_score]
+    ranked_count = 0
+
+    def score_points(points):
+        nonlocal ranked_count
+        for p in points:
+            if _expired(deadline):
                 break
+            score = _score_candidate(p, vertices, current, error_deg, config, deadline, initial_radius)
             scored.append(score)
-    best = min(scored, key=lambda row: (row["objective_m"], row["movement_distance_m"],
-                                         row["position"]["x"], row["position"]["y"]))
-    threshold = best["objective_m"] + config.near_best_epsilon_m
-    cloud = [row["position"] for row in scored if row["objective_m"] <= threshold]
-    return {"status": "OK", "selected": best, "near_best_candidate_cloud": cloud,
-            "source_scenario_count": len(scenarios), "evaluated_candidate_count": len(scored),
-            "timed_out": timed_out, **base}
+            ranked_count += 1
+
+    if not _expired(deadline):
+        coarse = _candidate_points(vertices, safe, current, config.coarse_spacing_m,
+                                   config.max_coarse_candidates, used, config.repeated_position_tolerance_m)
+        score_points(_deduplicate([fallback] + coarse))
+    key = lambda r: (r['objective_m'], r['movement_distance_m'], r['position']['x'], r['position']['y'])
+    coarse_best = min(scored, key=key)
+    if not _expired(deadline):
+        best_point = np.array([coarse_best['position']['x'], coarse_best['position']['y']])
+        local_bounds = {'x_min': best_point[0]-config.coarse_spacing_m,
+                        'x_max': best_point[0]+config.coarse_spacing_m,
+                        'y_min': best_point[1]-config.coarse_spacing_m,
+                        'y_max': best_point[1]+config.coarse_spacing_m}
+        raw = _grid(local_bounds, config.fine_spacing_m, best_point)
+        fine = _diverse_subset([p for p in raw if is_safe_candidate(p, vertices, guaranteed_radius)
+                               and all(np.linalg.norm(p-old) > config.repeated_position_tolerance_m for old in used)],
+                               config.max_fine_candidates, best_point)
+        already = [np.array([r['position']['x'], r['position']['y']]) for r in scored]
+        score_points([p for p in fine if all(np.linalg.norm(p-old) > config.repeated_position_tolerance_m for old in already)])
+    best = min(scored, key=key)
+    cloud = _deduplicate([np.array([r['position']['x'], r['position']['y']]) for r in scored
+                          if r['objective_m'] <= best['objective_m']+config.near_best_epsilon_m])
+    return finish({'status': 'OK', 'selected': best,
+                   'selection_mode': 'safe_fallback' if best is fallback_score else 'response_bound_search',
+                   'near_best_candidate_cloud': [{'x': float(p[0]), 'y': float(p[1])} for p in cloud],
+                   'evaluated_candidate_count': ranked_count, **base})

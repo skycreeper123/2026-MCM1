@@ -1,5 +1,7 @@
 import math
 import unittest
+from dataclasses import replace
+from unittest.mock import patch
 
 import numpy as np
 
@@ -11,6 +13,7 @@ from B.q2.selection import (
     circle_outer_halfplanes,
     is_safe_candidate,
     safe_candidate_region,
+    response_radius_bound,
 )
 
 
@@ -18,10 +21,9 @@ FAST_CONFIG = Q2Config(
     circle_sides=48,
     coarse_spacing_m=200,
     fine_spacing_m=50,
-    scenario_spacing_m=200,
     max_coarse_candidates=12,
     max_fine_candidates=12,
-    max_source_scenarios=16,
+    max_response_intervals=24,
 )
 
 
@@ -68,7 +70,9 @@ class Question2Tests(unittest.TestCase):
         self.assertTrue(is_safe_candidate(selected, vertices, radius))
         self.assertLessEqual(np.max(np.linalg.norm(vertices - selected, axis=1)), radius + 1e-8)
         self.assertGreater(np.linalg.norm(selected - np.array([-1000.0, 0.0])), 1e-6)
-        self.assertGreater(result["source_scenario_count"], 5)
+        self.assertGreater(result['selected']['response_interval_count'], 1)
+        self.assertEqual(result['selected']['radius_bound_scope'],
+                         'all_direction_responses_over_initial_outer_polygon')
 
     def test_selection_is_deterministic_and_improves_sampled_radius(self):
         first = choose_second_detection(self.first, config=FAST_CONFIG)
@@ -105,6 +109,71 @@ class Question2Tests(unittest.TestCase):
     def test_source_truth_satisfies_first_wedge(self):
         A, b = bearing_halfplanes([self.first])
         self.assertTrue(np.all(A @ self.true_source <= b))
+
+    def test_tangent_and_narrow_physical_regions_always_return_safe_points(self):
+        for degrees in (13., 77., 203.):
+            a = math.radians(degrees)
+            source = 1800*np.array([math.cos(a), math.sin(a)])
+            station = source-1000*np.array([-math.sin(a), math.cos(a)])
+            for error in (-1., -.999999, -.9999):
+                first = {'position': dict(zip(['x', 'y'], station)),
+                         'svd_deg': degrees+90+error}
+                result = choose_second_detection(first, config=FAST_CONFIG)
+                self.assertEqual(result['status'], 'OK', (degrees, error, result))
+                p = np.array(list(result['selected']['position'].values()))
+                self.assertLessEqual(np.linalg.norm(p-source), 999.9+1e-7)
+                self.assertTrue(is_safe_candidate(p, result['initial_region']['vertices'], 999.9))
+
+    def test_expired_budget_returns_unused_safe_fallback_with_finite_bound(self):
+        config = replace(FAST_CONFIG, calculation_time_limit_s=1e-9)
+        initial, _, _ = build_initial_outer_region(self.first, config=config)
+        witness = initial['minimum_enclosing_circle']['center']
+        result = choose_second_detection(self.first, used_positions=[dict(zip(['x', 'y'], witness))], config=config)
+        self.assertEqual(result['status'], 'OK')
+        self.assertTrue(result['timed_out'])
+        self.assertEqual(result['selection_mode'], 'safe_fallback')
+        self.assertEqual(result['evaluated_candidate_count'], 0)
+        p = np.array(list(result['selected']['position'].values()))
+        self.assertGreater(np.linalg.norm(p-witness), 1e-6)
+        self.assertTrue(is_safe_candidate(p, initial['vertices'], 999.9))
+        self.assertTrue(math.isfinite(result['selected']['objective_m']))
+        self.assertGreaterEqual(result['selected']['worst_updated_cover_radius_m'],
+                                initial['minimum_enclosing_circle']['radius_m'])
+
+    def test_precision_is_default_and_cloud_points_are_safe(self):
+        self.assertEqual(Q2Config().movement_weight_m_per_s, 0.)
+        result = choose_second_detection(self.first, config=FAST_CONFIG)
+        self.assertAlmostEqual(result['selected']['objective_m'],
+                               result['selected']['worst_updated_cover_radius_m'])
+        for p in result['near_best_candidate_cloud']:
+            self.assertTrue(is_safe_candidate(np.array([p['x'], p['y']]),
+                                             result['initial_region']['vertices'], 999.9))
+
+    def test_response_bound_covers_independent_dense_bearings_and_wrap(self):
+        from B.q2.validation import reference_update, reference_circle
+        polygon = np.array([[0., -10.], [1000., -10.], [1000., 10.], [0., 10.]])
+        for station in (np.array([-50., 0.]), np.array([500., 0.]), np.array([500., 400.])):
+            bound = response_radius_bound(polygon, station, config=FAST_CONFIG)
+            for angle in np.linspace(-180., 180., 181):
+                p, _, _ = reference_update(polygon, station, angle)
+                if len(p):
+                    _, radius = reference_circle(p)
+                    self.assertLessEqual(radius, bound['worst_updated_cover_radius_m']+1e-6)
+
+    def test_interval_limit_preserves_upper_bound_and_near_is_not_zero(self):
+        polygon = np.array([[-2., -2.], [2., -2.], [2., 2.], [-2., 2.]])
+        bound = response_radius_bound(polygon, np.zeros(2),
+                                      config=replace(FAST_CONFIG, max_response_intervals=1))
+        self.assertGreaterEqual(bound['worst_updated_cover_radius_m'], math.sqrt(8))
+        self.assertFalse(bound['response_bound_converged'])
+
+    def test_timeout_during_split_retains_parent_cover(self):
+        polygon = np.array([[0., -10.], [1000., -10.], [1000., 10.], [0., 10.]])
+        with patch('B.q2.selection._expired', side_effect=[False, True]):
+            bound = response_radius_bound(polygon, np.array([500., 400.]),
+                                          config=FAST_CONFIG, deadline=1.)
+        self.assertEqual(bound['response_interval_count'], 1)
+        self.assertGreaterEqual(bound['worst_updated_cover_radius_m'], math.hypot(500, 10))
 
 
 if __name__ == "__main__":
