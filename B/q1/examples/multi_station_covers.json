@@ -1,0 +1,15 @@
+{
+  "description": "Synthetic six-station case whose diameter circle covers the localization polygon; not official simulator data.",
+  "true_source": {"x": 250.0, "y": -150.0},
+  "error_deg": 1.0,
+  "expected_diameter_circle_covers": true,
+  "injected_errors_deg": [0.5080, -0.1242, 0.0958, -0.8572, -0.8017, -0.2240],
+  "observations": [
+    {"position": {"x": 877.970, "y": 801.749}, "svd_deg": 237.0909},
+    {"position": {"x": 696.249, "y": 742.598}, "svd_deg": 243.3134},
+    {"position": {"x": -846.921, "y": -521.220}, "svd_deg": 18.7927},
+    {"position": {"x": -663.527, "y": -648.368}, "svd_deg": 27.7571},
+    {"position": {"x": -902.787, "y": -929.342}, "svd_deg": 33.2589},
+    {"position": {"x": 258.456, "y": -1049.847}, "svd_deg": 90.3144}
+  ]
+}

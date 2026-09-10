@@ -1,0 +1,15 @@
+{
+  "description": "Synthetic six-station case with a protruding vertex outside every radius-D/2 cover; not official simulator data.",
+  "true_source": {"x": 250.0, "y": -150.0},
+  "error_deg": 1.0,
+  "expected_diameter_circle_covers": false,
+  "injected_errors_deg": [0.1693, -0.0829, -0.3272, 0.4077, 0.7855, 0.3558],
+  "observations": [
+    {"position": {"x": 897.824, "y": 918.793}, "svd_deg": 238.9481},
+    {"position": {"x": 279.043, "y": 461.439}, "svd_deg": 267.1976},
+    {"position": {"x": -1054.500, "y": 290.050}, "svd_deg": 341.0318},
+    {"position": {"x": -258.495, "y": -292.017}, "svd_deg": 16.0122},
+    {"position": {"x": 837.823, "y": -1266.550}, "svd_deg": 118.5507},
+    {"position": {"x": 937.618, "y": -387.864}, "svd_deg": 161.2740}
+  ]
+}

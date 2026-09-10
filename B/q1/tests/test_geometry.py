@@ -1,5 +1,6 @@
 import json
 import math
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
@@ -29,6 +30,12 @@ def clip_polygon(polygon, normal, bound):
     return out
 
 
+def load_multi_station_case(name):
+    path = Path(__file__).resolve().parents[1] / "examples" / name
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return data, data["observations"]
+
+
 class GeometryTests(unittest.TestCase):
     def test_analytic_rectangle_and_negative_coordinates(self):
         result = rectangle(-7, -3, -9, -6)
@@ -48,6 +55,37 @@ class GeometryTests(unittest.TestCase):
         self.assertFalse(result["diameter_circle_covers"])
         self.assertAlmostEqual(result["minimum_enclosing_circle"]["radius_m"], 2 / h)
         self.assertAlmostEqual(result["diameter_circle"]["coverage_gap_m"], h - 1)
+
+    def test_six_station_case_covered_by_diameter_circle(self):
+        case, observations = load_multi_station_case("multi_station_covers.json")
+        result = solve_bearings(observations, case["error_deg"])
+        target = np.array([case["true_source"]["x"], case["true_source"]["y"]])
+        A, b = bearing_halfplanes(observations, case["error_deg"])
+
+        self.assertEqual(len(observations), 6)
+        self.assertTrue(all(abs(error) <= case["error_deg"] for error in case["injected_errors_deg"]))
+        self.assertTrue(np.all(A @ target <= b + 1e-7))
+        self.assertEqual(result["status"], "BOUNDED")
+        self.assertEqual(result["diameter_circle_covers"], case["expected_diameter_circle_covers"])
+        self.assertEqual(result["diameter_circle"]["outside_vertex_indices"], [])
+        self.assertAlmostEqual(result["minimum_enclosing_circle"]["radius_m"], result["diameter_m"] / 2)
+        self.assertAlmostEqual(result["minimum_enclosing_circle"]["radius_to_half_diameter_ratio"], 1)
+
+    def test_six_station_case_not_covered_by_diameter_circle(self):
+        case, observations = load_multi_station_case("multi_station_not_covers.json")
+        result = solve_bearings(observations, case["error_deg"])
+        target = np.array([case["true_source"]["x"], case["true_source"]["y"]])
+        A, b = bearing_halfplanes(observations, case["error_deg"])
+
+        self.assertEqual(len(observations), 6)
+        self.assertTrue(all(abs(error) <= case["error_deg"] for error in case["injected_errors_deg"]))
+        self.assertTrue(np.all(A @ target <= b + 1e-7))
+        self.assertEqual(result["status"], "BOUNDED")
+        self.assertEqual(result["diameter_circle_covers"], case["expected_diameter_circle_covers"])
+        self.assertTrue(result["diameter_circle"]["outside_vertex_indices"])
+        self.assertGreater(result["diameter_circle"]["coverage_gap_m"], 4.5)
+        self.assertGreater(result["diameter_circle"]["max_thales_dot_m2"], 0)
+        self.assertGreater(result["minimum_enclosing_circle"]["radius_to_half_diameter_ratio"], 1.05)
 
     def test_point_and_segment(self):
         for bounds, dimension, diameter in [((2, 2, -3, -3), 0, 0), ((-2, 5, 3, 3), 1, 7)]:

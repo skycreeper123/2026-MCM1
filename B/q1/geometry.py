@@ -211,13 +211,21 @@ def solve_halfplanes(A, b, tolerance_m=DEFAULT_TOL_M):
         center = vertices[i] + (vertices[j] - vertices[i]) / 2
         max_distance = float(np.max(np.linalg.norm(vertices - center, axis=1)))
         gap = max_distance - diameter / 2
+        vertex_gaps = np.linalg.norm(vertices - center, axis=1) - diameter / 2
+        outside_indices = np.flatnonzero(vertex_gaps > tolerance_m).tolist()
+        thales_dots = np.sum((vertices - vertices[i]) * (vertices - vertices[j]), axis=1)
         enclosing_circle = minimum_enclosing_circle(vertices)
+        enclosing_circle["radius_to_half_diameter_ratio"] = (
+            enclosing_circle["radius_m"] / (diameter / 2) if diameter > tolerance_m else 1.0
+        )
         result = _result("BOUNDED", tolerance_m)
         result.update({
             "vertices": vertices.tolist(), "dimension": dimension, "area_m2": float(area),
             "diameter_m": diameter, "diameter_pair": [vertices[i].tolist(), vertices[j].tolist()],
             "diameter_circle": {"center": center.tolist(), "radius_m": diameter / 2,
-                                "max_vertex_distance_m": max_distance, "coverage_gap_m": gap},
+                                "max_vertex_distance_m": max_distance, "coverage_gap_m": gap,
+                                "outside_vertex_indices": outside_indices,
+                                "max_thales_dot_m2": float(np.max(thales_dots))},
             "diameter_circle_covers": bool(gap <= tolerance_m),
             "minimum_enclosing_circle": enclosing_circle,
         })
