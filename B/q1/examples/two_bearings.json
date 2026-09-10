@@ -1,0 +1,8 @@
+{
+  "description": "Synthetic Q1 example: bearings from (0, 0) and (600, 0) towards (300, 400); not official test data.",
+  "error_deg": 1.0,
+  "observations": [
+    {"position": {"x": 0, "y": 0}, "svd_deg": 53.13010235415598},
+    {"position": {"x": 600, "y": 0}, "svd_deg": 126.86989764584402}
+  ]
+}

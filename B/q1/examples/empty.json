@@ -1,0 +1,7 @@
+{
+  "description": "Two forward wedges pointing away from one another are inconsistent.",
+  "observations": [
+    {"position": {"x": 1, "y": 0}, "svd_deg": 0},
+    {"position": {"x": -1, "y": 0}, "svd_deg": 180}
+  ]
+}

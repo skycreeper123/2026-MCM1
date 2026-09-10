@@ -1,0 +1,6 @@
+{
+  "description": "One bearing gives an unbounded forward wedge.",
+  "observations": [
+    {"position": {"x": 0, "y": 0}, "svd_deg": 0}
+  ]
+}
