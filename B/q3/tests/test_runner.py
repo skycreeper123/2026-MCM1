@@ -44,9 +44,13 @@ class FakeResponse:
 
 
 class RunnerValidationTests(unittest.TestCase):
-    def test_strategy_argument_is_explicit_and_defaults_to_v3_global(self):
+    def test_strategy_argument_is_explicit_and_defaults_to_v4_cooperative(self):
         parser = build_parser()
-        self.assertEqual(parser.parse_args(["--self-check"]).strategy, "v3_global")
+        self.assertEqual(parser.parse_args(["--self-check"]).strategy, "v4_cooperative")
+        self.assertEqual(
+            parser.parse_args(["--self-check", "--strategy", "v3_global"]).strategy,
+            "v3_global",
+        )
         self.assertEqual(
             parser.parse_args(["--self-check", "--strategy", "b0_batch_fifo"]).strategy,
             "b0_batch_fifo",

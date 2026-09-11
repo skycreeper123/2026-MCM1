@@ -12,15 +12,16 @@
 ```powershell
 python -m unittest discover -s B\q3\tests -v
 python -m B.q3.runner --self-check
+python -m B.q3.runner --self-check --strategy v4_cooperative
 python -m B.q3.runner --self-check --strategy v3_global
 ```
 
-离线固定案例配对验证（不需要启动模拟器）：`python -m B.q3.validation --cases 24`。这类结果只验证自建环境中的算法行为，不是官方演练成绩。`--self-check` 只校验配置和理论界，不会运行案例。`v3_global` 的有限时间界刻意很宽松，不能用来预计实际成绩。
+离线固定案例配对验证（不需要启动模拟器）：`python -m B.q3.validation --cases 24`。这类结果只验证自建环境中的算法行为，不是官方演练成绩。`--self-check` 只校验配置和理论界，不会运行案例。`v4_cooperative` 与 `v3_global` 的有限时间界刻意很宽松，不能用来预计实际成绩。
 
 ## 演练命令
 
 ```powershell
-python -m B.q3.runner --robot-id <当前登录参赛队号> --strategy v3_global
+python -m B.q3.runner --robot-id <当前登录参赛队号> --strategy v4_cooperative
 ```
 
 也可以省略 `--robot-id`，由程序在终端中提示输入：
@@ -32,7 +33,7 @@ python -m B.q3.runner
 运行器默认等待 Robot API 开放 180 秒。因此可以先启动命令，再在模拟器中点击
 “问题3演练测试”。数据准备和 5 秒倒计时结束后，运行器会自动调用 `/enter`。
 
-`v3_global` 是当前默认策略：先完成全局发现，再动态选择安全测向和局部覆盖清除。`--strategy v2_local` 保留旧版批内服务对照；`b0_batch_fifo` 和 `b0_serial` 保留 B0 对照。V3 的 152 点条带仅用于异常回退。算法与参数解释见 [Q3 summary](Q3_ALGORITHM_SUMMARY.md)。
+`v4_cooperative` 是当前默认策略：七站发现期间按价值选择固定站顺路复测，随后按区域质量联合安排安全测向与认证清除，并对全部待处理区域进行动态路线优化。`--strategy v3_global` 保留上一版全局对照，`v2_local`、`b0_batch_fifo` 和 `b0_serial` 保留旧版对照。V4 的 152 点条带仅用于异常回退。算法与参数解释见 [Q3 summary](Q3_ALGORITHM_SUMMARY.md)。
 
 ## 运行中
 

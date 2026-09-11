@@ -318,7 +318,7 @@ def print_progress(action_index: int, action: Q3Action, response: dict, planner:
 
 
 def run_planner(robot_id, base_url, log_dir, connect_wait_s, exit_reserve_s, timeout_s,
-                strategy="v3_global"):
+                strategy="v4_cooperative"):
     robot_id = validate_robot_id(robot_id)
     run_stamp = time.strftime("%Y%m%d-%H%M%S", time.localtime())
     log_path = log_dir / f"q3-{run_stamp}-{uuid.uuid4().hex[:8]}.jsonl"
@@ -449,8 +449,8 @@ def build_parser():
     parser.add_argument("--exit-reserve-s", type=float, default=30.0)
     parser.add_argument("--timeout-s", type=float, default=5.0)
     parser.add_argument(
-        "--strategy", choices=SUPPORTED_STRATEGIES, default="v3_global",
-        help="v3_global (default), v2_local, b0_batch_fifo, or b0_serial",
+        "--strategy", choices=SUPPORTED_STRATEGIES, default="v4_cooperative",
+        help="v4_cooperative (default), v3_global, v2_local, b0_batch_fifo, or b0_serial",
     )
     parser.add_argument("--self-check", action="store_true", help="validate without networking")
     return parser
@@ -461,7 +461,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.self_check:
         bounds = (q3_global_upper_bounds(Q3Config(strategy=args.strategy))
-                  if args.strategy == "v3_global" else
+                  if args.strategy in ("v3_global", "v4_cooperative") else
                   q3_v2_upper_bounds(Q3Config(strategy=args.strategy))
                   if args.strategy == "v2_local"
                   else q3_baseline_upper_bounds(Q3Config(strategy=args.strategy)))

@@ -13,7 +13,7 @@ import time
 
 import numpy as np
 
-from B.q2 import Q2Config
+from B.q2 import Q2Config, is_safe_candidate
 
 from .geometry import (
     distance,
@@ -26,6 +26,7 @@ from .localize import (
     ClearPlan,
     build_cover_plan,
     choose_detection_from_region,
+    completion_upper_bound,
     initialize_outer_region,
     update_outer_region,
     verify_cover_certificate,
@@ -59,6 +60,7 @@ class PlannerPhase(str, Enum):
 
 class MeasurePurpose(str, Enum):
     COVERAGE_SCAN = "COVERAGE_SCAN"
+    OPPORTUNISTIC_REVISIT = "OPPORTUNISTIC_REVISIT"
     LOCALIZE = "LOCALIZE"
 
 
@@ -70,12 +72,14 @@ class ServicePhase(str, Enum):
     FALLBACK = "FALLBACK"
 
 
-SUPPORTED_STRATEGIES = ("b0_serial", "b0_batch_fifo", "v2_local", "v3_global")
+SUPPORTED_STRATEGIES = (
+    "b0_serial", "b0_batch_fifo", "v2_local", "v3_global", "v4_cooperative",
+)
 
 
 @dataclass(frozen=True)
 class Q3Config:
-    strategy: str = "v3_global"
+    strategy: str = "v4_cooperative"
     channel_min: int = 1
     channel_max: int = 20
     source_count_upper_bound: int = 16
@@ -96,7 +100,7 @@ class Q3Config:
     strip_step_m: float = 20.0
     strip_offsets_m: tuple[float, float] = (-15.0, 15.0)
     local_grid_cell_m: float = 28.0
-    max_extra_measurements_per_source: int = 3
+    max_extra_measurements_per_source: int | None = None
     max_optimized_clear_attempts_per_source: int | None = None
     extra_route_budget_m_per_source: float = 4000.0
     q2_candidate_limit: int | None = None
@@ -105,11 +109,19 @@ class Q3Config:
     total_planning_time_limit_s: float = 60.0
     minimum_radius_improvement_fraction: float | None = None
     repeated_position_tolerance_m: float = 1e-6
+    opportunistic_min_net_saving_s: float = 0.25
+    opportunistic_max_center_range_m: float = 1500.0
+    quality_max_clear_points: int = 4
+    quality_max_radius_m: float = 80.0
+    quality_max_area_m2: float = 10000.0
+    quality_max_completion_s: float = 180.0
 
     def __post_init__(self):
-        # Preserve V2 comparison defaults while making V3 the default strategy.
-        global_mode = self.strategy == "v3_global"
+        # Preserve V2/V3 comparison defaults while making V4 the default.
+        global_mode = self.strategy in ("v3_global", "v4_cooperative")
+        cooperative_mode = self.strategy == "v4_cooperative"
         for name, value in {
+            "max_extra_measurements_per_source": 4 if cooperative_mode else 3,
             "max_optimized_clear_attempts_per_source": 16 if global_mode else 8,
             "q2_candidate_limit": 16 if global_mode else 12,
             "q2_calculation_time_limit_s": 1.5 if global_mode else 1.0,
@@ -156,6 +168,9 @@ class Task:
     continuation_target: tuple[float, float] | None
     service_plan: ServicePlan | None = None
     score: dict | None = None
+    exit_position: tuple[float, float] | None = None
+    intrinsic_upper_s: float = 0.0
+    quality: dict | None = None
 
 
 @dataclass
@@ -184,6 +199,15 @@ class ChannelRecord:
     near_position: tuple[float, float] | None = None
     detection_scores: list[dict] | None = None
     detection_score_version: int = -1
+    fixed_direction_station_ids: set[int] = field(default_factory=set)
+    adaptive_direction_count: int = 0
+    revisit_measure_count: int = 0
+    revisit_no_signal_station_ids: set[int] = field(default_factory=set)
+    region_area_history_m2: list[float] = field(default_factory=list)
+    localization_events: list[dict] = field(default_factory=list)
+    revisit_decisions: list[dict] = field(default_factory=list)
+    detected_at_virtual_s: float | None = None
+    cleared_at_virtual_s: float | None = None
 
 
 def _validate_config(config):
@@ -192,7 +216,7 @@ def _validate_config(config):
     integer_fields = (
         "channel_min", "channel_max", "source_count_upper_bound", "circle_sides",
         "max_extra_measurements_per_source", "max_optimized_clear_attempts_per_source",
-        "q2_candidate_limit", "q2_response_intervals",
+        "q2_candidate_limit", "q2_response_intervals", "quality_max_clear_points",
     )
     for name in integer_fields:
         value = getattr(config, name)
@@ -216,6 +240,8 @@ def _validate_config(config):
         "successful_clear_duration_s", "angle_half_width_deg", "strip_max_range_m",
         "strip_step_m", "local_grid_cell_m", "extra_route_budget_m_per_source",
         "q2_calculation_time_limit_s", "total_planning_time_limit_s",
+        "opportunistic_max_center_range_m", "quality_max_radius_m",
+        "quality_max_area_m2", "quality_max_completion_s",
     )
     for name in positive_fields:
         value = getattr(config, name)
@@ -225,7 +251,8 @@ def _validate_config(config):
             raise ValueError(f"{name} must be positive")
     if not 0 < config.angle_half_width_deg < 90:
         raise ValueError("angle_half_width_deg must be below 90 degrees")
-    for name in ("minimum_radius_improvement_fraction", "repeated_position_tolerance_m"):
+    for name in ("minimum_radius_improvement_fraction", "repeated_position_tolerance_m",
+                 "opportunistic_min_net_saving_s"):
         value = getattr(config, name)
         if isinstance(value, bool) or not isinstance(value, (int, float)) \
                 or not math.isfinite(value) or value < 0:
@@ -267,7 +294,8 @@ class Q3Planner:
             for channel in range(self.config.channel_min, self.config.channel_max + 1)
         }
         self.session_status = SessionStatus.ACTIVE
-        self.phase = (PlannerPhase.DISCOVERY if self.config.strategy == "v3_global"
+        self.phase = (PlannerPhase.DISCOVERY if self.config.strategy in
+                      ("v3_global", "v4_cooperative")
                       else PlannerPhase.SCAN)
         self.completion_reason = None
         self.current_position = (0.0, 0.0)
@@ -290,6 +318,8 @@ class Q3Planner:
         self.measure_count = 0
         self.coverage_measure_count = 0
         self.localize_measure_count = 0
+        self.opportunistic_revisit_count = 0
+        self.localization_inbound_distance_m = 0.0
         self.switch_count = 0
         self.clear_attempt_count = 0
         self.failed_clear_count = 0
@@ -297,13 +327,16 @@ class Q3Planner:
         self.cover_clear_count = 0
         self.fallback_clear_count = 0
         self.planning_time_s = 0.0
+        self.latest_planned_region_order: list[int] = []
+        self.completed_region_order: list[int] = []
+        self.route_plan_history: list[dict] = []
 
     def _station_order(self, station_index):
         channels = tuple(range(self.config.channel_min, self.config.channel_max + 1))
         return channels if station_index % 2 == 0 else tuple(reversed(channels))
 
     def _mark_upper_bound_absences(self):
-        if self.config.strategy == "v3_global":
+        if self.config.strategy in ("v3_global", "v4_cooperative"):
             known = sum(r.status in (ChannelStatus.DETECTED, ChannelStatus.CLEARED)
                         for r in self.channels.values())
             if known < self.config.source_count_upper_bound:
@@ -347,6 +380,55 @@ class Q3Planner:
         index = self.station_index + 1
         return self.stations[index] if index < len(self.stations) else None
 
+    @staticmethod
+    def _polygon_area(vertices):
+        if vertices is None or len(vertices) < 3:
+            return 0.0
+        points = np.asarray(vertices, dtype=float)
+        return abs(float(np.dot(points[:, 0], np.roll(points[:, 1], -1))
+                         - np.dot(points[:, 1], np.roll(points[:, 0], -1)))) / 2.0
+
+    def _region_metrics(self, record, plan=None):
+        if record.outer_vertices is None:
+            return {
+                "radius_m": None, "area_m2": None, "major_extent_m": None,
+                "minor_extent_m": None, "certified_clear_points": None,
+                "completion_upper_s": None, "quality_sufficient": False,
+            }
+        vertices = np.asarray(record.outer_vertices, dtype=float)
+        center = np.mean(vertices, axis=0)
+        centered = vertices - center
+        if len(vertices) >= 2:
+            covariance = centered.T @ centered
+            _, axes = np.linalg.eigh(covariance)
+            spans = np.ptp(centered @ axes, axis=0)
+            minor, major = sorted(map(float, spans))
+        else:
+            minor = major = 0.0
+        radius = (
+            record.radius_history_m[-1]
+            if record.radius_history_m
+            else float(np.linalg.norm(centered, axis=1).max())
+        )
+        point_count = plan.cover.point_count if plan is not None else None
+        completion = plan.cover.completion_upper_s if plan is not None else None
+        sufficient = bool(
+            plan is not None
+            and point_count <= self.config.quality_max_clear_points
+            and completion <= self.config.quality_max_completion_s
+            and radius <= self.config.quality_max_radius_m
+            and self._polygon_area(vertices) <= self.config.quality_max_area_m2
+        )
+        return {
+            "radius_m": float(radius),
+            "area_m2": self._polygon_area(vertices),
+            "major_extent_m": major,
+            "minor_extent_m": minor,
+            "certified_clear_points": point_count,
+            "completion_upper_s": completion,
+            "quality_sufficient": sufficient,
+        }
+
     def _set_plan(self, record, kind, points):
         self.active_plan_kind = kind
         self.active_plan_points = tuple(tuple(map(float, point)) for point in points)
@@ -364,7 +446,7 @@ class Q3Planner:
             self.session_status = SessionStatus.MODEL_OR_PROTOCOL_INCONSISTENCY
             record.geometry_failure_reason = "MISSING_DIRECTION_ANCHOR"
             return
-        if self.config.strategy == "v3_global":
+        if self.config.strategy in ("v3_global", "v4_cooperative"):
             self.phase = PlannerPhase.EMERGENCY_FALLBACK
             if record.geometry_failure_reason is None:
                 record.geometry_failure_reason = "NO_CERTIFIED_LOCAL_PLAN"
@@ -565,10 +647,212 @@ class Q3Planner:
         self.service_plans[record.channel] = plan
         return plan
 
+    def _opportunistic_revisit_action(self, record, station_id, deadline):
+        """Return a valuable fixed-station revisit, or log why it was skipped.
+
+        Guaranteed candidates use a continuous worst-response bound.  A station
+        that is not guaranteed to receive may still be tried when its feasible-
+        region centroid predicts useful cross-bearing information; no-signal is
+        then deliberately treated as non-geometric evidence.
+        """
+        station = tuple(self.stations[station_id])
+        if (
+            record.outer_vertices is None
+            or not record.geometry_valid
+            or record.near_position is not None
+        ):
+            return None
+        if any(distance(station, old) <= self.config.repeated_position_tolerance_m
+               for old in record.measured_positions):
+            return None
+        if any(row["station_id"] == station_id for row in record.revisit_decisions):
+            return None
+        continuation = (self.stations[station_id + 1]
+                        if station_id + 1 < len(self.stations) else None)
+        started = time.monotonic()
+        decision = {
+            "station_id": station_id,
+            "position": station,
+            "region_version": record.region_version,
+            "selected": False,
+        }
+        try:
+            baseline = build_cover_plan(
+                record.outer_vertices, station, continuation, max_points=100000,
+                preferred_orientations_deg=(record.anchor_bearing_deg,),
+                cell_limit_m=self.config.local_grid_cell_m,
+                clear_radius_m=self.config.safe_clear_radius_m,
+                speed_mps=self.config.speed_mps,
+                failed_clear_duration_s=self.config.failed_clear_duration_s,
+                successful_clear_duration_s=self.config.successful_clear_duration_s,
+            )
+            if baseline is None:
+                decision["reason"] = "NO_BASELINE_CERTIFICATE"
+                record.revisit_decisions.append(decision)
+                return None
+            center = np.mean(record.outer_vertices, axis=0)
+            center_point = (float(center[0]), float(center[1]))
+            ranges = np.linalg.norm(record.outer_vertices - np.asarray(station), axis=1)
+            guaranteed = is_safe_candidate(
+                station, record.outer_vertices,
+                self.config.minimum_receive_radius_m - 0.1,
+            )
+            center_range = distance(station, center_point)
+            possible = float(ranges.min()) <= self.config.maximum_receive_radius_m + 1e-7
+            predicted_points = baseline.point_count
+            predicted_service_s = baseline.completion_upper_s
+            basis = "GUARANTEED_CONTINUOUS_BOUND"
+            if guaranteed:
+                bound = completion_upper_bound(
+                    record.outer_vertices, station, continuation, self.config,
+                    current_position=station, error_deg=self.config.angle_half_width_deg,
+                    orientation_deg=record.anchor_bearing_deg,
+                    deadline_monotonic=deadline,
+                )
+                if bound is None:
+                    decision["reason"] = "NO_COMPLETION_BOUND"
+                    record.revisit_decisions.append(decision)
+                    return None
+                predicted_points = bound["worst_cover_point_count"]
+                predicted_service_s = bound["completion_upper_s"]
+            elif possible and center_range <= self.config.opportunistic_max_center_range_m:
+                basis = "CENTROID_DIRECTION_SCENARIO"
+                predicted_bearing = math.degrees(math.atan2(
+                    center[1] - station[1], center[0] - station[0])) % 360.0
+                updated = update_outer_region(
+                    record.outer_vertices,
+                    {"position": {"x": station[0], "y": station[1]},
+                     "svd_deg": predicted_bearing},
+                    self.config.angle_half_width_deg,
+                    self.config.maximum_receive_radius_m,
+                    self.config.circle_sides,
+                )
+                if updated["status"] != "BOUNDED":
+                    decision["reason"] = "PREDICTED_REGION_INVALID"
+                    record.revisit_decisions.append(decision)
+                    return None
+                predicted = build_cover_plan(
+                    updated["vertices"], station, continuation, max_points=100000,
+                    preferred_orientations_deg=(record.anchor_bearing_deg,),
+                    cell_limit_m=self.config.local_grid_cell_m,
+                    clear_radius_m=self.config.safe_clear_radius_m,
+                    speed_mps=self.config.speed_mps,
+                    failed_clear_duration_s=self.config.failed_clear_duration_s,
+                    successful_clear_duration_s=self.config.successful_clear_duration_s,
+                )
+                if predicted is None:
+                    decision["reason"] = "NO_PREDICTED_CERTIFICATE"
+                    record.revisit_decisions.append(decision)
+                    return None
+                predicted_points = predicted.point_count
+                predicted_service_s = predicted.completion_upper_s
+            else:
+                decision.update({
+                    "reason": "LOW_RECEPTION_VALUE",
+                    "guaranteed_receive": guaranteed,
+                    "center_range_m": center_range,
+                    "minimum_region_range_m": float(ranges.min()),
+                })
+                record.revisit_decisions.append(decision)
+                return None
+            center_bearing = math.degrees(math.atan2(
+                center[1] - station[1], center[0] - station[0])) % 360.0
+            crossing = abs(((center_bearing - record.anchor_bearing_deg + 90.0) % 180.0) - 90.0)
+            switch_s = (self.current_channel != record.channel) * self.config.switch_duration_s
+            action_s = self.config.measure_duration_s + switch_s
+            if guaranteed:
+                net_saving = baseline.completion_upper_s - predicted_service_s - switch_s
+            else:
+                net_saving = baseline.completion_upper_s - predicted_service_s - action_s
+            selected = (
+                crossing >= 5.0
+                and predicted_points < baseline.point_count
+                and net_saving >= self.config.opportunistic_min_net_saving_s
+            )
+            decision.update({
+                "selected": selected,
+                "reason": "POSITIVE_NET_VALUE" if selected else "INSUFFICIENT_NET_VALUE",
+                "basis": basis,
+                "guaranteed_receive": guaranteed,
+                "center_range_m": center_range,
+                "crossing_angle_deg": crossing,
+                "baseline_clear_points": baseline.point_count,
+                "predicted_clear_points": predicted_points,
+                "baseline_completion_upper_s": baseline.completion_upper_s,
+                "predicted_completion_upper_s": predicted_service_s,
+                "measurement_and_switch_cost_s": action_s,
+                "net_saving_s": net_saving,
+            })
+            record.revisit_decisions.append(decision)
+            if not selected:
+                return None
+            return Q3Action(
+                "MEASURE", station, record.channel, "VALUABLE_FIXED_STATION_REVISIT",
+                station_id=station_id,
+                purpose=MeasurePurpose.OPPORTUNISTIC_REVISIT.value,
+                region_version=record.region_version,
+                decision_budget=decision.copy(),
+            )
+        except (ValueError, ArithmeticError, np.linalg.LinAlgError) as exc:
+            decision.update({"reason": f"REVISIT_SCORING_ERROR: {exc}"})
+            record.revisit_decisions.append(decision)
+            return None
+        finally:
+            self.planning_time_s += time.monotonic() - started
+
+    def _task_route_cost(self, order):
+        position = self.current_position
+        channel = self.current_channel
+        total = 0.0
+        for task in order:
+            total += distance(position, task.position) / self.config.speed_mps
+            total += (channel != task.channel) * self.config.switch_duration_s
+            total += task.intrinsic_upper_s
+            position = task.exit_position or task.position
+            channel = task.channel
+        return total
+
+    def _optimize_task_route(self, tasks):
+        """Nearest insertion followed by deterministic 2-opt over all regions."""
+        remaining = list(tasks)
+        order = []
+        position, channel = self.current_position, self.current_channel
+        while remaining:
+            task = min(
+                remaining,
+                key=lambda row: (
+                    distance(position, row.position) / self.config.speed_mps
+                    + (channel != row.channel) * self.config.switch_duration_s
+                    + row.intrinsic_upper_s,
+                    row.channel, row.kind, row.position,
+                ),
+            )
+            order.append(task)
+            remaining.remove(task)
+            position = task.exit_position or task.position
+            channel = task.channel
+        best_cost = self._task_route_cost(order)
+        improved = True
+        while improved and len(order) >= 3:
+            improved = False
+            for left in range(len(order) - 1):
+                for right in range(left + 2, len(order) + 1):
+                    candidate = order[:left] + list(reversed(order[left:right])) + order[right:]
+                    cost = self._task_route_cost(candidate)
+                    if cost + 1e-9 < best_cost:
+                        order, best_cost, improved = candidate, cost, True
+                        break
+                if improved:
+                    break
+        return order, best_cost
+
     def _global_detection_tasks(self, record, continuation, deadline):
         if record.near_position is not None or record.outer_vertices is None \
                 or record.extra_measure_count >= self.config.max_extra_measurements_per_source \
-                or self._weak_recent_updates(record):
+                or (
+                    self.config.strategy != "v4_cooperative"
+                    and self._weak_recent_updates(record)
+                ):
             return []
         if record.detection_score_version != record.region_version:
             record.detection_scores = []
@@ -601,11 +885,19 @@ class Q3Planner:
             cost += (self.current_channel != record.channel) * self.config.switch_duration_s
             if continuation is not None:
                 cost += max(distance(p, continuation) for p in row["possible_exit_points"]) / self.config.speed_mps
-            tasks.append(Task(record.channel, "LOCALIZE", point, cost, continuation, score=row))
+            tasks.append(Task(
+                record.channel, "LOCALIZE", point, cost, continuation, score=row,
+                exit_position=point,
+                intrinsic_upper_s=max(
+                    self.config.measure_duration_s,
+                    row["completion_upper_s"] - row["movement_time_s"],
+                ),
+            ))
         return tasks
 
     def _select_global_task(self, deadline):
         tasks = []
+        cooperative = self.config.strategy == "v4_cooperative"
         # Materialize feasible entries before lookahead; never use a true source
         # coordinate or a future successful clear position as the next entry.
         for channel in sorted(self.pending_sources):
@@ -621,7 +913,7 @@ class Q3Planner:
             self.planning_time_s += time.monotonic()-started
         for channel in sorted(self.pending_sources):
             record = self.channels[channel]
-            continuation = self._global_continuation(record)
+            continuation = None if cooperative else self._global_continuation(record)
             started = time.monotonic()
             try:
                 plan = self._global_cover(record, continuation) if record.geometry_valid else None
@@ -633,13 +925,53 @@ class Q3Planner:
                 record.geometry_failure_reason = f"GLOBAL_GEOMETRY_ERROR: {exc}"
                 plan, detect_tasks = None, []
             self.planning_time_s += time.monotonic() - started
-            tasks.extend(detect_tasks)
+            quality = self._region_metrics(record, plan)
+            clear_task = None
             if plan is not None:
-                # Large regions first receive a safe measurement if one remains.
-                if plan.cover.point_count <= self.config.max_optimized_clear_attempts_per_source or not detect_tasks:
-                    tasks.append(Task(channel, "CLEAR", plan.cover.entry_point,
-                                      plan.cover.completion_upper_s, continuation, service_plan=plan))
-            elif not detect_tasks:
+                points = plan.cover.points
+                internal_distance = sum(
+                    distance(a, b) for a, b in zip(points[:-1], points[1:])
+                )
+                intrinsic = (
+                    internal_distance / self.config.speed_mps
+                    + max(0, len(points) - 1) * self.config.failed_clear_duration_s
+                    + self.config.successful_clear_duration_s
+                )
+                clear_task = Task(
+                    channel, "CLEAR", plan.cover.entry_point,
+                    plan.cover.completion_upper_s, continuation,
+                    service_plan=plan, exit_position=plan.cover.exit_point,
+                    intrinsic_upper_s=intrinsic, quality=quality,
+                )
+            if cooperative:
+                # One preferred action per region is enough for the joint route.
+                # Poor regions are shrunk first unless a one-point clear is ready.
+                if clear_task is not None and (
+                        clear_task.service_plan.cover.point_count == 1
+                        or quality["quality_sufficient"]
+                        or not detect_tasks):
+                    tasks.append(clear_task)
+                elif detect_tasks:
+                    best_detection = min(
+                        detect_tasks,
+                        key=lambda row: (
+                            row.completion_upper_s, row.channel, row.position,
+                        ),
+                    )
+                    tasks.append(Task(
+                        **{**best_detection.__dict__, "quality": quality}
+                    ))
+                elif clear_task is not None:
+                    tasks.append(clear_task)
+            else:
+                tasks.extend(detect_tasks)
+                if clear_task is not None:
+                    # Large regions first receive a safe measurement if one remains.
+                    if (plan.cover.point_count
+                            <= self.config.max_optimized_clear_attempts_per_source
+                            or not detect_tasks):
+                        tasks.append(clear_task)
+            if plan is None and not detect_tasks:
                 record.geometry_failure_reason = record.geometry_failure_reason or "NO_CERTIFIED_LOCAL_PLAN"
                 anchor = record.anchor_position or self.current_position
                 # Exceptional task only; the strip is not a competing normal plan.
@@ -652,15 +984,42 @@ class Q3Planner:
                             + self.config.successful_clear_duration_s)
                 else:
                     cost = 0.0  # immediately expose an unrecoverable missing anchor
-                tasks.append(Task(channel, "FALLBACK", anchor, cost, continuation))
+                tasks.append(Task(
+                    channel, "FALLBACK", anchor, cost, continuation,
+                    exit_position=anchor, intrinsic_upper_s=cost, quality=quality,
+                ))
         if not tasks:
             return None
-        task = min(tasks, key=lambda item: (item.completion_upper_s, item.channel, item.kind, item.position))
+        if cooperative:
+            route, route_cost = self._optimize_task_route(tasks)
+            task = route[0]
+            self.latest_planned_region_order = [row.channel for row in route]
+            route_row = {
+                "selected_channel": task.channel,
+                "selected_kind": task.kind,
+                "region_order": self.latest_planned_region_order.copy(),
+                "route_upper_s": route_cost,
+                "region_versions": {
+                    str(row.channel): self.channels[row.channel].region_version
+                    for row in route
+                },
+            }
+            self.route_plan_history.append(route_row)
+        else:
+            route_cost = None
+            task = min(tasks, key=lambda item: (
+                item.completion_upper_s, item.channel, item.kind, item.position,
+            ))
         self.task_history.append({"channel": task.channel, "kind": task.kind,
                                   "position": task.position,
                                   "completion_upper_s": task.completion_upper_s,
                                   "continuation_target": task.continuation_target,
-                                  "candidate_count": len(tasks)})
+                                  "candidate_count": len(tasks),
+                                  "quality": task.quality,
+                                  "planned_region_order":
+                                      self.latest_planned_region_order.copy()
+                                      if cooperative else None,
+                                  "joint_route_upper_s": route_cost})
         return task
 
     def _propose_global(self, deadline):
@@ -673,12 +1032,24 @@ class Q3Planner:
             order = self._station_order(self.station_index)
             while self.scan_cursor < len(order):
                 channel = order[self.scan_cursor]
-                if self.channels[channel].status != ChannelStatus.UNKNOWN:
+                record = self.channels[channel]
+                if record.status == ChannelStatus.UNKNOWN:
+                    return Q3Action(
+                        "MEASURE", self.stations[self.station_index], channel,
+                        "SEVEN_STATION_COVERAGE_SCAN",
+                        station_id=self.station_index,
+                        purpose=MeasurePurpose.COVERAGE_SCAN.value,
+                    )
+                if (self.config.strategy == "v4_cooperative"
+                        and record.status == ChannelStatus.DETECTED):
+                    action = self._opportunistic_revisit_action(
+                        record, self.station_index, deadline,
+                    )
+                    if action is not None:
+                        return action
                     self.scan_cursor += 1
                     continue
-                return Q3Action("MEASURE", self.stations[self.station_index], channel,
-                                "SEVEN_STATION_COVERAGE_SCAN", station_id=self.station_index,
-                                purpose=MeasurePurpose.COVERAGE_SCAN.value)
+                self.scan_cursor += 1
             self.station_index += 1
             self.scan_cursor = 0
         self.phase = PlannerPhase.LOCALIZE_SERVICE
@@ -698,7 +1069,15 @@ class Q3Planner:
                             decision_budget={"completion_upper_s": task.completion_upper_s,
                                              "predicted_continuous_radius_upper_m": task.score["worst_updated_cover_radius_m"],
                                              "worst_cover_point_count": task.score["worst_cover_point_count"],
-                                             "selection_mode": "v3_global_completion_upper_bound"})
+                                             "selection_mode":
+                                                 "v4_cooperative_completion_upper_bound"
+                                                 if self.config.strategy == "v4_cooperative"
+                                                 else "v3_global_completion_upper_bound",
+                                             "quality_before": task.quality,
+                                             "planned_region_order":
+                                                 self.latest_planned_region_order.copy()
+                                                 if self.config.strategy == "v4_cooperative"
+                                                 else None})
         if task.kind == "CLEAR":
             self.phase = PlannerPhase.ROUTE_EXECUTION
             self.cover_plan_history.append(task.service_plan.as_dict())
@@ -719,7 +1098,7 @@ class Q3Planner:
             self.pending_action = self._finish_action(self.session_status.value)
             return self.pending_action
         self._mark_upper_bound_absences()
-        if self.config.strategy == "v3_global":
+        if self.config.strategy in ("v3_global", "v4_cooperative"):
             self.pending_action = self._propose_global(deadline_monotonic)
             return self.pending_action
         if self.active_service_channel is not None:
@@ -807,6 +1186,7 @@ class Q3Planner:
         record.outer_vertices = np.asarray(region["vertices"], dtype=float)
         record.region_version = 1
         record.radius_history_m.append(region["minimum_enclosing_circle"]["radius_m"])
+        record.region_area_history_m2.append(self._polygon_area(record.outer_vertices))
 
     def _append_direction(self, record, action, bearing):
         observation = {"position": {"x": action.position[0], "y": action.position[1]},
@@ -824,6 +1204,37 @@ class Q3Planner:
         record.outer_vertices = np.asarray(updated["vertices"], dtype=float)
         record.region_version += 1
         record.radius_history_m.append(updated["minimum_enclosing_circle"]["radius_m"])
+        record.region_area_history_m2.append(self._polygon_area(record.outer_vertices))
+
+    def _audit_region_snapshot(self, record, position):
+        plan = None
+        if (
+            record.near_position is None
+            and record.geometry_valid
+            and record.outer_vertices is not None
+        ):
+            try:
+                cover = build_cover_plan(
+                    record.outer_vertices, position, None, max_points=100000,
+                    preferred_orientations_deg=(record.anchor_bearing_deg,),
+                    cell_limit_m=self.config.local_grid_cell_m,
+                    clear_radius_m=self.config.safe_clear_radius_m,
+                    speed_mps=self.config.speed_mps,
+                    failed_clear_duration_s=self.config.failed_clear_duration_s,
+                    successful_clear_duration_s=self.config.successful_clear_duration_s,
+                )
+                if cover is not None:
+                    plan = ServicePlan(record.channel, record.region_version, cover)
+            except (ValueError, ArithmeticError, np.linalg.LinAlgError):
+                plan = None
+        metrics = self._region_metrics(record, plan)
+        if record.near_position is not None:
+            metrics.update({
+                "certified_clear_points": 1,
+                "completion_upper_s": self.config.successful_clear_duration_s,
+                "quality_sufficient": True,
+            })
+        return metrics
 
     def apply_measure_result(self, action, result, svd_deg=None):
         """Apply one accepted coverage or localization response exactly once."""
@@ -840,12 +1251,36 @@ class Q3Planner:
         else:
             bearing = None
         purpose = action.purpose or MeasurePurpose.COVERAGE_SCAN.value
-        if purpose not in (MeasurePurpose.COVERAGE_SCAN.value, MeasurePurpose.LOCALIZE.value):
+        if purpose not in (
+                MeasurePurpose.COVERAGE_SCAN.value,
+                MeasurePurpose.OPPORTUNISTIC_REVISIT.value,
+                MeasurePurpose.LOCALIZE.value):
             raise ValueError("invalid measure purpose")
-        if purpose == MeasurePurpose.COVERAGE_SCAN.value and action.station_id is None:
-            raise ValueError("coverage scan requires station_id")
+        if (
+            purpose in (
+                MeasurePurpose.COVERAGE_SCAN.value,
+                MeasurePurpose.OPPORTUNISTIC_REVISIT.value,
+            )
+            and action.station_id is None
+        ):
+            raise ValueError("fixed-station measurement requires station_id")
         if purpose == MeasurePurpose.LOCALIZE.value and action.station_id is not None:
             raise ValueError("localization measurement cannot carry station_id")
+        record = self.channels[action.channel]
+        before = (
+            self._audit_region_snapshot(record, self.current_position)
+            if (
+                self.config.strategy == "v4_cooperative"
+                and purpose in (
+                    MeasurePurpose.OPPORTUNISTIC_REVISIT.value,
+                    MeasurePurpose.LOCALIZE.value,
+                )
+            )
+            else None
+        )
+        inbound_distance = distance(self.current_position, action.position)
+        if purpose == MeasurePurpose.LOCALIZE.value:
+            self.localization_inbound_distance_m += inbound_distance
         self._move_to(action.position)
         if self.current_channel != action.channel:
             self.current_channel = action.channel
@@ -853,7 +1288,6 @@ class Q3Planner:
             self.virtual_time_s += self.config.switch_duration_s
         self.virtual_time_s += self.config.measure_duration_s
         self.measure_count += 1
-        record = self.channels[action.channel]
         if purpose == MeasurePurpose.COVERAGE_SCAN.value:
             self.coverage_measure_count += 1
             self.scan_cursor += 1
@@ -866,37 +1300,71 @@ class Q3Planner:
                 if record.status != ChannelStatus.UNKNOWN:
                     raise ValueError("coverage discovery requires an UNKNOWN channel")
                 record.status = ChannelStatus.DETECTED
+                record.detected_at_virtual_s = self.virtual_time_s
                 self._check_source_count_consistency()
                 if result == "direction":
-                    if self.config.strategy in ("v2_local", "v3_global"):
+                    if self.config.strategy in ("v2_local", "v3_global", "v4_cooperative"):
                         try:
                             self._initialize_direction(record, action, bearing)
                         except (ValueError, ArithmeticError, np.linalg.LinAlgError) as exc:
                             record.geometry_valid = False
                             record.geometry_failure_reason = f"INITIAL_GEOMETRY_ERROR: {exc}"
+                        record.fixed_direction_station_ids.add(action.station_id)
                     else:
                         record.anchor_position = action.position
                         record.anchor_bearing_deg = bearing
                     if self.config.strategy == "b0_serial":
                         self.active_service_channel = record.channel
                         self._activate_fallback(record)
-                    elif self.config.strategy == "v3_global":
+                    elif self.config.strategy in ("v3_global", "v4_cooperative"):
                         self.pending_sources.add(record.channel)
                     else:
                         self.batch_channels.append(record.channel)
                 else:
-                    if self.config.strategy == "v3_global":
+                    if self.config.strategy in ("v3_global", "v4_cooperative"):
                         record.near_position = action.position
                         record.measured_positions.append(action.position)
                         self.pending_sources.add(record.channel)
                     else:
                         self.active_service_channel = record.channel
                         self._set_plan(record, "NEAR_SOURCE", (action.position,))
+        elif purpose == MeasurePurpose.OPPORTUNISTIC_REVISIT.value:
+            self.opportunistic_revisit_count += 1
+            record.revisit_measure_count += 1
+            self.scan_cursor += 1
+            if result == "no_signal":
+                # A revisit is not part of the seven-station absence proof.
+                # Without a non-convex representation this response is logged
+                # but cannot safely shrink the current convex outer region.
+                record.revisit_no_signal_station_ids.add(action.station_id)
+            elif result == "near":
+                record.near_position = action.position
+                record.measured_positions.append(action.position)
+            else:
+                try:
+                    self._append_direction(record, action, bearing)
+                    record.fixed_direction_station_ids.add(action.station_id)
+                except (ValueError, ArithmeticError, np.linalg.LinAlgError) as exc:
+                    record.geometry_valid = False
+                    record.geometry_failure_reason = f"REVISIT_GEOMETRY_ERROR: {exc}"
+            record.service_plan = None
+            self.service_plans.pop(record.channel, None)
+            after = self._audit_region_snapshot(record, action.position)
+            record.localization_events.append({
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": action.station_id,
+                "position": action.position,
+                "response": result,
+                "before": before,
+                "after": after,
+                "inbound_distance_m": inbound_distance,
+                "decision": action.decision_budget,
+            })
         else:
             self.localize_measure_count += 1
             record.extra_measure_count += 1
             self._record_optimization_point(record, action.position)
-            if self.config.strategy == "v3_global":
+            if self.config.strategy in ("v3_global", "v4_cooperative"):
                 record.service_plan = None
                 self.service_plans.pop(record.channel, None)
             if result == "no_signal":
@@ -905,7 +1373,7 @@ class Q3Planner:
                 self._activate_fallback(record)
             elif result == "near":
                 record.measured_positions.append(action.position)
-                if self.config.strategy == "v3_global":
+                if self.config.strategy in ("v3_global", "v4_cooperative"):
                     record.near_position = action.position
                     plan = self._global_cover(record, self._global_continuation(record))
                     self.cover_plan_history.append(plan.as_dict())
@@ -914,25 +1382,40 @@ class Q3Planner:
             else:
                 try:
                     self._append_direction(record, action, bearing)
+                    record.adaptive_direction_count += 1
                 except (ValueError, ArithmeticError, np.linalg.LinAlgError) as exc:
                     record.geometry_valid = False
                     record.geometry_failure_reason = f"UPDATE_GEOMETRY_ERROR: {exc}"
                 self.active_plan_kind = None
                 self.active_plan_points = ()
                 self.active_plan_index = 0
-                if self.config.strategy == "v3_global":
+                if self.config.strategy in ("v3_global", "v4_cooperative"):
                     self.active_service_channel = None
                     self.active_task = None
                     record.service_plan = None
                     self.service_plans.pop(record.channel, None)
                     self.phase = PlannerPhase.LOCALIZE_SERVICE
+            if self.config.strategy == "v4_cooperative":
+                after = self._audit_region_snapshot(record, action.position)
+                record.localization_events.append({
+                    "origin": "ADAPTIVE_SAFE_POINT",
+                    "station_id": None,
+                    "position": action.position,
+                    "response": result,
+                    "before": before,
+                    "after": after,
+                    "inbound_distance_m": inbound_distance,
+                    "decision": action.decision_budget,
+                })
         self.pending_action = None
 
     def _finish_channel(self, record, position):
         record.status = ChannelStatus.CLEARED
         record.service_phase = ServicePhase.NONE
         record.clear_position = position
+        record.cleared_at_virtual_s = self.virtual_time_s
         self.successful_clear_count += 1
+        self.completed_region_order.append(record.channel)
         self.pending_sources.discard(record.channel)
         self.service_plans.pop(record.channel, None)
         record.service_plan = None
@@ -999,6 +1482,42 @@ class Q3Planner:
         }
         average = (self.virtual_time_s / self.successful_clear_count
                    if self.successful_clear_count else None)
+        source_times = {
+            str(record.channel): record.cleared_at_virtual_s - record.detected_at_virtual_s
+            for record in self.channels.values()
+            if record.cleared_at_virtual_s is not None
+            and record.detected_at_virtual_s is not None
+        }
+        source_diagnostics = {}
+        for record in self.channels.values():
+            if record.status not in (ChannelStatus.DETECTED, ChannelStatus.CLEARED):
+                continue
+            source_diagnostics[str(record.channel)] = {
+                "fixed_station_direction_count": len(record.fixed_direction_station_ids),
+                "fixed_direction_station_ids":
+                    sorted(record.fixed_direction_station_ids),
+                "adaptive_direction_count": record.adaptive_direction_count,
+                "total_direction_count": len(record.observations),
+                "revisit_measure_count": record.revisit_measure_count,
+                "revisit_no_signal_station_ids":
+                    sorted(record.revisit_no_signal_station_ids),
+                "initial_region_radius_m":
+                    record.radius_history_m[0] if record.radius_history_m else None,
+                "final_region_radius_m":
+                    record.radius_history_m[-1] if record.radius_history_m else None,
+                "initial_region_area_m2":
+                    record.region_area_history_m2[0]
+                    if record.region_area_history_m2 else None,
+                "final_region_area_m2":
+                    record.region_area_history_m2[-1]
+                    if record.region_area_history_m2 else None,
+                "localization_point_sources":
+                    [event["origin"] for event in record.localization_events],
+                "localization_events": record.localization_events,
+                "revisit_decisions": record.revisit_decisions,
+                "service_time_s": source_times.get(str(record.channel)),
+            }
+        source_time_values = list(source_times.values())
         return {
             "strategy": self.config.strategy,
             "session_status": self.session_status.value,
@@ -1013,6 +1532,9 @@ class Q3Planner:
             "measure_count": self.measure_count,
             "coverage_measure_count": self.coverage_measure_count,
             "localize_measure_count": self.localize_measure_count,
+            "opportunistic_revisit_count": self.opportunistic_revisit_count,
+            "localization_inbound_distance_m":
+                self.localization_inbound_distance_m,
             "switch_count": self.switch_count,
             "clear_attempt_count": self.clear_attempt_count,
             "failed_clear_count": self.failed_clear_count,
@@ -1025,6 +1547,19 @@ class Q3Planner:
             "local_cover_plan_point_counts": [p["point_count"] for p in self.cover_plan_history],
             "pending_sources": sorted(self.pending_sources),
             "task_selection_count": len(self.task_history),
+            "latest_planned_region_order":
+                self.latest_planned_region_order.copy(),
+            "final_region_visit_order": self.completed_region_order.copy(),
+            "route_plan_history": self.route_plan_history,
+            "source_diagnostics": source_diagnostics,
+            "source_service_times_s": source_times,
+            "p95_source_service_time_s": (
+                float(np.percentile(source_time_values, 95))
+                if source_time_values else None
+            ),
+            "max_source_service_time_s": (
+                max(source_time_values) if source_time_values else None
+            ),
             "batch_channels": tuple(self.batch_channels),
             "current_position": self.current_position,
             "current_channel": self.current_channel,
@@ -1105,7 +1640,7 @@ def q3_v2_upper_bounds(config=None):
 
 
 def q3_global_upper_bounds(config=None):
-    """Loose finite bound; B0's return-to-scan argument does not apply to V3."""
+    """Loose finite bound for V3/V4; not a performance prediction."""
     config = config or Q3Config()
     _validate_config(config)
     outer_radius = min(config.target_radius_m, config.maximum_receive_radius_m) / math.cos(math.pi/config.circle_sides)
@@ -1114,6 +1649,8 @@ def q3_global_upper_bounds(config=None):
     scan_count = 7 * (config.channel_max-config.channel_min+1)
     strip_count = len(strip_clear_points((0., 0.), 0., config.strip_max_range_m,
                                         config.strip_step_m, config.strip_offsets_m))
+    # At each fixed station/channel pair V4 performs at most one scan or one
+    # revisit, so the same 7*20 fixed-measurement bound covers both.
     measures = scan_count + source_count*config.max_extra_measurements_per_source
     clears = source_count*(grid_count+strip_count)
     # Source envelopes are inside the circumscribed target disk. Safe points
@@ -1123,7 +1660,7 @@ def q3_global_upper_bounds(config=None):
                         + max(map(abs, config.strip_offsets_m)),
                         2*target_outer, target_outer+config.minimum_receive_radius_m)
     distance_bound = 2*position_norm*(measures+clears)
-    return {"strategy_scope": "v3_global_finite_loose_bound_not_performance_prediction",
+    return {"strategy_scope": "v3_or_v4_global_finite_loose_bound_not_performance_prediction",
             "local_grid_point_bound_per_source": grid_count,
             "logical_request_count_including_enter_exit": 2+measures+clears,
             "distance_bound_m": distance_bound,

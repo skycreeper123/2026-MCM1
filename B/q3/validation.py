@@ -1,4 +1,4 @@
-"""Seeded, paired offline Q3 validation. Hidden truth belongs ONLY to this harness.
+"""Seeded, paired V3/V4 Q3 validation. Hidden truth belongs ONLY to this harness.
 
 Run: python -m B.q3.validation --cases 24
 Optional one-factor matrix: python -m B.q3.validation --cases 6 --matrix
@@ -99,7 +99,7 @@ def run_case(case, config, keep_trace=False):
                 truth_checks += 1
                 assert inside_region(record.outer_vertices, source["position"]), (case["case_id"], action)
         else:
-            if config.strategy == "v3_global":
+            if config.strategy in ("v3_global", "v4_cooperative"):
                 assert planner.station_index == len(planner.stations), "service before discovery completion"
             if record.service_plan is not None and record.near_position is None:
                 certificate_checks += 1
@@ -132,30 +132,40 @@ def run_case(case, config, keep_trace=False):
 
 def aggregate(rows):
     averages = np.asarray([r["average_clear_time_s"] for r in rows])
+    source_times = [
+        value
+        for row in rows
+        for value in row["source_service_times_s"].values()
+    ]
     return {"case_count": len(rows), "source_count": sum(r["source_count"] for r in rows),
             "clear_rate": sum(r["cleared_count"] for r in rows)/sum(r["source_count"] for r in rows),
             "mean_average_clear_time_s": float(averages.mean()),
             "weighted_average_clear_time_s": sum(r["virtual_time_s"] for r in rows)/sum(r["source_count"] for r in rows),
             "p95_average_clear_time_s": float(np.percentile(averages, 95)),
             "max_average_clear_time_s": float(averages.max()),
+            "p95_source_service_time_s": float(np.percentile(source_times, 95)),
+            "max_source_service_time_s": float(max(source_times)),
             **{key: sum(r[key] for r in rows) for key in
                ("virtual_time_s", "distance_m", "failed_clear_count", "fallback_source_count",
-                "fallback_clear_count", "localize_measure_count", "planning_time_s", "wall_time_s",
+                "fallback_clear_count", "measure_count", "localize_measure_count",
+                "opportunistic_revisit_count", "localization_inbound_distance_m",
+                "planning_time_s", "wall_time_s",
                 "safety_checks", "truth_checks", "certificate_checks")},
             "local_cover_plan_point_counts": [n for r in rows for n in r["local_cover_plan_point_counts"]]}
 
 
 def configurations(matrix=False):
-    # V2 comparison uses its recorded old settings, with shared geometry fixes.
-    variants = {"v2_local": Q3Config(strategy="v2_local", max_optimized_clear_attempts_per_source=8,
-                                     q2_candidate_limit=12, q2_calculation_time_limit_s=1.0,
-                                     minimum_radius_improvement_fraction=0.05),
-                "v3_global": Q3Config()}
+    # V3 is frozen as the paired baseline; every V4 variant uses the same maps.
+    variants = {
+        "v3_global": Q3Config(strategy="v3_global"),
+        "v4_cooperative": Q3Config(strategy="v4_cooperative"),
+    }
     if matrix:
         for field, values in {
             "max_optimized_clear_attempts_per_source": (8, 12, 24),
-            "max_extra_measurements_per_source": (2, 4),
-            "minimum_radius_improvement_fraction": (0.05, 0.10),
+            "max_extra_measurements_per_source": (3, 4),
+            "quality_max_clear_points": (3, 6),
+            "opportunistic_min_net_saving_s": (0.0, 5.0),
             "q2_candidate_limit": (12, 24),
         }.items():
             for value in values:
@@ -178,7 +188,7 @@ def main(argv=None):
     input_hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                     for p in Path(__file__).parent.glob("*.py")}
     if args.output is None:
-        args.output = Path(__file__).with_name("validation_results_v3")
+        args.output = Path(__file__).with_name("validation_results_v4")
         if args.matrix:
             args.output = args.output / "matrix"
     args.output.mkdir(parents=True, exist_ok=True)
@@ -190,22 +200,27 @@ def main(argv=None):
                   f"average={result['average_clear_time_s']:.3f}s failures={result['failed_clear_count']} "
                   f"fallback={result['fallback_source_count']}", flush=True)
     summaries = {name: aggregate(value) for name, value in rows.items()}
-    old, new = summaries["v2_local"], summaries["v3_global"]
-    performance_pass = (new["clear_rate"] >= old["clear_rate"] and
-                        new["failed_clear_count"] < old["failed_clear_count"] and
-                        new["fallback_source_count"] <= old["fallback_source_count"] and
-                        any(new[k] < 0.95*old[k] for k in
-                            ("mean_average_clear_time_s", "p95_average_clear_time_s", "max_average_clear_time_s")) and
-                        all(new[k] <= 1.10*old[k] for k in
-                            ("mean_average_clear_time_s", "p95_average_clear_time_s", "max_average_clear_time_s")))
-    result = {"algorithm_version": 3, "python": platform.python_version(),
+    old, new = summaries["v3_global"], summaries["v4_cooperative"]
+    time_metrics = (
+        "weighted_average_clear_time_s",
+        "p95_source_service_time_s",
+        "max_source_service_time_s",
+    )
+    performance_pass = (
+        new["clear_rate"] >= old["clear_rate"]
+        and new["failed_clear_count"] < old["failed_clear_count"]
+        and new["fallback_source_count"] <= old["fallback_source_count"]
+        and any(new[key] < 0.95 * old[key] for key in time_metrics)
+        and all(new[key] <= 1.10 * old[key] for key in time_metrics)
+    )
+    result = {"algorithm_version": 4, "python": platform.python_version(),
               "scope": "paired synthetic offline worlds; not official simulator runs",
-              "baseline": "v2_local old parameters with current shared geometry fixes",
+              "baseline": "v3_global with current shared geometry fixes",
               "cases": cases, "configs": {k: asdict(v) for k, v in variants.items()},
               "input_sha256": input_hashes,
               "rows": rows, "aggregate": summaries,
               "performance_acceptance": performance_pass,
-              "performance_thresholds": "one time metric improves >=5%; other times regress <=10%; fewer failures; no increased fallback",
+              "performance_thresholds": "one of weighted/P95-source/max-source time improves >=5%; the others regress <=10%; fewer failures; no increased fallback",
               "correctness_acceptance": True}
     (args.output/"paired_results.json").write_text(json.dumps(result, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     print(json.dumps({"aggregate": {k: {f: v for f, v in a.items() if f != "local_cover_plan_point_counts"}
