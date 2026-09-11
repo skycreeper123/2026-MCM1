@@ -1,0 +1,66 @@
+{
+  "completed": true,
+  "task_completed": true,
+  "exit_accepted": true,
+  "entered": true,
+  "error": null,
+  "exit_response": {
+    "accepted": true,
+    "real_timestamp_ms": 1789120595802,
+    "virtual_time_s": 4456.029028,
+    "exit_reason": "user_exit"
+  },
+  "planner_summary": {
+    "strategy": "v3_global",
+    "session_status": "EXITED",
+    "planner_phase": "ROUTE_EXECUTION",
+    "completion_reason": "ALL_CHANNELS_RESOLVED",
+    "completion_certificate": true,
+    "channel_counts": {
+      "UNKNOWN": 0,
+      "DETECTED": 0,
+      "CLEARED": 13,
+      "ABSENT": 7
+    },
+    "cleared_count": 13,
+    "virtual_time_s": 4456.029029858117,
+    "average_clear_time_s": 342.77146383523973,
+    "distance_m": 19500.145149290587,
+    "measure_count": 82,
+    "coverage_measure_count": 68,
+    "localize_measure_count": 14,
+    "switch_count": 75,
+    "clear_attempt_count": 15,
+    "failed_clear_count": 2,
+    "cover_clear_count": 15,
+    "fallback_clear_count": 0,
+    "planning_time_s": 7.514999999955762,
+    "fallback_source_count": 0,
+    "fallback_reasons": {},
+    "local_cover_plan_point_counts": [
+      2,
+      1,
+      4,
+      2,
+      4,
+      1,
+      1,
+      2,
+      2,
+      1,
+      2,
+      1,
+      1
+    ],
+    "pending_sources": [],
+    "task_selection_count": 27,
+    "batch_channels": [],
+    "current_position": [
+      -1136.928932181969,
+      732.4357635095657
+    ],
+    "current_channel": 2
+  },
+  "action_count": 98,
+  "jsonl_log": "F:\\ivo_zheng\\26_CUMCM\\B\\q3\\runs\\q3-20260911-175622-56b44046.jsonl"
+}
