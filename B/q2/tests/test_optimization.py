@@ -1,6 +1,9 @@
 """Regression checks for multi-start ranking and continuous region predicates."""
 from dataclasses import asdict, replace
 import unittest
+import json
+from pathlib import Path
+import tempfile
 
 import numpy as np
 
@@ -13,6 +16,26 @@ from B.q2.validation import reference_circle
 
 
 class OptimizationTests(unittest.TestCase):
+    def test_saved_baseline_matches_observation_not_case_number(self):
+        from B.q2.optimization_validation import load_saved_baselines
+        first = {'position': {'x': -1000., 'y': 0.}, 'svd_deg': .5}
+        old = {'status': 'OK', 'algorithm_version': 2, 'selected': {'position': {'x': -110., 'y': -448.}}}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)/'baseline.json'
+            path.write_text(json.dumps({'records': [{'case': {'case': 1, 'first': first}, 'old': old}]}), encoding='utf-8')
+            results, metadata = load_saved_baselines(path, [{'case': 99, 'first': first}])
+        self.assertEqual(results, [old])
+        self.assertTrue(metadata['old_elapsed_times_are_historical'])
+        self.assertEqual(len(metadata['source_sha256']), 64)
+
+    def test_saved_baseline_rejects_an_unmatched_observation(self):
+        from B.q2.optimization_validation import load_saved_baselines
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)/'baseline.json'
+            path.write_text(json.dumps({'records': []}), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'No valid recorded V2 baseline'):
+                load_saved_baselines(path, [{'case': 1, 'first': {'position': {'x': 0., 'y': 0.}, 'svd_deg': 0.}}])
+
     def test_vectorized_cover_matches_independent_support_enumeration(self):
         rng = np.random.default_rng(20260911)
         for n in range(1, 12):

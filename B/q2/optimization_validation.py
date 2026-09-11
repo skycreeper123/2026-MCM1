@@ -24,7 +24,6 @@ from scipy.stats import wilcoxon
 
 from .selection import (Q2Config, choose_second_detection, response_radius_bound,
                         is_safe_candidate, _grid)
-from .legacy_selection_v2 import choose_second_detection as choose_legacy
 from .regions import analyze_candidate_region, geometric_features, classify_reception
 from .validation import xy, dump, evaluate, baseline_points, save
 
@@ -35,7 +34,47 @@ CHECK_CONFIG = Q2Config(max_response_intervals=256, response_bound_tolerance_m=.
 
 def hashes():
     return {name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest()
-            for name in ('selection.py', 'regions.py', 'legacy_selection_v2.py', 'optimization_validation.py', 'validation.py')}
+            for name in ('selection.py', 'regions.py', 'optimization_validation.py', 'validation.py')}
+
+
+def load_saved_baselines(path, cases):
+    """Use recorded V2 recommendations; no obsolete algorithm is executable.
+
+    Match the full observation, never just the sequential case number. V2
+    positions and original timings remain historical measurements; both points
+    are independently rescored when the current algorithm is rerun.
+    """
+    path = Path(path)
+    if not path.is_file():
+        raise ValueError(f'Saved comparison data required: {path}. Use --baseline with paired_results.json.')
+    raw = path.read_bytes()
+    saved = json.loads(raw)
+    key = lambda first: json.dumps(first, sort_keys=True, allow_nan=False)
+    recorded = {key(r['case']['first']): r['old'] for r in saved['records'] if not r.get('failure')}
+    matched = []
+    for case in cases:
+        old = recorded.get(key(case['first']))
+        if old is None or old.get('status') != 'OK' or old.get('algorithm_version') != 2:
+            raise ValueError(f"No valid recorded V2 baseline for observation {case['case']}; add matching baseline evidence before comparing new cases.")
+        matched.append(old)
+    return matched, {'kind': 'recorded_v2_recommendations', 'source': str(path.resolve()),
+                     'source_sha256': hashlib.sha256(raw).hexdigest(),
+                     'old_elapsed_times_are_historical': True}
+
+
+def check_source_hashes(data, out):
+    recorded = data['metadata']['hashes']
+    current = hashes()
+    for name in ('selection.py', 'regions.py'):
+        assert recorded[name] == current[name], f'Stale evidence: {name}'
+    if recorded['validation.py'] != current['validation.py']:
+        # A cleanup removed obsolete CLI/plots but kept every shared helper
+        # verbatim. Preserve the original experiment hashes instead of claiming
+        # that archived experiments were rerun by a newly edited validator.
+        manifest = json.loads((out/'validation_reorganization.json').read_text(encoding='utf-8'))
+        assert manifest['original_validation_sha256'] == recorded['validation.py'], 'Unexpected original validator'
+        assert manifest['current_validation_sha256'] == current['validation.py'], 'Validator changed after cleanup'
+        assert manifest['paired_results_sha256'] == hashlib.sha256((out/'paired_results.json').read_bytes()).hexdigest(), 'Reorganization evidence belongs to a different experiment'
 
 
 def make_stratified_cases(count):
@@ -92,8 +131,7 @@ def compact_result(r):
     return {k: v for k, v in r.items() if k not in ('candidate_scores', 'near_best_candidate_cloud')}
 
 
-def paired_case(case):
-    old = choose_legacy(case['first'])
+def paired_case(case, old):
     new = choose_second_detection(case['first'])
     if old['status'] != 'OK' or new['status'] != 'OK':
         return {'case': case, 'failure': True, 'old': compact_result(old), 'new': compact_result(new)}
@@ -128,20 +166,21 @@ def paired_case(case):
     return row
 
 
-def run_paired(cases, workers, out):
+def run_paired(cases, workers, out, baseline_path):
+    baselines, baseline_info = load_saved_baselines(baseline_path, cases)
     records = []
     with ProcessPoolExecutor(max_workers=workers) as pool:
-        futures = [pool.submit(paired_case, c) for c in cases]
+        futures = [pool.submit(paired_case, c, old) for c, old in zip(cases, baselines)]
         for f in as_completed(futures):
             records.append(f.result())
             if len(records) % 10 == 0:
                 print(f'Paired experiments: {len(records)}/{len(cases)}', flush=True)
-                dump(out/'paired_checkpoint.json', {'hashes': hashes(), 'records': records})
     records.sort(key=lambda r: r['case']['case'])
     data = {'metadata': {'hashes': hashes(), 'seeds': SEEDS, 'config': asdict(Q2Config()),
                          'common_scoring_config': asdict(CHECK_CONFIG), 'python': platform.python_version(),
                          'independent_errors_deg': np.linspace(-1, 1, 21).tolist(),
-                         'requested_sources_per_case': 12, 'synthetic_data': True}, 'records': records}
+                         'requested_sources_per_case': 12, 'synthetic_data': True,
+                         'baseline': baseline_info}, 'records': records}
     dump(out/'paired_results.json', data)
     return data
 
@@ -325,7 +364,6 @@ def make_visuals(data, references, out):
             item = future.result()
             (maps if kind == 'map' else sensitivity).append(item)
             print(f'Visualization evidence complete: {name}', flush=True)
-            dump(out/'visualization_checkpoint.json', {'maps': maps, 'sensitivity': sensitivity})
     maps = {m['name']: m for m in maps}
     base = maps['wide_fixed']['result']
     base_precise = response_radius_bound(np.asarray(base['initial_region']['vertices']), xy(base['selected']['position']), config=CHECK_CONFIG)
@@ -467,7 +505,7 @@ def write_report(data, summary, out):
                 selected['response_bound_gap_m'], ev['safety_margin_m'], ev['features']['corridor_transverse_distance_m'], ev['features']['probe_min_crossing_angle_deg']])))
     s = summary
     lines = ['# Q2 按优化建议升级后的验证报告', '',
-        '所有案例均为离线合成观测，真实源只传入独立验证器，不参与选点。旧版为优化前冻结的版本2；历史版本1/2产物保留。', '',
+        '所有案例均为离线合成观测，真实源只传入独立验证器，不参与选点。旧版对照位置与原始评分保存在本版paired_results.json中；目录仅保留最新版算法、文档与验收材料。重新进行配对检验时读取这些已保存位置，并统一重新评分，不再运行旧算法；旧版耗时为历史记录。', '',
         '## 配对检验', '',
         f"200 个分层随机观测（5 个种子）及 20 个附加极限切向边界案例。实际完成 {s['random_cases']} + {s['boundary_cases']} 例。",
         '新旧推荐位置均以同一初始外包、256 个角度区间上限、0.05 m 容差复评。此比较隔离了选点变化与上界加密的影响。', '',
@@ -512,7 +550,7 @@ def write_report(data, summary, out):
     lines += ['## 指标、边界与复现', '',
         '主指标为最小包围圆半径，直接对应半径20 m清除条件。CSV同时报告独立响应的最大直径、最大面积、半径压缩率、移动距离和移动时间；这些最大值可能来自不同响应。D(P)≤2R_MEC(P)，但D≤40 m不充分保证R_MEC≤20 m。near不当作0 m几何半径。', '',
         '敏感性图固定其余参数且统一纵轴。细网格和圆边数引起的变化小于0.05 m评分容差，不能据此断言其中某一参数严格最优；改变圆边数还会改变初始外包集合。', '',
-        '初始区域退化为线段时，独立验证器现保留两端约束，避免把有限线段误作无限直线；新增点/线段回归测试。首轮未达验收的诊断结果位于 `diagnostic_first_pass/`，不属于最终通过证据。', '',
+        '初始区域退化为线段时，独立验证器保留两端约束，避免把有限线段误作无限直线；有对应点/线段回归测试。目录已清理旧版结果、旧计划和中间检查点，当前仅保留最终验收证据。', '',
         '```powershell', 'python -m unittest discover -s B/q2/tests -v',
         'python -m B.q2.optimization_validation --cases 200 --workers 4',
         'python -m B.q2.optimization_validation --phase check', '```', '',
@@ -529,19 +567,21 @@ def main():
     parser.add_argument('--workers', type=int, default=4)
     parser.add_argument('--phase', choices=['all', 'paired', 'reference', 'visuals', 'replot', 'report', 'check'], default='all')
     parser.add_argument('--output', type=Path, default=ROOT/'validation_results_v3')
+    parser.add_argument('--baseline', type=Path, help='Saved paired_results.json containing matching V2 recommendations; defaults to existing results')
     args = parser.parse_args()
     out = args.output
     out.mkdir(parents=True, exist_ok=True)
     if args.phase in ('all', 'paired'):
-        data = run_paired(make_stratified_cases(args.cases), args.workers, out)
+        baseline_path = args.baseline or (out/'paired_results.json' if (out/'paired_results.json').exists()
+                                          else ROOT/'validation_results_v3'/'paired_results.json')
+        data = run_paired(make_stratified_cases(args.cases), args.workers, out, baseline_path)
     else:
         data = json.loads((out/'paired_results.json').read_text(encoding='utf-8'))
-        for name in ('selection.py', 'regions.py', 'legacy_selection_v2.py', 'validation.py'):
-            assert data['metadata']['hashes'][name] == hashes()[name], f'Stale evidence: {name}'
+        check_source_hashes(data, out)
     refs = None
     if args.phase in ('all', 'reference'):
         refs = run_references(data, args.workers, out)
-    elif (out/'independent_search.json').exists():
+    elif args.phase != 'paired' and (out/'independent_search.json').exists():
         reference_data = json.loads((out/'independent_search.json').read_text(encoding='utf-8'))
         assert reference_data['paired_input_sha256'] == hashlib.sha256((out/'paired_results.json').read_bytes()).hexdigest(), 'Stale independent search input'
         refs = reference_data['records']

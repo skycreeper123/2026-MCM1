@@ -1,0 +1,16 @@
+{
+  "purpose": "Remove obsolete runner and plots; preserve current independent geometry helpers verbatim",
+  "original_validation_sha256": "1dc7ba216ca6a347401c6e0ec73b6698f8a7878871b49ba8b47e8492f00e2eb0",
+  "current_validation_sha256": "400f128d64bf2cb49cad61dcf6d728643d5eac985f9fd619ada6650b3397ab0a",
+  "paired_results_sha256": "7212d7efb676fcd2abf17487cda13f9c968f410b5d615e95c569588fcaa21405",
+  "unchanged_functions_sha256": {
+    "xy": "3319f855002e17bd1ad9acf75970dbee1b45439a1e503389747cb8e4cf33cded",
+    "reference_update": "c59f9a01c3f9ea5f17adfe6a9f199c61a7fb25439061dc9f37fa4d4976efde35",
+    "reference_circle": "e403343b8db8bcb024773b8e3d7ac3ca7815b7342909ba1803edf51702ca4aa8",
+    "baseline_points": "93a6aa4c6938736ee2bb76612f566e8f5f32eec1fb62826e2ab5eb1df8acfba0",
+    "evaluate": "51c7bab88cd72baf7e980429c0ed3b09a2238733ae3ebbf6c6cde92c54601a9d",
+    "dump": "d96bb10f144e4deadf991bce20a301a51a5f16b48a4d6fac5737ecb6278b5a8b",
+    "save": "6f66d76a8de41a25506f11134dfdc29343420d222f4c467615cd71aee904f0eb"
+  },
+  "numerical_results_recomputed": false
+}
