@@ -13,7 +13,7 @@ import time
 
 import numpy as np
 
-from .selection import Q2Config, choose_second_detection, response_radius_bound
+from .legacy_selection_v2 import Q2Config, choose_second_detection, response_radius_bound
 from .validation import evaluate, xy, dump
 
 

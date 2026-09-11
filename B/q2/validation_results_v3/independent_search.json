@@ -1,0 +1,265 @@
+{
+  "records": [
+    {
+      "case": 76,
+      "grid_spacing_m": 25.0,
+      "grid_count": 5027,
+      "reference_point": [
+        1338.6708669408836,
+        1203.3348804712784
+      ],
+      "reference_bound": {
+        "worst_updated_cover_radius_m": 0.14112670787002837,
+        "sampled_direction_radius_m": 0.13566827810666715,
+        "response_bound_gap_m": 0.005458429763361222,
+        "response_bound_converged": true,
+        "response_interval_count": 4,
+        "response_evaluations": 6,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06
+      },
+      "recommended_common_bound_m": 0.14112670787002837,
+      "regret_m": 0.0,
+      "acceptance_tolerance_m": 2.0,
+      "passed": true
+    },
+    {
+      "case": 112,
+      "grid_spacing_m": 25.0,
+      "grid_count": 5025,
+      "reference_point": [
+        1788.8082231747305,
+        -225.02570207775037
+      ],
+      "reference_bound": {
+        "worst_updated_cover_radius_m": 0.29790189438502124,
+        "sampled_direction_radius_m": 0.2599061822149732,
+        "response_bound_gap_m": 0.037995712170048046,
+        "response_bound_converged": true,
+        "response_interval_count": 4,
+        "response_evaluations": 6,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06
+      },
+      "recommended_common_bound_m": 0.30569139493821373,
+      "regret_m": 0.007789500553192497,
+      "acceptance_tolerance_m": 2.0,
+      "passed": true
+    },
+    {
+      "case": 23,
+      "grid_spacing_m": 25.0,
+      "grid_count": 709,
+      "reference_point": [
+        703.5937350387301,
+        -797.8823903724149
+      ],
+      "reference_bound": {
+        "worst_updated_cover_radius_m": 55.95934392736537,
+        "sampled_direction_radius_m": 55.91728095900528,
+        "response_bound_gap_m": 0.04206296836008505,
+        "response_bound_converged": true,
+        "response_interval_count": 71,
+        "response_evaluations": 140,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06
+      },
+      "recommended_common_bound_m": 56.170462188198876,
+      "regret_m": 0.2111182608335085,
+      "acceptance_tolerance_m": 2.0,
+      "passed": true
+    },
+    {
+      "case": 41,
+      "grid_spacing_m": 25.0,
+      "grid_count": 706,
+      "reference_point": [
+        474.1023620936235,
+        -525.5127247963828
+      ],
+      "reference_bound": {
+        "worst_updated_cover_radius_m": 55.94867564332876,
+        "sampled_direction_radius_m": 55.915476483071686,
+        "response_bound_gap_m": 0.0331991602570767,
+        "response_bound_converged": true,
+        "response_interval_count": 75,
+        "response_evaluations": 148,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06
+      },
+      "recommended_common_bound_m": 55.94867564332876,
+      "regret_m": 0.0,
+      "acceptance_tolerance_m": 2.0,
+      "passed": true
+    },
+    {
+      "case": 89,
+      "grid_spacing_m": 25.0,
+      "grid_count": 704,
+      "reference_point": [
+        -481.9083740389106,
+        402.8074341733915
+      ],
+      "reference_bound": {
+        "worst_updated_cover_radius_m": 56.06278389012379,
+        "sampled_direction_radius_m": 56.01861767426578,
+        "response_bound_gap_m": 0.04416621585800584,
+        "response_bound_converged": true,
+        "response_interval_count": 72,
+        "response_evaluations": 142,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06
+      },
+      "recommended_common_bound_m": 56.06278389012379,
+      "regret_m": 0.0,
+      "acceptance_tolerance_m": 2.0,
+      "passed": true
+    },
+    {
+      "case": 3,
+      "grid_spacing_m": 25.0,
+      "grid_count": 4964,
+      "reference_point": [
+        1272.3570997056554,
+        -1249.0768064011354
+      ],
+      "reference_bound": {
+        "worst_updated_cover_radius_m": 0.5334063726138343,
+        "sampled_direction_radius_m": 0.48583173515611205,
+        "response_bound_gap_m": 0.047574637457722224,
+        "response_bound_converged": true,
+        "response_interval_count": 109,
+        "response_evaluations": 216,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06
+      },
+      "recommended_common_bound_m": 0.5334063726138343,
+      "regret_m": 0.0,
+      "acceptance_tolerance_m": 2.0,
+      "passed": true
+    },
+    {
+      "case": 152,
+      "grid_spacing_m": 25.0,
+      "grid_count": 5017,
+      "reference_point": [
+        1508.4870892356034,
+        977.5856529953371
+      ],
+      "reference_bound": {
+        "worst_updated_cover_radius_m": 0.18099106033477502,
+        "sampled_direction_radius_m": 0.13803799426576283,
+        "response_bound_gap_m": 0.0429530660690122,
+        "response_bound_converged": true,
+        "response_interval_count": 42,
+        "response_evaluations": 82,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06
+      },
+      "recommended_common_bound_m": 0.18099106033477502,
+      "regret_m": 0.0,
+      "acceptance_tolerance_m": 2.0,
+      "passed": true
+    },
+    {
+      "case": 146,
+      "grid_spacing_m": 25.0,
+      "grid_count": 710,
+      "reference_point": [
+        -823.1305112241881,
+        -1501.12013325275
+      ],
+      "reference_bound": {
+        "worst_updated_cover_radius_m": 55.899943121832756,
+        "sampled_direction_radius_m": 55.85729946961323,
+        "response_bound_gap_m": 0.0426436522195246,
+        "response_bound_converged": true,
+        "response_interval_count": 70,
+        "response_evaluations": 138,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06
+      },
+      "recommended_common_bound_m": 55.92038694833912,
+      "regret_m": 0.02044382650636578,
+      "acceptance_tolerance_m": 2.0,
+      "passed": true
+    },
+    {
+      "case": 168,
+      "grid_spacing_m": 25.0,
+      "grid_count": 5015,
+      "reference_point": [
+        1788.0517357557055,
+        -177.0684327629988
+      ],
+      "reference_bound": {
+        "worst_updated_cover_radius_m": 0.22181468362802606,
+        "sampled_direction_radius_m": 0.1740360899929939,
+        "response_bound_gap_m": 0.047778593635032174,
+        "response_bound_converged": true,
+        "response_interval_count": 47,
+        "response_evaluations": 92,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06
+      },
+      "recommended_common_bound_m": 0.22181468362802606,
+      "regret_m": 0.0,
+      "acceptance_tolerance_m": 2.0,
+      "passed": true
+    },
+    {
+      "case": 170,
+      "grid_spacing_m": 25.0,
+      "grid_count": 704,
+      "reference_point": [
+        569.9128688100526,
+        -1328.7767237391968
+      ],
+      "reference_bound": {
+        "worst_updated_cover_radius_m": 55.94906797803794,
+        "sampled_direction_radius_m": 55.90272784584281,
+        "response_bound_gap_m": 0.04634013219512667,
+        "response_bound_converged": true,
+        "response_interval_count": 71,
+        "response_evaluations": 140,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06
+      },
+      "recommended_common_bound_m": 56.50459367256662,
+      "regret_m": 0.5555256945286828,
+      "acceptance_tolerance_m": 2.0,
+      "passed": true
+    }
+  ],
+  "paired_input_sha256": "7212d7efb676fcd2abf17487cda13f9c968f410b5d615e95c569588fcaa21405",
+  "spatial_search": "full_25m_grid_then_5m_local_grid",
+  "scoring_config": {
+    "target_center_x": 0.0,
+    "target_center_y": 0.0,
+    "target_radius_m": 1800.0,
+    "maximum_reception_radius_m": 1500.0,
+    "minimum_reception_radius_m": 1000.0,
+    "safety_margin_m": 0.1,
+    "near_radius_m": 5.0,
+    "movement_speed_mps": 5.0,
+    "movement_weight_m_per_s": 0.0,
+    "circle_sides": 128,
+    "coarse_spacing_m": 75.0,
+    "fine_spacing_m": 15.0,
+    "max_coarse_candidates": 64,
+    "max_fine_candidates": 49,
+    "refinement_starts": 5,
+    "response_bound_tolerance_m": 0.05,
+    "max_response_intervals": 256,
+    "shortlist_response_intervals": 128,
+    "final_response_intervals": 256,
+    "maximum_refinement_intervals": 1024,
+    "final_bound_tolerance_m": 0.05,
+    "polish_starts": 2,
+    "near_best_relative_tolerance": 0.05,
+    "candidate_region_mode": "fixed",
+    "near_best_epsilon_m": 10.0,
+    "repeated_position_tolerance_m": 1e-06,
+    "calculation_time_limit_s": null
+  }
+}

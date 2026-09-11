@@ -1,31 +1,64 @@
-# Q2 版本2结果复现
+# Q2 版本3优化与验证复现
 
-在项目根目录使用安装了依赖的 Python：
+在仓库根目录，使用 Python 3.10+ 并安装依赖：
 
 ```powershell
 python -m pip install -r B/q2/requirements-validation.txt
 python -m unittest discover -s B/q2/tests -v
-python -m B.q2.validation --cases 60 --sources 24 --seed 20260912
-python -m B.q2.repair_validation
+python -m unittest discover -s B/q1/tests -v
+python -m B.q2.optimization_validation --cases 200 --workers 4
+python -m B.q2.optimization_validation --phase check
 ```
 
-当前算法是精度优先的连续响应上界评分；第二个对照为显式λ=1的时间折中版本，另比较见证点、随机安全点和沿示向前进。真源坐标只进入独立评估器。
+默认输出目录 `B/q2/validation_results_v3/`，可通过 `--output` 改变。完整离线验证包括：
 
-新结果在 `validation_results_v2/`。`validation_results/` 和 `../review/audit_evidence.json` 是修复前历史结果，保留作版本对照；不得以当前图注或策略名称重新标记历史结果。
+- 200 个分层随机首次观测、5 个随机种子，各40例；另外20个目标圆/接收圆切向极限案例。距离包含5.01、1000、1500 m，首次误差包含±1°及邻近值。
+- 与冻结的版本2默认算法进行同输入配对。两个推荐点都用同一256区间、0.05 m容差重新评分，避免仅靠加密造成“看似提升”。
+- 每例最多12个独立物理源位置与21个第二误差值；极窄物理区域不足12个时如实保存实际数量。真源包含、收信安全、半径上界分别核验。独立几何采用半平面边界交点枚举和支撑圆枚举。
+- 10例独立搜索：各种子按初始区域半径选最窄和最宽各一例，不按改善结果挑选；全域25 m网格加局部5 m网格，允许差距 max(2 m, 参考值的2%)。有限网格不是全局最优证明。
+- 固定测点的128/256区间稳定性；固定其他参数的粗网格、细网格、圆边数敏感性；45/30 m近优区域制图网格比较。
+- 全域U热力图、5%近优边界及连通区面积/形心/推荐点、交会角与横向距离、三类收信区域、首次收信信息C₁扩展方案。
 
-主验证输出六组300dpi PNG/SVG/PDF、策略及可靠性表、中文说明、记录输入/原始评估/参数/哈希的 `metrics.json`。前两例固定用于展示，其余58例采用新随机种子的分层测试。每例24个独立源、21个第二误差取值；near单列，不按零几何半径计入。敏感性和权重图仅用前三例，不能当成总体最优性证据。
+长实验可分阶段运行：
 
-`repair_validation.py` 生成 `repair_acceptance.json`：
+```powershell
+python -m B.q2.optimization_validation --phase paired --cases 200 --workers 4
+python -m B.q2.optimization_validation --phase reference --workers 4
+python -m B.q2.optimization_validation --phase visuals
+python -m B.q2.optimization_validation --phase check
+```
 
-- 原30例使用相同独立源及第二误差，与修复前默认策略和纯精度策略配对。
-- 144个新增边界案例：12种圆周方位、两个切向、两个站源距离、三种接近极限的首次误差。检查正常返回、推荐点和近优点云安全性、真源包含性及可用方向反馈的半径上界。
-- 前10个配对案例固定输入和测点，只增加响应区间上限，检查上界不增。
-- 三档小预算检查安全返回及明确的超限状态，不冒称硬实时达标。
+`--phase replot`仅用已保存的可视化数据重绘，不重新跑算法；`--phase report`重写逐例CSV及中文报告。独立搜索完成后再重绘，可靠性图才会包含完整独立复核结果。
 
-验证不要求每例精度都优于所有基线，但要求合法边界无选点失败、无真源遗漏、无收信安全违规、无独立半径超过保守上界。断言失败返回非零状态，不能忽略后宣称通过。
+验收断言要求：无失败、无安全违规、无真源遗漏、无独立半径超过保守上界；配对平均改善bootstrap区间下限大于0、Wilcoxon单侧p<0.05、5个种子平均改善均为正；最终最大上下界间隙不超过0.5 m；独立几何差异不超过1e-6 m；独立搜索全部达到阈值。任何失败返回非零，不能忽略后宣称通过。统计改善不等于每一例必然更优。
 
-已有版本2结果时用 `python -m B.q2.validation --replot` 重绘，保留计算哈希并另记重绘哈希。`--output` 指定其他目录；同目录重跑覆盖同名产物。历史版本1结果拒绝用版本2流程重绘。
+## 输出文件
 
-本机默认Python未装依赖，本次使用桌面提供的Python3.12及项目内 `.modeling-deps`。其他机器按依赖清单安装，无需复制本机路径。绘图使用Microsoft YaHei，SVG字形转路径。
+| 文件 | 内容 |
+| --- | --- |
+| `Q2优化验证报告.md` | 中文结论、限制、图表与复现入口 |
+| `acceptance_summary.json` | 验收汇总及统计检验结果 |
+| `paired_results.json` | 首次观测、独立源、参数、原始结果、代码哈希 |
+| `paired_metrics.csv` | 新旧同精度指标、直径、面积、压缩率、距离、时间 |
+| `independent_search.json` | 独立网格候选数、最优参考点与验收差距 |
+| `visualization_data.json` | 热力图场、区域边界、几何特征、敏感性原始结果 |
+| `*_candidate_region.json` | 连通区域面积、形心、边界和推荐点 |
+| `q2_v3_01...06_*.png/.svg/.pdf` | 六组可导出的300dpi验证图 |
+| `diagnostic_first_pass/` | 首轮未通过的诊断证据，不计入最终验收 |
 
-这些是离线实验，不是官方成绩。连续响应上界有数学包含关系依据，代码使用浮点容差，候选测点搜索仍为有限近似。
+近优边界按安全三角网格插值，其面积和精度范围有分辨率误差；JSON明确标明未认证插值目标和全局最优性。安全判据本身仍作用于整个凸源外包。几何图中的最小交会角是源探针最小值。
+
+## 历史版本
+
+`validation_results/`、`validation_results_v2/` 和旧修复报告都是历史证据。`legacy_selection_v2.py`保留本次优化前算法，`validation.py`与`repair_validation.py`的历史策略入口绑定该冻结版本，避免把新版结果误写成版本2。当前完整验收请使用 `optimization_validation.py`。历史哈希校验针对当时文件，不代表现有工作区与历史代码完全一致。
+
+## 本机环境
+
+本机系统默认Python缺少数值依赖；已使用桌面提供的Python3.12和项目内 `.modeling-deps` 验证。其他机器按依赖清单安装即可。本机可按下列方式运行（解释器路径依安装位置调整）：
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path .modeling-deps).Path
+& 'C:\Users\but48\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m B.q2.optimization_validation --phase check
+```
+
+绘图使用Microsoft YaHei，SVG字形转路径。实验为离线合成数据，耗时是在本机并行实验环境测得，不是官方模拟器成绩或硬实时承诺。

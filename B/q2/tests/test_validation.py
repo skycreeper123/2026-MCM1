@@ -32,6 +32,17 @@ class ValidationGeometryTests(unittest.TestCase):
         self.assertIsNone(evaluation['rows'][0]['radius_m'])
         self.assertIsNone(evaluation['worst_radius_m'])
 
+    def test_degenerate_segment_preserves_endpoint_constraints(self):
+        segment = np.array([[10., 0.], [20., 0.]])
+        points, _, _ = reference_update(segment, np.zeros(2), 0.)
+        self.assertAlmostEqual(reference_circle(points)[1], 5.)
+        self.assertGreaterEqual(points[:, 0].min(), 10.-1e-8)
+        self.assertLessEqual(points[:, 0].max(), 20.+1e-8)
+
+    def test_degenerate_point_remains_a_point(self):
+        points, _, _ = reference_update(np.array([[10., 0.]]), np.zeros(2), 0.)
+        self.assertAlmostEqual(reference_circle(points)[1], 0.)
+
 
 if __name__ == '__main__':
     unittest.main()

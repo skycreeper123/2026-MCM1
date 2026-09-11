@@ -22,7 +22,8 @@ import numpy as np
 import scipy
 from scipy.spatial import ConvexHull
 
-from .selection import Q2Config, choose_second_detection, _clip_with_bearing
+from .legacy_selection_v2 import Q2Config, choose_second_detection
+from .selection import _clip_with_bearing
 from B.q1.geometry import minimum_enclosing_circle
 
 ROOT = Path(__file__).resolve().parent
@@ -39,10 +40,21 @@ def reference_update(vertices, station, bearing):
 
     Builds wedge normals directly; ConvexHull recovers the ordered intersection.
     """
-    edge = np.roll(vertices, -1, axis=0) - vertices
-    normals = np.column_stack((edge[:, 1], -edge[:, 0]))
-    normals /= np.linalg.norm(normals, axis=1)[:, None]
-    bounds = np.sum(normals * vertices, axis=1)
+    if len(vertices) < 3 or np.linalg.matrix_rank(vertices-vertices[0], tol=1e-8) < 2:
+        # A segment requires endpoint constraints too. Its two opposing edge
+        # normals alone describe an infinite line, which invalidates the audit.
+        distances = np.linalg.norm(vertices[:, None]-vertices[None], axis=2)
+        i, j = np.unravel_index(np.argmax(distances), distances.shape)
+        a, c = vertices[i], vertices[j]
+        direction = (c-a)/distances[i, j] if distances[i, j] > 1e-12 else np.array([1., 0.])
+        normal = np.array([-direction[1], direction[0]])
+        normals = np.array([-direction, direction, normal, -normal])
+        bounds = np.array([-direction@a, direction@c, normal@a, -normal@a])
+    else:
+        edge = np.roll(vertices, -1, axis=0) - vertices
+        normals = np.column_stack((edge[:, 1], -edge[:, 0]))
+        normals /= np.linalg.norm(normals, axis=1)[:, None]
+        bounds = np.sum(normals * vertices, axis=1)
     lo, hi = np.deg2rad([bearing - 1, bearing + 1])
     wedge = np.array([[np.sin(lo), -np.cos(lo)], [-np.sin(hi), np.cos(hi)]])
     A = np.vstack((normals, wedge))

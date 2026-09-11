@@ -1,6 +1,8 @@
-# 第二问：安全区域、近优区域与第二检测点选择（版本3）
+# Q2 优化后算法总结（版本3）
 
-版本3完整归档见 [Q2_ALGORITHM_SUMMARY_V3.md](Q2_ALGORITHM_SUMMARY_V3.md)，其中补充了默认参数表、输入输出清单、本次实际验收数值及六组验证图入口。
+记录日期：2026-09-11。对应程序输出 `algorithm_version=3`。本文独立记录按 `Q2优化.md` 完成优化并通过验收后的算法，包含建模依据、实际搜索流程、默认参数、接口、验证结果与适用边界。
+
+本次相对版本2的核心变化是：由单起点细化改为最多5个分散起点；按精度目标修正候选保留规则；采用32→128→256并可继续至1024区间的分级评分；增加局部方向搜索、数值5%近优区域、三类收信判定和首次收信信息扩展区域C₁。
 
 实现见 `selection.py` 和 `regions.py`；完整数值证据见 [优化验证报告](validation_results_v3/Q2优化验证报告.md)，复现见 [验证说明](VALIDATION_README.md)。版本2算法冻结在 `legacy_selection_v2.py`，旧说明保存在 [版本2说明](Q2_ALGORITHM_SUMMARY_V2.md)。本次按 [Q2优化.md](Q2优化.md) 落实优化，不改变其原始建议文本。
 
@@ -139,3 +141,120 @@ expanded = choose_second_detection(
 | MEC、直径、面积口径 | 独立响应评估和逐例CSV，near不按零半径处理 |
 | 200例、5种子、边界与敏感性 | 200随机+20切向极限、21误差、单因素分析、128/256稳定性 |
 | 不引入深度学习主算法 | 全流程几何方法，接收安全和响应覆盖有包含关系依据 |
+
+## 10. 默认参数记录
+
+以下取自本版本 `Q2Config`；距离单位为米，时间单位为秒，示向角单位为度。表中“区间上限”是允许的最大叶区间数，达到容差时可以提前结束。
+
+| 参数 | 默认值 | 用途 |
+| --- | ---: | --- |
+| `target_radius_m` | 1800 | 目标区域半径 |
+| `minimum_reception_radius_m` / `maximum_reception_radius_m` | 1000 / 1500 | 全向源有效接收半径范围 |
+| `safety_margin_m` | 0.1 | 固定保证方案的距离裕量 |
+| `near_radius_m` | 5 | near响应距离阈值 |
+| `movement_speed_mps` | 5 | 将移动距离换算为时间 |
+| `movement_weight_m_per_s` | 0 | 默认精度优先 |
+| `circle_sides` | 128 | 每个圆的外切多边形边数 |
+| `coarse_spacing_m` / `fine_spacing_m` | 75 / 15 | 粗、细网格间距 |
+| `max_coarse_candidates` | 64 | 粗候选保留上限；安全后备点可另行加入 |
+| `refinement_starts` | 5 | 空间分散的细化起点上限 |
+| `max_fine_candidates` | 49 | 每个细化起点的细候选上限 |
+| `max_response_intervals` | 32 | 初步评分区间上限 |
+| `shortlist_response_intervals` | 128 | 前列候选二次评分上限 |
+| `final_response_intervals` | 256 | 最终高精度评分及局部方向搜索上限 |
+| `maximum_refinement_intervals` | 1024 | 最终未收敛推荐点继续加密的上限 |
+| `response_bound_tolerance_m` | 0.5 | 初步评分的上下界间隙容差 |
+| `final_bound_tolerance_m` | 0.05 | 高精度阶段目标容差 |
+| `polish_starts` | 2 | 最后局部方向搜索的起点数 |
+| `near_best_relative_tolerance` | 0.05 | 数值近优阈值为采样最小U的1.05倍 |
+| `candidate_region_mode` | `fixed` | 主方案；`information`启用C₁ |
+| `repeated_position_tolerance_m` | 1e-6 | 已测位置排除容差 |
+| `calculation_time_limit_s` | `None` | 默认不限制离线计算时间 |
+
+`error_deg=1.0`是入口函数参数，不在`Q2Config`内。`near_best_epsilon_m=10.0`仍保留在配置中以兼容旧接口，但版本3的近优点云采用相对5%规则，不使用该旧加性阈值。
+
+0.05 m是高精度阶段的计算目标，不能据此断言所有输出均已达到该精度。应读取推荐点实际的`response_bound_gap_m`和评分阶段；本次完整验收采用0.5 m的总体容差门槛。
+
+## 11. 输入输出与复用清单
+
+主入口：
+
+```python
+choose_second_detection(
+    first_observation,
+    error_deg=1.0,
+    current_position=None,
+    used_positions=None,
+    config=None,
+)
+```
+
+`first_observation`仅含`position: {x, y}`和`svd_deg`。当前位置默认首测点；首测点自动列入已测位置。附加已测位置只用于排除重复测点，不自动增加观测约束。
+
+| 输出 | 含义 |
+| --- | --- |
+| `initial_region` | 首次观测与圆约束得到的定位外包 |
+| `safe_candidate_region` | 当前收信保证区域的定义、见证点和包围盒；C₁包含额外假设说明 |
+| `selected.position` | 推荐第二检测点 |
+| `selected.worst_updated_cover_radius_m` | 连续direction响应半径上界U |
+| `selected.sampled_direction_radius_m` | 已计算中点响应半径的最大值L |
+| `selected.response_bound_gap_m` | 当前U−L间隙 |
+| `selected.response_bound_converged` | 是否满足该条评分记录使用的容差；不代表位置搜索全局收敛 |
+| `selected.movement_distance_m` / `movement_time_s` | 从当前位置出发的移动距离和时间 |
+| `selected.objective_m` | 用于排名的J值 |
+| `candidate_scores` | 每个位置当前保留的评分记录 |
+| `refinement_starts` / `response_refinement_log` | 空间细化起点及分级评分前后首位变化 |
+| `near_best_candidate_cloud` | 满足相对近优条件的已评分点；连续边界由区域分析函数另行计算 |
+| `elapsed_s` / `timed_out` / `budget_overrun_s` | 实际耗时、预算耗尽状态和超时量 |
+
+可独立复用的函数：`safe_candidate_region`、`response_radius_bound`、`classify_reception`、`is_information_candidate`、`geometric_features`、`analyze_candidate_region`。这些函数位于`selection.py`或`regions.py`，其中区域分析需要绘图库。
+
+## 12. 本版本实际验收结果
+
+以下数字来自已保存的[验收汇总](validation_results_v3/acceptance_summary.json)，不是预计效果。实验采用5个随机种子、200个分层随机首次观测和20个附加极限边界案例。旧版为冻结的版本2默认算法；两个版本的推荐位置均以相同初始外包、256区间上限和0.05 m目标容差重新评分。
+
+| 检验指标 | 实际结果 |
+| --- | --- |
+| 旧 / 新同精度半径上界中位数 | 47.521 / 46.980 m |
+| 配对半径上界改善均值 / 中位数 | 0.829 / 0.528 m |
+| 平均改善的bootstrap 95%区间 | [0.708, 0.955] m |
+| 单侧配对Wilcoxon p值 | 1.69×10⁻²⁷ |
+| 改善 / 持平 / 退步，按±0.05 m区分 | 171 / 8 / 21例 |
+| 最大单例退步 | 0.649 m |
+| 旧 / 新最大响应上下界间隙 | 4.183 / 0.358 m |
+| 收信安全违规 / 真源遗漏 / 响应上界违规 | 0 / 0 / 0 |
+| 独立direction响应检验 | 49,077次；near另记40次 |
+| 独立MEC实现最大差异 | 5.41×10⁻¹⁰ m |
+| 独立网格最优性复核 | 10/10通过，最大差距0.556 m |
+| 旧 / 新计算时间中位数 | 1.446 / 5.031 s |
+| 源位置归属与热力图节点安全复核 | 2,377个源位置、5,421个节点，均通过 |
+| 单元测试 | Q2共29项、Q1共18项，通过 |
+
+5个种子的平均配对改善均为正，依次约0.762、0.821、0.872、0.703、0.985 m。独立物理响应评估中，双方均存在direction统计的193个随机案例，其采样最坏半径平均下降0.638 m；该统计不以0 m补入near，也不能替代连续响应上界。
+
+因此，本版本的证据支持“在本次分层合成实验中，选点精度总体改善且评分可靠性提高”，不支持“所有案例必然改善”或“已求得连续全局最优”。增加计算量是此次精度改善的代价。
+
+## 13. 可视化和复现记录
+
+本版本保存六组PNG/SVG/PDF：
+
+1. [全安全域U热力图与5%近优边界](validation_results_v3/q2_v3_01_good_regions.png)。
+2. [200例配对改善与5种子对比](validation_results_v3/q2_v3_02_paired_improvement.png)。
+3. [分级加密收敛、128/256稳定性与独立网格复核](validation_results_v3/q2_v3_03_reliability.png)。
+4. [交会角、横向距离与侧向/前向策略比较](validation_results_v3/q2_v3_04_geometry_features.png)。
+5. [三类收信位置与C₁扩展区域](validation_results_v3/q2_v3_05_reception_regions.png)。
+6. [粗网格、细网格和圆边数的单因素敏感性](validation_results_v3/q2_v3_06_sensitivity.png)。
+
+典型大范围案例的固定保证区域面积约439,229 m²，30 m制图网格下的5%近优面积约14,412 m²，分为两个连通区域。C₁将该案例候选区域扩展至约1,210,230 m²，但推荐半径上界仍约55.879 m；区域扩张并不自动等于推荐点精度进一步改善。各连通区的面积、形心、边界和已评分推荐点保存于`*_candidate_region.json`。
+
+复现命令在仓库根目录执行：
+
+```powershell
+python -m pip install -r B/q2/requirements-validation.txt
+python -m unittest discover -s B/q2/tests -v
+python -m unittest discover -s B/q1/tests -v
+python -m B.q2.optimization_validation --cases 200 --workers 4
+python -m B.q2.optimization_validation --phase check
+```
+
+详细环境与分阶段命令见[验证说明](VALIDATION_README.md)。原始观测、参数、种子、源验证样本、评分和代码哈希见`validation_results_v3/paired_results.json`，逐例指标见`paired_metrics.csv`。历史版本2及首轮未通过的诊断记录均单独保留，不混入本版本最终验收结论。
