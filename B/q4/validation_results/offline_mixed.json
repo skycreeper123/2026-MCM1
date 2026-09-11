@@ -1,0 +1,1124 @@
+{
+  "scope": "offline synthetic mixed worlds; not official simulator results",
+  "runs": [
+    {
+      "seed": 11,
+      "strategy": "q4_certified_cooperative",
+      "cleared_count": 10,
+      "known_count": 10,
+      "channel_states": {
+        "1": "CLEARED",
+        "2": "CLEARED",
+        "3": "CLEARED",
+        "4": "ABSENT",
+        "5": "ABSENT",
+        "6": "ABSENT",
+        "7": "CLEARED",
+        "8": "ABSENT",
+        "9": "CLEARED",
+        "10": "CLEARED",
+        "11": "CLEARED",
+        "12": "CLEARED",
+        "13": "CLEARED",
+        "14": "ABSENT",
+        "15": "ABSENT",
+        "16": "ABSENT",
+        "17": "ABSENT",
+        "18": "ABSENT",
+        "19": "CLEARED",
+        "20": "ABSENT"
+      },
+      "completion": {
+        "complete": true,
+        "method": "CLEARED_OR_FULL_NETWORK_ABSENT",
+        "cleared": [
+          1,
+          2,
+          3,
+          7,
+          9,
+          10,
+          11,
+          12,
+          13,
+          19
+        ],
+        "absent": [
+          4,
+          5,
+          6,
+          8,
+          14,
+          15,
+          16,
+          17,
+          18,
+          20
+        ],
+        "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e"
+      },
+      "stop_reason": null,
+      "receiver_channel": 20,
+      "position": [
+        -1614.2713526541938,
+        931.9999999999999
+      ],
+      "station_cursor": 20,
+      "station_count": 21,
+      "station_certificate": {
+        "passed": true,
+        "floating": {
+          "passed": true,
+          "stations": 21,
+          "root_triangles": 28,
+          "leaf_triangles": 268,
+          "maximum_subdivision_depth": 5,
+          "max_provider_distance_m": 998.8993503354292,
+          "outer_polygon_inradius_m": 1800.485740202823,
+          "boundary_margin_m": 0.48574020282308084,
+          "range_margin_m": 1.100649664570824,
+          "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+        },
+        "exact": {
+          "passed": true,
+          "leaf_triangles": 268,
+          "arithmetic": "exact fractions of stored binary64 station coordinates",
+          "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+        },
+        "fallback": false
+      },
+      "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+      "metrics": {
+        "measurements": 308,
+        "switches": 294,
+        "clear_requests": 184,
+        "failed_clears": 174,
+        "successful_clears": 10,
+        "distance_m": 24414.22513740597,
+        "no_signal": 289,
+        "no_signal_revisits": 8,
+        "station_revisits": 9,
+        "pairs_started": 1,
+        "pairs_received": 1,
+        "local_measurements": 8
+      },
+      "estimated_virtual_time_s": 7288.845027481194,
+      "average_clear_time_s": 728.8845027481194,
+      "planning_elapsed_s": 4.671999999976833,
+      "last_decision": {
+        "upper_s": 1032.7705464820658,
+        "direction_upper_s": 973.8996429519024,
+        "direct_upper_s": 1026.7705464820658,
+        "includes_no_signal": true,
+        "intervals_total": 32,
+        "intervals_fallback": 0,
+        "eligible": true,
+        "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+      },
+      "fallback_route_estimate_s": 735.0194726673693,
+      "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+      "source_budgets": {
+        "1": {
+          "measurements": 1,
+          "closed_distance_m": 157.29211228648697
+        },
+        "2": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "3": {
+          "measurements": 1,
+          "closed_distance_m": 166.22404878241693
+        },
+        "7": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "9": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "11": {
+          "measurements": 1,
+          "closed_distance_m": 1365.2000473507485
+        },
+        "12": {
+          "measurements": 1,
+          "closed_distance_m": 2163.566315553014
+        },
+        "13": {
+          "measurements": 1,
+          "closed_distance_m": 221.18388868263239
+        },
+        "19": {
+          "measurements": 3,
+          "closed_distance_m": 81.61101797863196
+        }
+      },
+      "offline_all_cleared": true,
+      "source_count": 10,
+      "config": {
+        "local_measurement_limit": 4,
+        "local_distance_limit_m": 4000.0,
+        "candidate_limit": 24,
+        "response_intervals": 32,
+        "planning_call_s": 1.5,
+        "planning_total_s": 10.0,
+        "guaranteed_saving_s": 1.0,
+        "uncertain_saving_s": 10.0,
+        "uncertain_extra_s": 30.0,
+        "services_per_station": 4,
+        "route_depth": 3,
+        "route_width": 12,
+        "exit_reserve_s": 30.0
+      },
+      "clearance_rate": 1.0,
+      "real_elapsed_s": 7.985000000000582,
+      "actions_including_exit": 493,
+      "audited_region_versions": 18,
+      "audited_clear_plans": 10,
+      "first_clear_station_cursor": 0
+    },
+    {
+      "seed": 11,
+      "strategy": "q4_certified_cooperative",
+      "cleared_count": 16,
+      "known_count": 16,
+      "channel_states": {
+        "1": "CLEARED",
+        "2": "CLEARED",
+        "3": "CLEARED",
+        "4": "CLEARED",
+        "5": "UNKNOWN",
+        "6": "CLEARED",
+        "7": "CLEARED",
+        "8": "CLEARED",
+        "9": "CLEARED",
+        "10": "CLEARED",
+        "11": "CLEARED",
+        "12": "CLEARED",
+        "13": "CLEARED",
+        "14": "UNKNOWN",
+        "15": "CLEARED",
+        "16": "CLEARED",
+        "17": "CLEARED",
+        "18": "UNKNOWN",
+        "19": "UNKNOWN",
+        "20": "CLEARED"
+      },
+      "completion": {
+        "complete": true,
+        "method": "16_DISTINCT_CHANNELS_CLEARED",
+        "channels": [
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          15,
+          16,
+          17,
+          20
+        ]
+      },
+      "stop_reason": null,
+      "receiver_channel": 20,
+      "position": [
+        -1133.2296791791118,
+        1145.1373453020128
+      ],
+      "station_cursor": 19,
+      "station_count": 21,
+      "station_certificate": {
+        "passed": true,
+        "floating": {
+          "passed": true,
+          "stations": 21,
+          "root_triangles": 28,
+          "leaf_triangles": 268,
+          "maximum_subdivision_depth": 5,
+          "max_provider_distance_m": 998.8993503354292,
+          "outer_polygon_inradius_m": 1800.485740202823,
+          "boundary_margin_m": 0.48574020282308084,
+          "range_margin_m": 1.100649664570824,
+          "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+        },
+        "exact": {
+          "passed": true,
+          "leaf_triangles": 268,
+          "arithmetic": "exact fractions of stored binary64 station coordinates",
+          "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+        },
+        "fallback": false
+      },
+      "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+      "metrics": {
+        "measurements": 233,
+        "switches": 224,
+        "clear_requests": 243,
+        "failed_clears": 227,
+        "successful_clears": 16,
+        "distance_m": 25176.333133031094,
+        "no_signal": 204,
+        "no_signal_revisits": 12,
+        "station_revisits": 17,
+        "pairs_started": 0,
+        "pairs_received": 0,
+        "local_measurements": 8
+      },
+      "estimated_virtual_time_s": 7185.266626606219,
+      "average_clear_time_s": 449.0791641628887,
+      "planning_elapsed_s": 5.3439999999973224,
+      "last_decision": {
+        "upper_s": 867.4387246164854,
+        "direction_upper_s": 822.481204520685,
+        "direct_upper_s": 862.4387246164854,
+        "includes_no_signal": true,
+        "intervals_total": 32,
+        "intervals_fallback": 0,
+        "eligible": true,
+        "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+      },
+      "fallback_route_estimate_s": 432.4791566262935,
+      "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+      "source_budgets": {
+        "1": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "2": {
+          "measurements": 1,
+          "closed_distance_m": 1588.8565071141636
+        },
+        "3": {
+          "measurements": 1,
+          "closed_distance_m": 203.989337025773
+        },
+        "4": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "6": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "7": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "8": {
+          "measurements": 1,
+          "closed_distance_m": 155.73701171252804
+        },
+        "9": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "10": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "11": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "13": {
+          "measurements": 2,
+          "closed_distance_m": 723.7880291832146
+        },
+        "15": {
+          "measurements": 1,
+          "closed_distance_m": 36.33896502215009
+        },
+        "16": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "17": {
+          "measurements": 1,
+          "closed_distance_m": 228.01562603711145
+        },
+        "20": {
+          "measurements": 1,
+          "closed_distance_m": 245.36500894650132
+        }
+      },
+      "offline_all_cleared": true,
+      "source_count": 16,
+      "config": {
+        "local_measurement_limit": 4,
+        "local_distance_limit_m": 4000.0,
+        "candidate_limit": 24,
+        "response_intervals": 32,
+        "planning_call_s": 1.5,
+        "planning_total_s": 10.0,
+        "guaranteed_saving_s": 1.0,
+        "uncertain_saving_s": 10.0,
+        "uncertain_extra_s": 30.0,
+        "services_per_station": 4,
+        "route_depth": 3,
+        "route_width": 12,
+        "exit_reserve_s": 30.0
+      },
+      "clearance_rate": 1.0,
+      "real_elapsed_s": 10.60899999999674,
+      "actions_including_exit": 477,
+      "audited_region_versions": 28,
+      "audited_clear_plans": 16,
+      "first_clear_station_cursor": 0
+    },
+    {
+      "seed": 29,
+      "strategy": "q4_certified_cooperative",
+      "cleared_count": 10,
+      "known_count": 10,
+      "channel_states": {
+        "1": "CLEARED",
+        "2": "ABSENT",
+        "3": "CLEARED",
+        "4": "CLEARED",
+        "5": "CLEARED",
+        "6": "ABSENT",
+        "7": "ABSENT",
+        "8": "CLEARED",
+        "9": "CLEARED",
+        "10": "ABSENT",
+        "11": "CLEARED",
+        "12": "CLEARED",
+        "13": "ABSENT",
+        "14": "CLEARED",
+        "15": "ABSENT",
+        "16": "ABSENT",
+        "17": "ABSENT",
+        "18": "ABSENT",
+        "19": "CLEARED",
+        "20": "ABSENT"
+      },
+      "completion": {
+        "complete": true,
+        "method": "CLEARED_OR_FULL_NETWORK_ABSENT",
+        "cleared": [
+          1,
+          3,
+          4,
+          5,
+          8,
+          9,
+          11,
+          12,
+          14,
+          19
+        ],
+        "absent": [
+          2,
+          6,
+          7,
+          10,
+          13,
+          15,
+          16,
+          17,
+          18,
+          20
+        ],
+        "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e"
+      },
+      "stop_reason": null,
+      "receiver_channel": 20,
+      "position": [
+        -1614.2713526541938,
+        931.9999999999999
+      ],
+      "station_cursor": 20,
+      "station_count": 21,
+      "station_certificate": {
+        "passed": true,
+        "floating": {
+          "passed": true,
+          "stations": 21,
+          "root_triangles": 28,
+          "leaf_triangles": 268,
+          "maximum_subdivision_depth": 5,
+          "max_provider_distance_m": 998.8993503354292,
+          "outer_polygon_inradius_m": 1800.485740202823,
+          "boundary_margin_m": 0.48574020282308084,
+          "range_margin_m": 1.100649664570824,
+          "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+        },
+        "exact": {
+          "passed": true,
+          "leaf_triangles": 268,
+          "arithmetic": "exact fractions of stored binary64 station coordinates",
+          "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+        },
+        "fallback": false
+      },
+      "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+      "metrics": {
+        "measurements": 303,
+        "switches": 292,
+        "clear_requests": 98,
+        "failed_clears": 88,
+        "successful_clears": 10,
+        "distance_m": 24139.904645772018,
+        "no_signal": 283,
+        "no_signal_revisits": 11,
+        "station_revisits": 13,
+        "pairs_started": 1,
+        "pairs_received": 1,
+        "local_measurements": 8
+      },
+      "estimated_virtual_time_s": 6948.980929154403,
+      "average_clear_time_s": 694.8980929154403,
+      "planning_elapsed_s": 4.108000000007451,
+      "last_decision": {
+        "upper_s": 972.8824070831647,
+        "direction_upper_s": 928.4044519644287,
+        "direct_upper_s": 967.8824070831646,
+        "includes_no_signal": true,
+        "intervals_total": 32,
+        "intervals_fallback": 0,
+        "eligible": true,
+        "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+      },
+      "fallback_route_estimate_s": 945.3733481006905,
+      "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+      "source_budgets": {
+        "1": {
+          "measurements": 1,
+          "closed_distance_m": 309.6523188024953
+        },
+        "3": {
+          "measurements": 1,
+          "closed_distance_m": 1523.601571513148
+        },
+        "4": {
+          "measurements": 1,
+          "closed_distance_m": 157.69452206304223
+        },
+        "5": {
+          "measurements": 1,
+          "closed_distance_m": 1950.8711957198843
+        },
+        "8": {
+          "measurements": 2,
+          "closed_distance_m": 512.0154513692877
+        },
+        "9": {
+          "measurements": 1,
+          "closed_distance_m": 1363.881716401513
+        },
+        "11": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "14": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "19": {
+          "measurements": 1,
+          "closed_distance_m": 28.902047339167726
+        }
+      },
+      "offline_all_cleared": true,
+      "source_count": 10,
+      "config": {
+        "local_measurement_limit": 4,
+        "local_distance_limit_m": 4000.0,
+        "candidate_limit": 24,
+        "response_intervals": 32,
+        "planning_call_s": 1.5,
+        "planning_total_s": 10.0,
+        "guaranteed_saving_s": 1.0,
+        "uncertain_saving_s": 10.0,
+        "uncertain_extra_s": 30.0,
+        "services_per_station": 4,
+        "route_depth": 3,
+        "route_width": 12,
+        "exit_reserve_s": 30.0
+      },
+      "clearance_rate": 1.0,
+      "real_elapsed_s": 7.26600000000326,
+      "actions_including_exit": 402,
+      "audited_region_versions": 19,
+      "audited_clear_plans": 10,
+      "first_clear_station_cursor": 0
+    },
+    {
+      "seed": 29,
+      "strategy": "q4_certified_cooperative",
+      "cleared_count": 16,
+      "known_count": 16,
+      "channel_states": {
+        "1": "CLEARED",
+        "2": "CLEARED",
+        "3": "CLEARED",
+        "4": "CLEARED",
+        "5": "CLEARED",
+        "6": "CLEARED",
+        "7": "CLEARED",
+        "8": "CLEARED",
+        "9": "UNKNOWN",
+        "10": "UNKNOWN",
+        "11": "CLEARED",
+        "12": "UNKNOWN",
+        "13": "CLEARED",
+        "14": "CLEARED",
+        "15": "UNKNOWN",
+        "16": "CLEARED",
+        "17": "CLEARED",
+        "18": "CLEARED",
+        "19": "CLEARED",
+        "20": "CLEARED"
+      },
+      "completion": {
+        "complete": true,
+        "method": "16_DISTINCT_CHANNELS_CLEARED",
+        "channels": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          11,
+          13,
+          14,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      },
+      "stop_reason": null,
+      "receiver_channel": 11,
+      "position": [
+        -872.0571472790311,
+        349.12304276842394
+      ],
+      "station_cursor": 20,
+      "station_count": 21,
+      "station_certificate": {
+        "passed": true,
+        "floating": {
+          "passed": true,
+          "stations": 21,
+          "root_triangles": 28,
+          "leaf_triangles": 268,
+          "maximum_subdivision_depth": 5,
+          "max_provider_distance_m": 998.8993503354292,
+          "outer_polygon_inradius_m": 1800.485740202823,
+          "boundary_margin_m": 0.48574020282308084,
+          "range_margin_m": 1.100649664570824,
+          "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+        },
+        "exact": {
+          "passed": true,
+          "leaf_triangles": 268,
+          "arithmetic": "exact fractions of stored binary64 station coordinates",
+          "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+        },
+        "fallback": false
+      },
+      "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+      "metrics": {
+        "measurements": 241,
+        "switches": 233,
+        "clear_requests": 295,
+        "failed_clears": 279,
+        "successful_clears": 16,
+        "distance_m": 25348.409095447852,
+        "no_signal": 216,
+        "no_signal_revisits": 12,
+        "station_revisits": 16,
+        "pairs_started": 0,
+        "pairs_received": 0,
+        "local_measurements": 5
+      },
+      "estimated_virtual_time_s": 7424.68181908957,
+      "average_clear_time_s": 464.04261369309813,
+      "planning_elapsed_s": 4.453999999983353,
+      "last_decision": {
+        "upper_s": 1023.0478971326598,
+        "direction_upper_s": 283.2323020956869,
+        "direct_upper_s": 1017.0478971326598,
+        "includes_no_signal": true,
+        "intervals_total": 32,
+        "intervals_fallback": 0,
+        "eligible": true,
+        "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+      },
+      "fallback_route_estimate_s": 12.041280837953966,
+      "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+      "source_budgets": {
+        "1": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "2": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "3": {
+          "measurements": 1,
+          "closed_distance_m": 196.81528065246567
+        },
+        "4": {
+          "measurements": 1,
+          "closed_distance_m": 769.61845427671
+        },
+        "5": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "6": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "7": {
+          "measurements": 1,
+          "closed_distance_m": 157.6106453951576
+        },
+        "8": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "11": {
+          "measurements": 1,
+          "closed_distance_m": 2669.6563497491497
+        },
+        "13": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "14": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "16": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "18": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "19": {
+          "measurements": 1,
+          "closed_distance_m": 326.6944471275864
+        },
+        "20": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        }
+      },
+      "offline_all_cleared": true,
+      "source_count": 16,
+      "config": {
+        "local_measurement_limit": 4,
+        "local_distance_limit_m": 4000.0,
+        "candidate_limit": 24,
+        "response_intervals": 32,
+        "planning_call_s": 1.5,
+        "planning_total_s": 10.0,
+        "guaranteed_saving_s": 1.0,
+        "uncertain_saving_s": 10.0,
+        "uncertain_extra_s": 30.0,
+        "services_per_station": 4,
+        "route_depth": 3,
+        "route_width": 12,
+        "exit_reserve_s": 30.0
+      },
+      "clearance_rate": 1.0,
+      "real_elapsed_s": 9.796999999991385,
+      "actions_including_exit": 537,
+      "audited_region_versions": 24,
+      "audited_clear_plans": 16,
+      "first_clear_station_cursor": 0
+    },
+    {
+      "seed": 47,
+      "strategy": "q4_certified_cooperative",
+      "cleared_count": 10,
+      "known_count": 10,
+      "channel_states": {
+        "1": "ABSENT",
+        "2": "CLEARED",
+        "3": "ABSENT",
+        "4": "ABSENT",
+        "5": "ABSENT",
+        "6": "ABSENT",
+        "7": "CLEARED",
+        "8": "CLEARED",
+        "9": "CLEARED",
+        "10": "ABSENT",
+        "11": "CLEARED",
+        "12": "ABSENT",
+        "13": "ABSENT",
+        "14": "ABSENT",
+        "15": "ABSENT",
+        "16": "CLEARED",
+        "17": "CLEARED",
+        "18": "CLEARED",
+        "19": "CLEARED",
+        "20": "CLEARED"
+      },
+      "completion": {
+        "complete": true,
+        "method": "CLEARED_OR_FULL_NETWORK_ABSENT",
+        "cleared": [
+          2,
+          7,
+          8,
+          9,
+          11,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "absent": [
+          1,
+          3,
+          4,
+          5,
+          6,
+          10,
+          12,
+          13,
+          14,
+          15
+        ],
+        "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e"
+      },
+      "stop_reason": null,
+      "receiver_channel": 7,
+      "position": [
+        -826.3676981502342,
+        599.5859851607079
+      ],
+      "station_cursor": 20,
+      "station_count": 21,
+      "station_certificate": {
+        "passed": true,
+        "floating": {
+          "passed": true,
+          "stations": 21,
+          "root_triangles": 28,
+          "leaf_triangles": 268,
+          "maximum_subdivision_depth": 5,
+          "max_provider_distance_m": 998.8993503354292,
+          "outer_polygon_inradius_m": 1800.485740202823,
+          "boundary_margin_m": 0.48574020282308084,
+          "range_margin_m": 1.100649664570824,
+          "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+        },
+        "exact": {
+          "passed": true,
+          "leaf_triangles": 268,
+          "arithmetic": "exact fractions of stored binary64 station coordinates",
+          "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+        },
+        "fallback": false
+      },
+      "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+      "metrics": {
+        "measurements": 304,
+        "switches": 291,
+        "clear_requests": 210,
+        "failed_clears": 200,
+        "successful_clears": 10,
+        "distance_m": 25183.850650720393,
+        "no_signal": 287,
+        "no_signal_revisits": 6,
+        "station_revisits": 9,
+        "pairs_started": 1,
+        "pairs_received": 1,
+        "local_measurements": 4
+      },
+      "estimated_virtual_time_s": 7497.770130144078,
+      "average_clear_time_s": 749.7770130144079,
+      "planning_elapsed_s": 3.313000000009197,
+      "last_decision": {
+        "upper_s": 890.932023803793,
+        "direction_upper_s": 868.5712992613317,
+        "direct_upper_s": 884.932023803793,
+        "includes_no_signal": true,
+        "intervals_total": 32,
+        "intervals_fallback": 0,
+        "eligible": true,
+        "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+      },
+      "fallback_route_estimate_s": 910.195174315943,
+      "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+      "source_budgets": {
+        "7": {
+          "measurements": 1,
+          "closed_distance_m": 156.5038336438945
+        },
+        "8": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "9": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "11": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "16": {
+          "measurements": 1,
+          "closed_distance_m": 157.14306584647954
+        },
+        "17": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "18": {
+          "measurements": 1,
+          "closed_distance_m": 1362.464061691588
+        },
+        "19": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "20": {
+          "measurements": 1,
+          "closed_distance_m": 2162.506478954924
+        }
+      },
+      "offline_all_cleared": true,
+      "source_count": 10,
+      "config": {
+        "local_measurement_limit": 4,
+        "local_distance_limit_m": 4000.0,
+        "candidate_limit": 24,
+        "response_intervals": 32,
+        "planning_call_s": 1.5,
+        "planning_total_s": 10.0,
+        "guaranteed_saving_s": 1.0,
+        "uncertain_saving_s": 10.0,
+        "uncertain_extra_s": 30.0,
+        "services_per_station": 4,
+        "route_depth": 3,
+        "route_width": 12,
+        "exit_reserve_s": 30.0
+      },
+      "clearance_rate": 1.0,
+      "real_elapsed_s": 6.484000000011292,
+      "actions_including_exit": 515,
+      "audited_region_versions": 16,
+      "audited_clear_plans": 10,
+      "first_clear_station_cursor": 0
+    },
+    {
+      "seed": 47,
+      "strategy": "q4_certified_cooperative",
+      "cleared_count": 16,
+      "known_count": 16,
+      "channel_states": {
+        "1": "CLEARED",
+        "2": "CLEARED",
+        "3": "UNKNOWN",
+        "4": "CLEARED",
+        "5": "CLEARED",
+        "6": "CLEARED",
+        "7": "CLEARED",
+        "8": "UNKNOWN",
+        "9": "CLEARED",
+        "10": "CLEARED",
+        "11": "UNKNOWN",
+        "12": "CLEARED",
+        "13": "CLEARED",
+        "14": "CLEARED",
+        "15": "CLEARED",
+        "16": "CLEARED",
+        "17": "UNKNOWN",
+        "18": "CLEARED",
+        "19": "CLEARED",
+        "20": "CLEARED"
+      },
+      "completion": {
+        "complete": true,
+        "method": "16_DISTINCT_CHANNELS_CLEARED",
+        "channels": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          7,
+          9,
+          10,
+          12,
+          13,
+          14,
+          15,
+          16,
+          18,
+          19,
+          20
+        ]
+      },
+      "stop_reason": null,
+      "receiver_channel": 6,
+      "position": [
+        -1664.2255581097563,
+        -697.5056916609527
+      ],
+      "station_cursor": 20,
+      "station_count": 21,
+      "station_certificate": {
+        "passed": true,
+        "floating": {
+          "passed": true,
+          "stations": 21,
+          "root_triangles": 28,
+          "leaf_triangles": 268,
+          "maximum_subdivision_depth": 5,
+          "max_provider_distance_m": 998.8993503354292,
+          "outer_polygon_inradius_m": 1800.485740202823,
+          "boundary_margin_m": 0.48574020282308084,
+          "range_margin_m": 1.100649664570824,
+          "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+        },
+        "exact": {
+          "passed": true,
+          "leaf_triangles": 268,
+          "arithmetic": "exact fractions of stored binary64 station coordinates",
+          "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+        },
+        "fallback": false
+      },
+      "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+      "metrics": {
+        "measurements": 224,
+        "switches": 218,
+        "clear_requests": 433,
+        "failed_clears": 417,
+        "successful_clears": 16,
+        "distance_m": 28914.11867738193,
+        "no_signal": 201,
+        "no_signal_revisits": 17,
+        "station_revisits": 20,
+        "pairs_started": 0,
+        "pairs_received": 0,
+        "local_measurements": 4
+      },
+      "estimated_virtual_time_s": 8451.823735476386,
+      "average_clear_time_s": 528.2389834672741,
+      "planning_elapsed_s": 3.7189999999827705,
+      "last_decision": {
+        "upper_s": 562.1026511932428,
+        "direction_upper_s": 291.45688017996684,
+        "direct_upper_s": 556.1026511932428,
+        "includes_no_signal": true,
+        "intervals_total": 32,
+        "intervals_fallback": 0,
+        "eligible": true,
+        "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+      },
+      "fallback_route_estimate_s": 577.4422136111034,
+      "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+      "source_budgets": {
+        "2": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "4": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "5": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "6": {
+          "measurements": 1,
+          "closed_distance_m": 3075.2151012621885
+        },
+        "7": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "9": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "10": {
+          "measurements": 1,
+          "closed_distance_m": 207.81208990443955
+        },
+        "12": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "13": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "14": {
+          "measurements": 1,
+          "closed_distance_m": 2692.2280802575083
+        },
+        "15": {
+          "measurements": 1,
+          "closed_distance_m": 157.78009075102582
+        },
+        "16": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "18": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "19": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        },
+        "20": {
+          "measurements": 0,
+          "closed_distance_m": 0.0
+        }
+      },
+      "offline_all_cleared": true,
+      "source_count": 16,
+      "config": {
+        "local_measurement_limit": 4,
+        "local_distance_limit_m": 4000.0,
+        "candidate_limit": 24,
+        "response_intervals": 32,
+        "planning_call_s": 1.5,
+        "planning_total_s": 10.0,
+        "guaranteed_saving_s": 1.0,
+        "uncertain_saving_s": 10.0,
+        "uncertain_extra_s": 30.0,
+        "services_per_station": 4,
+        "route_depth": 3,
+        "route_width": 12,
+        "exit_reserve_s": 30.0
+      },
+      "clearance_rate": 1.0,
+      "real_elapsed_s": 9.015999999988708,
+      "actions_including_exit": 658,
+      "audited_region_versions": 22,
+      "audited_clear_plans": 16,
+      "first_clear_station_cursor": 0
+    }
+  ]
+}

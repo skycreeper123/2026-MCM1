@@ -1,0 +1,172 @@
+{
+  "task_completed": true,
+  "exit_accepted": true,
+  "entered": true,
+  "error": null,
+  "unresolved_request": false,
+  "mode_verification": "operator_confirmed; API may not expose mode",
+  "actual_virtual_time_s": 8338.432094,
+  "planner": {
+    "strategy": "q4_certified_cooperative",
+    "cleared_count": 11,
+    "known_count": 11,
+    "channel_states": {
+      "1": "ABSENT",
+      "2": "ABSENT",
+      "3": "CLEARED",
+      "4": "CLEARED",
+      "5": "CLEARED",
+      "6": "ABSENT",
+      "7": "ABSENT",
+      "8": "CLEARED",
+      "9": "CLEARED",
+      "10": "CLEARED",
+      "11": "CLEARED",
+      "12": "ABSENT",
+      "13": "ABSENT",
+      "14": "CLEARED",
+      "15": "CLEARED",
+      "16": "ABSENT",
+      "17": "CLEARED",
+      "18": "ABSENT",
+      "19": "CLEARED",
+      "20": "ABSENT"
+    },
+    "completion": {
+      "complete": true,
+      "method": "CLEARED_OR_FULL_NETWORK_ABSENT",
+      "cleared": [
+        3,
+        4,
+        5,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15,
+        17,
+        19
+      ],
+      "absent": [
+        1,
+        2,
+        6,
+        7,
+        12,
+        13,
+        16,
+        18,
+        20
+      ],
+      "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e"
+    },
+    "stop_reason": null,
+    "receiver_channel": 20,
+    "position": [
+      -1614.2713526541938,
+      931.9999999999999
+    ],
+    "station_cursor": 20,
+    "station_count": 21,
+    "station_certificate": {
+      "passed": true,
+      "floating": {
+        "passed": true,
+        "stations": 21,
+        "root_triangles": 28,
+        "leaf_triangles": 268,
+        "maximum_subdivision_depth": 5,
+        "max_provider_distance_m": 998.8993503354292,
+        "outer_polygon_inradius_m": 1800.485740202823,
+        "boundary_margin_m": 0.48574020282308084,
+        "range_margin_m": 1.100649664570824,
+        "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+      },
+      "exact": {
+        "passed": true,
+        "leaf_triangles": 268,
+        "arithmetic": "exact fractions of stored binary64 station coordinates",
+        "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+      },
+      "fallback": false
+    },
+    "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+    "metrics": {
+      "measurements": 265,
+      "switches": 254,
+      "clear_requests": 264,
+      "failed_clears": 253,
+      "successful_clears": 11,
+      "distance_m": 29727.16052073319,
+      "no_signal": 239,
+      "no_signal_revisits": 19,
+      "station_revisits": 26,
+      "pairs_started": 0,
+      "pairs_received": 0,
+      "local_measurements": 8
+    },
+    "estimated_virtual_time_s": 8338.432104146637,
+    "average_clear_time_s": 758.0392821951489,
+    "planning_elapsed_s": 5.503999999942607,
+    "last_decision": {
+      "upper_s": 215.4292306619272,
+      "direction_upper_s": 188.67437371774542,
+      "direct_upper_s": 209.4292306619272,
+      "includes_no_signal": true,
+      "intervals_total": 32,
+      "intervals_fallback": 0,
+      "eligible": true,
+      "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+    },
+    "fallback_route_estimate_s": 979.5165910677974,
+    "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+    "source_budgets": {
+      "3": {
+        "measurements": 1,
+        "closed_distance_m": 1571.5882130589632
+      },
+      "4": {
+        "measurements": 0,
+        "closed_distance_m": 0.0
+      },
+      "5": {
+        "measurements": 0,
+        "closed_distance_m": 0.0
+      },
+      "8": {
+        "measurements": 2,
+        "closed_distance_m": 3394.826985273054
+      },
+      "9": {
+        "measurements": 3,
+        "closed_distance_m": 103.18574815643967
+      },
+      "10": {
+        "measurements": 0,
+        "closed_distance_m": 0.0
+      },
+      "11": {
+        "measurements": 0,
+        "closed_distance_m": 0.0
+      },
+      "14": {
+        "measurements": 0,
+        "closed_distance_m": 0.0
+      },
+      "15": {
+        "measurements": 1,
+        "closed_distance_m": 2000.048769780482
+      },
+      "17": {
+        "measurements": 0,
+        "closed_distance_m": 0.0
+      },
+      "19": {
+        "measurements": 1,
+        "closed_distance_m": 38.258596383830174
+      }
+    }
+  },
+  "log_path": "F:\\ivo_zheng\\26_CUMCM\\B\\q4\\runs\\q4-20260911-230428-75a2dc6a.jsonl"
+}

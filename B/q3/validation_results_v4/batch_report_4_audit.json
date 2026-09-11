@@ -1,0 +1,238 @@
+{
+  "date": "2026-09-11",
+  "previous": {
+    "runs": 5,
+    "sources": 68,
+    "weighted_time": 351.1731926945454,
+    "mean": 352.04044479004585,
+    "median": 356.81584112810117,
+    "sd": 12.551596466244057,
+    "cv": 3.565384788026197,
+    "minimum": 335.7334966697996,
+    "maximum": 366.86813926139394,
+    "time_mean": 4775.955420645817,
+    "time_median": 4654.172679724033,
+    "time_sd": 406.15092579740724,
+    "time_min": 4402.417671136727,
+    "time_max": 5371.7359467167935,
+    "actions": 578,
+    "responses": 583,
+    "retries": 8,
+    "retry_runs": 2,
+    "clear_success_pct": 61.81818181818181
+  },
+  "current": {
+    "runs": 12,
+    "sources": 156,
+    "weighted_time": 302.01044646846134,
+    "mean": 308.50183169438105,
+    "median": 302.8327566290312,
+    "sd": 47.410929159746225,
+    "cv": 15.368119177559409,
+    "minimum": 252.78682182317115,
+    "maximum": 384.4755770347665,
+    "time_mean": 3926.1358040899972,
+    "time_median": 3918.74004888747,
+    "time_sd": 309.1881211134233,
+    "time_min": 3565.4498578543235,
+    "time_max": 4437.8176728953285,
+    "actions": 1430,
+    "responses": 1442,
+    "retries": 39,
+    "retry_runs": 11,
+    "clear_success_pct": 84.32432432432432
+  },
+  "checks": "All assertions passed",
+  "rows": [
+    {
+      "case": "UTU7-FWAH-UW94-CP9A",
+      "summary": "q3-20260911-205724-09e38dfb.summary.json",
+      "result": "practice-p3-768035603023414777-UTU7-FWAH-UW94-CP9A.result.json",
+      "match_gap_ms": 0,
+      "virtual_gap_s": 2.4537848730687983e-06,
+      "retries": 0,
+      "retry_errors": {}
+    },
+    {
+      "case": "J84J-3VBM-TVBP-VRKE",
+      "summary": "q3-20260911-205739-b129ee4e.summary.json",
+      "result": "practice-p3-6143383492706136145-J84J-3VBM-TVBP-VRKE.result.json",
+      "match_gap_ms": 0,
+      "virtual_gap_s": 1.5447276382474229e-06,
+      "retries": 7,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 2,
+        "<urlopen error [WinError 10053] 你的主机中的软件中止了一个已建立的连接。>": 4,
+        "<urlopen error [WinError 10054] 远程主机强迫关闭了一个现有的连接。>": 1
+      }
+    },
+    {
+      "case": "FU5H-E2NA-9NNV-KCFG",
+      "summary": "q3-20260911-205816-7f4cde44.summary.json",
+      "result": "practice-p3-7382941152713919789-FU5H-E2NA-9NNV-KCFG.result.json",
+      "match_gap_ms": 0,
+      "virtual_gap_s": 1.5113528206711635e-07,
+      "retries": 3,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 2,
+        "<urlopen error [WinError 10053] 你的主机中的软件中止了一个已建立的连接。>": 1
+      }
+    },
+    {
+      "case": "MYR2-X46S-3AZ9-HCR2",
+      "summary": "q3-20260911-205843-8669413a.summary.json",
+      "result": "practice-p3-8745601684718376368-MYR2-X46S-3AZ9-HCR2.result.json",
+      "match_gap_ms": 0,
+      "virtual_gap_s": 2.617568497953471e-06,
+      "retries": 3,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 2,
+        "<urlopen error [WinError 10053] 你的主机中的软件中止了一个已建立的连接。>": 1
+      }
+    },
+    {
+      "case": "WU9T-2AY2-G8AF-Y4PZ",
+      "summary": "q3-20260911-205909-2008fdaa.summary.json",
+      "result": "practice-p3-3104455580525268962-WU9T-2AY2-G8AF-Y4PZ.result.json",
+      "match_gap_ms": 0,
+      "virtual_gap_s": 1.7697871044219937e-06,
+      "retries": 2,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 2
+      }
+    },
+    {
+      "case": "VRJ3-Y6NN-NB69-CB8B",
+      "summary": "q3-20260911-205931-62e86f9f.summary.json",
+      "result": "practice-p3-1697827577596135473-VRJ3-Y6NN-NB69-CB8B.result.json",
+      "match_gap_ms": 1,
+      "virtual_gap_s": 7.588414518977515e-07,
+      "retries": 3,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 1,
+        "<urlopen error [WinError 10053] 你的主机中的软件中止了一个已建立的连接。>": 2
+      }
+    },
+    {
+      "case": "FKC4-HRQ7-MDAA-R3EP",
+      "summary": "q3-20260911-205954-74dc8db1.summary.json",
+      "result": "practice-p3-3852873510170912870-FKC4-HRQ7-MDAA-R3EP.result.json",
+      "match_gap_ms": 0,
+      "virtual_gap_s": 6.171030690893531e-07,
+      "retries": 4,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 2,
+        "<urlopen error [WinError 10053] 你的主机中的软件中止了一个已建立的连接。>": 2
+      }
+    },
+    {
+      "case": "T9YK-9JAB-WPB9-3W6C",
+      "summary": "q3-20260911-210045-b799a120.summary.json",
+      "result": "practice-p3-2683597384579028682-T9YK-9JAB-WPB9-3W6C.result.json",
+      "match_gap_ms": 1,
+      "virtual_gap_s": 1.2414620869094506e-06,
+      "retries": 3,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 2,
+        "<urlopen error [WinError 10054] 远程主机强迫关闭了一个现有的连接。>": 1
+      }
+    },
+    {
+      "case": "2HSQ-ZAJ9-WFZ7-UBB9",
+      "summary": "q3-20260911-210114-3fa69898.summary.json",
+      "result": "practice-p3-618979282078852781-2HSQ-ZAJ9-WFZ7-UBB9.result.json",
+      "match_gap_ms": 0,
+      "virtual_gap_s": 1.4567649486707523e-07,
+      "retries": 3,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 1,
+        "<urlopen error [WinError 10053] 你的主机中的软件中止了一个已建立的连接。>": 2
+      }
+    },
+    {
+      "case": "AHTC-HF7B-YRHU-GGTK",
+      "summary": "q3-20260911-210141-2b4ae47e.summary.json",
+      "result": "practice-p3-2513615275639857812-AHTC-HF7B-YRHU-GGTK.result.json",
+      "match_gap_ms": 0,
+      "virtual_gap_s": 1.895328750833869e-06,
+      "retries": 3,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 1,
+        "<urlopen error [WinError 10053] 你的主机中的软件中止了一个已建立的连接。>": 2
+      }
+    },
+    {
+      "case": "7FRJ-FCHM-PEDQ-3YR6",
+      "summary": "q3-20260911-210204-1d4ca8b9.summary.json",
+      "result": "practice-p3-903000416565767815-7FRJ-FCHM-PEDQ-3YR6.result.json",
+      "match_gap_ms": 0,
+      "virtual_gap_s": 7.804865163052455e-07,
+      "retries": 4,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 1,
+        "<urlopen error [WinError 10053] 你的主机中的软件中止了一个已建立的连接。>": 3
+      }
+    },
+    {
+      "case": "5JYN-GXJ4-EXRX-WK8A",
+      "summary": "q3-20260911-210230-f8f9c347.summary.json",
+      "result": "practice-p3-6484962536429693863-5JYN-GXJ4-EXRX-WK8A.result.json",
+      "match_gap_ms": 1,
+      "virtual_gap_s": 2.17073829844594e-06,
+      "retries": 4,
+      "retry_errors": {
+        "[WinError 10054] 远程主机强迫关闭了一个现有的连接。": 3,
+        "<urlopen error [WinError 10053] 你的主机中的软件中止了一个已建立的连接。>": 1
+      }
+    }
+  ],
+  "input_sha256": {
+    "Q3_BATCH_TEST_REPORT_3.md": "6c1682d7b009ab3104e815336be8ba29998a387326e524852305fec2e8e5ecf9",
+    "runs\\q3-20260911-175504-da3ff81c.summary.json": "700042adbe74e50b22a30b8c8598bf6e77bc4951807ad3fda0f697e433f5eb0f",
+    "runs\\q3-20260911-175504-da3ff81c.jsonl": "04d16c70836e7b788bd567478e6d84a11d776e0b675363a6066a953aa0cf6c20",
+    "runs\\q3-20260911-175622-56b44046.summary.json": "9cfa86be7d23d6d5ed1e50013daefd03542eb4a81828dcdce21a2e4a33a9d565",
+    "runs\\q3-20260911-175622-56b44046.jsonl": "c0bfc5e167f0e445c3dd64b53fcb9a2a04573f6b47f404256fc38a7a628920c9",
+    "runs\\q3-20260911-175732-1d57d1aa.summary.json": "8a135a8c85f6f4ddf316950aef074d4b78ea10f221287287cbc648b73e6a3d79",
+    "runs\\q3-20260911-175732-1d57d1aa.jsonl": "8ff60bedefbb840551d8240377c7cc5b23c699a7227596fa5c2f10af2c33fe28",
+    "runs\\q3-20260911-175803-2f077ba9.summary.json": "5968586f4d1175f6cc794f02bcadac25d2da566dde5fcf87aa150c26b08c7d31",
+    "runs\\q3-20260911-175803-2f077ba9.jsonl": "ffe657d5b9a8fc73aa0b9243cba2ef89f197cc1c50f4addf108e143fccec78b2",
+    "runs\\q3-20260911-175834-1cd0c658.summary.json": "e2e3d0aa6137db5732904f6f7e791242472a297f17386af768e33e64bbebb9b7",
+    "runs\\q3-20260911-175834-1cd0c658.jsonl": "b4931b2b0643398e899d21a811ce6bb74d41c166ece2998e0eac7b4d3d810310",
+    "runs\\q3-20260911-205724-09e38dfb.summary.json": "86e192a76fa157d8353f564a0be875cd842b9ba6c9d4f975c46674920399c3e4",
+    "runs\\q3-20260911-205724-09e38dfb.jsonl": "47723a549607dbfac8887f40ca8eef6f23cb81eb81b2c3be21fd38831f6c9a9f",
+    "runs\\q3-20260911-205739-b129ee4e.summary.json": "7c00c44d0166c750a14edad816f81420ac9ce50a38041fa45cfa50a11d55b7a2",
+    "runs\\q3-20260911-205739-b129ee4e.jsonl": "877b936749d481f372b625e6791e4e140a38110228865e8bc054dcc64c21eaf9",
+    "runs\\q3-20260911-205816-7f4cde44.summary.json": "317712731b42087e63507b9cc76536b97991304211c18e1150cb517f457594a5",
+    "runs\\q3-20260911-205816-7f4cde44.jsonl": "4150855d810a90f13305ef9b1f388380eafa97d676f1e00b4a42a7fa30f02d27",
+    "runs\\q3-20260911-205843-8669413a.summary.json": "e30249d4fe485c8b43b3c7c0b0f22d2e02216b926dbfd83682dec8c820cf24d9",
+    "runs\\q3-20260911-205843-8669413a.jsonl": "90246149b288c19011f0d00f0c5090dc7d2c7b9016b5ce26a512eb29a7a49f6f",
+    "runs\\q3-20260911-205909-2008fdaa.summary.json": "2c3c3f4cc4c0eacc4440c85ccb542d6f84515f00513daa5eafdb859a1888d6e3",
+    "runs\\q3-20260911-205909-2008fdaa.jsonl": "6db1702512a011e7ebded7f3035e75fa34596d6939eb9b20bb5055e892d3bcfa",
+    "runs\\q3-20260911-205931-62e86f9f.summary.json": "4f43e0e03b6877516208c862123ef08e227aa87b7521a4edc14a33d084ab813b",
+    "runs\\q3-20260911-205931-62e86f9f.jsonl": "46bdf9841970e7f8e83e7a5412b3ec2ddd92abb1ad31c1189c92c5bdc90199c7",
+    "runs\\q3-20260911-205954-74dc8db1.summary.json": "9c7e663eb24a778793398a93e09dd32f2c2538096e575c25d7e8aa0c84d1074c",
+    "runs\\q3-20260911-205954-74dc8db1.jsonl": "a39621c4e0ab3aeb66a6a84059c6b5e2dab0eb9ef805aa19c9c9c105478b7e3a",
+    "runs\\q3-20260911-210045-b799a120.summary.json": "66c0ff825d72371ef3a8f7655c07cb6cac7868ea4190f176c58dba1b51065d6e",
+    "runs\\q3-20260911-210045-b799a120.jsonl": "81b308c7c2d4c2fa03b51cbabcf76ec4248b748766dbaf113a179ef40a1ce9fb",
+    "runs\\q3-20260911-210114-3fa69898.summary.json": "34d45adaf1b529d76b426549afc84ae5d7b05a8e2bf976ee75ef5550d4b9ef3e",
+    "runs\\q3-20260911-210114-3fa69898.jsonl": "464434ddcd3deac40292edecc47122bab1d26a405057777f1039d0b4a900537d",
+    "runs\\q3-20260911-210141-2b4ae47e.summary.json": "ee66f8c16790256e5743d288718940fb8731a9e9608210b3f450c04e61e41e0f",
+    "runs\\q3-20260911-210141-2b4ae47e.jsonl": "4bf71c35fb99498900430fdd9bed0b142e430d665cd1a161b4f3d6bd67c5e860",
+    "runs\\q3-20260911-210204-1d4ca8b9.summary.json": "1adeb7bcd57272fe372a236044addc20e7c2a5f606ddbfee7dad4df011a2d859",
+    "runs\\q3-20260911-210204-1d4ca8b9.jsonl": "25d07b9b3fc3541df1658a8c87c1383e8530983a81b912564320d79b45e56d0a",
+    "runs\\q3-20260911-210230-f8f9c347.summary.json": "6b65fe961c156e5f290479c38d0bcfc9089d6931a3db68214ab7e2db3e0f69f5",
+    "runs\\q3-20260911-210230-f8f9c347.jsonl": "130155765c0a36c1a1f593cb7fa54cdad0f7af7a300fb1bbb2962a83babf02a9",
+    "Q3_BATCH_TEST_DATA\\practice-p3-768035603023414777-UTU7-FWAH-UW94-CP9A.result.json": "758a2dc9bbd085c241184601ae83c268c92650d39a8da8a221fd6680f99c8755",
+    "Q3_BATCH_TEST_DATA\\practice-p3-6143383492706136145-J84J-3VBM-TVBP-VRKE.result.json": "37dd4da438afcd01570d018b95fae7d5cf333934ba08f1617832ae46938444ea",
+    "Q3_BATCH_TEST_DATA\\practice-p3-7382941152713919789-FU5H-E2NA-9NNV-KCFG.result.json": "6904020b3025fa025f690d7c999bb0ad1d95d42b4d0ee4f8f147d24e33c7bcc8",
+    "Q3_BATCH_TEST_DATA\\practice-p3-8745601684718376368-MYR2-X46S-3AZ9-HCR2.result.json": "9559a2a7bb0015d5ca1daa0b7372867ab8721c9c5b59b5ee759df327e0182010",
+    "Q3_BATCH_TEST_DATA\\practice-p3-3104455580525268962-WU9T-2AY2-G8AF-Y4PZ.result.json": "b823fe8446b3fce9457d00bbe1dfc379e87bd046bc2f9bb89b48ebdc2916449d",
+    "Q3_BATCH_TEST_DATA\\practice-p3-1697827577596135473-VRJ3-Y6NN-NB69-CB8B.result.json": "a61bc09ee93c068809349447f2cdc634ff8fa219e299dc0177e435b884488811",
+    "Q3_BATCH_TEST_DATA\\practice-p3-3852873510170912870-FKC4-HRQ7-MDAA-R3EP.result.json": "ed4fba3021509845edf4e99ec0fe18faeda559745f30121f731bbfb5c4eb83b2",
+    "Q3_BATCH_TEST_DATA\\practice-p3-2683597384579028682-T9YK-9JAB-WPB9-3W6C.result.json": "6f3eca6e35f257dddfa0b7f84b472df299e2d6f06eae2702819dfb37f3cc8df4",
+    "Q3_BATCH_TEST_DATA\\practice-p3-618979282078852781-2HSQ-ZAJ9-WFZ7-UBB9.result.json": "01f3d8ca056193145fd04b41394ec655fa88499ed0658a8e73334586e676a502",
+    "Q3_BATCH_TEST_DATA\\practice-p3-2513615275639857812-AHTC-HF7B-YRHU-GGTK.result.json": "5a47b5913e1e2856d5a61044f8ada6c2ab2d95ec94f9ecc44c1ee9016b1f180f",
+    "Q3_BATCH_TEST_DATA\\practice-p3-903000416565767815-7FRJ-FCHM-PEDQ-3YR6.result.json": "d8cd7c01c2ada8f83266d646746d90eea3b8e7f9d7fe754361bc9c9d5fe36cd9",
+    "Q3_BATCH_TEST_DATA\\practice-p3-6484962536429693863-5JYN-GXJ4-EXRX-WK8A.result.json": "bcac49db1d971ca80e3fd8f0beb951010a24a19578dc8ea92eb8a64b17f93541"
+  }
+}

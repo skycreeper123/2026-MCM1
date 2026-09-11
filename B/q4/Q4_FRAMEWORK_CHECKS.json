@@ -1,0 +1,61 @@
+{
+  "coverage": {
+    "passed": true,
+    "stations": 21,
+    "root_triangles": 28,
+    "leaf_triangles": 268,
+    "maximum_subdivision_depth": 5,
+    "max_provider_distance_m": 998.8993503354292,
+    "outer_polygon_inradius_m": 1800.485740202823,
+    "boundary_margin_m": 0.48574020282308084,
+    "range_margin_m": 1.100649664570824,
+    "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+  },
+  "exact_geometry": {
+    "passed": true,
+    "leaf_triangles": 268,
+    "arithmetic": "exact fractions of stored binary64 station coordinates",
+    "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+  },
+  "station_route": {
+    "station_ids": [
+      0,
+      6,
+      7,
+      8,
+      1,
+      2,
+      3,
+      4,
+      5,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "length_m": 17808.43161440987,
+    "lower_bound_m": 17808.431614409874,
+    "relative_gap": 0.0,
+    "solver_optimal": true,
+    "cut_rounds": 1,
+    "scope": "fixed 21 stations, start 0, free endpoint, station movement only"
+  },
+  "reception_lemmas": {
+    "positive_hull_cases": 10000,
+    "paired_probe_cases": 10000,
+    "passed": true,
+    "scope": "synthetic checks supplement the algebraic proofs"
+  },
+  "baseline_scan_measure_upper": 420,
+  "baseline_clear_request_upper": 2432,
+  "baseline_virtual_upper_s": 23201.686322881975,
+  "not_run": "Q4 end-to-end controller, official practice or formal tests"
+}
