@@ -1,0 +1,36 @@
+{
+  "completed": true,
+  "entered": true,
+  "error": null,
+  "exit_response": {
+    "accepted": true,
+    "real_timestamp_ms": 1789061746325,
+    "virtual_time_s": 8134.791492,
+    "exit_reason": "user_exit"
+  },
+  "planner_summary": {
+    "session_status": "EXITED",
+    "completion_reason": "ALL_CHANNELS_RESOLVED",
+    "channel_counts": {
+      "UNKNOWN": 0,
+      "DETECTED": 0,
+      "CLEARED": 13,
+      "ABSENT": 7
+    },
+    "cleared_count": 13,
+    "virtual_time_s": 8134.791491635246,
+    "average_clear_time_s": 625.7531916642497,
+    "distance_m": 29088.957458176224,
+    "measure_count": 83,
+    "switch_count": 76,
+    "clear_attempt_count": 600,
+    "failed_clear_count": 587,
+    "current_position": [
+      575.0000000000001,
+      -995.9292143521044
+    ],
+    "current_channel": 19
+  },
+  "action_count": 684,
+  "jsonl_log": "F:\\ivo_zheng\\26_CUMCM\\B\\q3\\runs\\q3-20260911-013311-3cf0cbb7.jsonl"
+}

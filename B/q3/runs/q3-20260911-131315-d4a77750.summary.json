@@ -1,0 +1,47 @@
+{
+  "completed": true,
+  "task_completed": true,
+  "exit_accepted": true,
+  "entered": true,
+  "error": null,
+  "exit_response": {
+    "accepted": true,
+    "real_timestamp_ms": 1789103605644,
+    "virtual_time_s": 5634.885919,
+    "exit_reason": "user_exit"
+  },
+  "planner_summary": {
+    "strategy": "v2_local",
+    "session_status": "EXITED",
+    "planner_phase": "SCAN",
+    "completion_reason": "ALL_CHANNELS_RESOLVED",
+    "completion_certificate": true,
+    "channel_counts": {
+      "UNKNOWN": 0,
+      "DETECTED": 0,
+      "CLEARED": 12,
+      "ABSENT": 8
+    },
+    "cleared_count": 12,
+    "virtual_time_s": 5634.885916993663,
+    "average_clear_time_s": 469.5738264161386,
+    "distance_m": 23764.42958496832,
+    "measure_count": 104,
+    "coverage_measure_count": 92,
+    "localize_measure_count": 12,
+    "switch_count": 101,
+    "clear_attempt_count": 79,
+    "failed_clear_count": 67,
+    "cover_clear_count": 19,
+    "fallback_clear_count": 60,
+    "planning_time_s": 2.7489999999816064,
+    "batch_channels": [],
+    "current_position": [
+      575.0000000000001,
+      -995.9292143521044
+    ],
+    "current_channel": 19
+  },
+  "action_count": 184,
+  "jsonl_log": "F:\\ivo_zheng\\26_CUMCM\\B\\q3\\runs\\q3-20260911-131315-d4a77750.jsonl"
+}
