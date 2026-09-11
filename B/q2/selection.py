@@ -218,6 +218,32 @@ def _clip_with_bearing(vertices, station, bearing_deg, error_deg):
     return polygon
 
 
+def clip_convex_polygon(vertices, A, b, tolerance_m=1e-8):
+    """Clip a convex polygon by public ``A @ x <= b`` constraints.
+
+    This is the supported incremental-update primitive used by Q3.  It keeps
+    Q2's clipping tolerances and avoids downstream modules importing private
+    helpers.
+    """
+    polygon = np.asarray(vertices, dtype=float)
+    A = np.asarray(A, dtype=float)
+    b = np.asarray(b, dtype=float)
+    tolerance_m = _finite_number(tolerance_m, "tolerance_m")
+    if polygon.ndim != 2 or polygon.shape[1] != 2 or not len(polygon) \
+            or not np.isfinite(polygon).all():
+        raise ValueError("vertices must be a nonempty finite (n, 2) array")
+    if A.ndim != 2 or A.shape[1] != 2 or b.shape != (len(A),) \
+            or not np.isfinite(A).all() or not np.isfinite(b).all():
+        raise ValueError("A and b must contain matching finite 2-D constraints")
+    if tolerance_m < 0:
+        raise ValueError("tolerance_m must be nonnegative")
+    for normal, bound in zip(A, b):
+        polygon = _clip_halfplane(polygon, normal, bound, tolerance_m)
+        if not len(polygon):
+            break
+    return polygon
+
+
 def _deduplicate(points, tolerance_m=1e-7):
     unique = []
     buckets = {}

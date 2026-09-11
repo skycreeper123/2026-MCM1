@@ -1,0 +1,183 @@
+{
+  "python": "3.12.14",
+  "created_utc": "2026-09-11T04:56:36Z",
+  "input_sha256": {
+    "B/q1/geometry.py": "02b1be4306d65dc756334b502ea3b352285c69beed058caaeb28ad9814908a1e",
+    "B/q2/selection.py": "3fdb35e0f8444248d3f8ab91149899d7741b0e9681aee35a3b91a249858a7108",
+    "B/q3/planner.py": "b74fbcbe728adca9e17a6cfdc4d2b1ee207d40f7eed6c64c581e32b1b59e0c8f",
+    "B/q3/geometry.py": "75989eec0ae1e5167967266a5651359fdaa59ea20798e042617aaddb7dd0c146",
+    "B/q3/localize.py": "8abb6c71b45358f7f6f12b54237db2a7e55510a0f142f4d4531129ff0fa8e7b5",
+    "B/q3/runner.py": "e7106812ff66757111787a79fa859c30d8e712200c4a9c49090829725a3bdc28",
+    "B/q3/Q3_OPTIMIZATION_SPEC_V2.md": "0301f506e67f681ebcfee94e46f49c0519cda413ddac86b4df896e280c0c645e"
+  },
+  "source_log_sha256": "75e6023e69686f332fe3d86e7e54a0ba5fce4f2c5dba2b999e4a305a544be77a",
+  "script_sha256": "d9d1b3eba1ba244f0af1222f9f13f0a789b2d60f5679096e2aea8808af8888cc",
+  "trace_counterfactual": {
+    "method": "counterfactual FIFO station batching, same per-channel positions and outcomes",
+    "assumptions": "stationary independent channels; fixed same-position bearings; no near in this trace",
+    "is_official_rerun": false,
+    "uses_hidden_truth": false,
+    "baseline": {
+      "distance_m": 29088.957458176224,
+      "measure_count": 83,
+      "switch_count": 76,
+      "failed_clear_count": 587,
+      "cleared_count": 13,
+      "virtual_time_s": 8134.791491635245,
+      "average_clear_time_s": 625.7531916642496
+    },
+    "batch_fifo": {
+      "distance_m": 25894.662627106292,
+      "measure_count": 83,
+      "switch_count": 76,
+      "failed_clear_count": 587,
+      "cleared_count": 13,
+      "virtual_time_s": 7495.932525421258,
+      "average_clear_time_s": 576.6101942631738
+    },
+    "saving_s": 638.8589662139866,
+    "saving_fraction": 0.07853415380970807
+  },
+  "q2_public_probes": [
+    {
+      "first_observation": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "svd_deg": 0.0
+      },
+      "error_deg": 1.005,
+      "algorithm_version": 3,
+      "movement_weight_m_per_s": 0.0,
+      "selection_elapsed_s": 4.989898400002858,
+      "selection_mode": "response_bound_search",
+      "selected": {
+        "position": {
+          "x": 825.2308007461048,
+          "y": -525.0
+        },
+        "movement_distance_m": 978.0750863303172,
+        "movement_time_s": 195.61501726606343,
+        "objective_m": 58.01989612103182,
+        "worst_updated_cover_radius_m": 58.01989612103182,
+        "sampled_direction_radius_m": 57.9758916534184,
+        "response_bound_gap_m": 0.04400446761341925,
+        "response_bound_converged": true,
+        "response_interval_count": 70,
+        "response_evaluations": 138,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06,
+        "scoring_interval_limit": 128
+      },
+      "evaluated_candidates": 263,
+      "timed_out": true,
+      "vertex_distance_max_m": 978.0750863303172,
+      "public_cases": 72,
+      "direct_clear_cases": 15,
+      "largest_radius_case": {
+        "source_range_m": 1500,
+        "source_angle_deg": 1.005,
+        "second_error_deg": 1.005,
+        "radius_m": 57.959941169193634
+      },
+      "limitation": "finite conservative 1.005-degree scenarios, not simulator error distribution or official-case performance; second reception outer disk included"
+    },
+    {
+      "first_observation": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "svd_deg": 0.0
+      },
+      "error_deg": 1.005,
+      "algorithm_version": 3,
+      "movement_weight_m_per_s": 1.0,
+      "selection_elapsed_s": 4.991898599997512,
+      "selection_mode": "response_bound_search",
+      "selected": {
+        "position": {
+          "x": 593.3544136952307,
+          "y": -383.6793971070201
+        },
+        "movement_distance_m": 706.5970138742573,
+        "movement_time_s": 141.31940277485145,
+        "objective_m": 234.71430902178366,
+        "worst_updated_cover_radius_m": 93.39490624693221,
+        "sampled_direction_radius_m": 92.47635880193064,
+        "response_bound_gap_m": 0.9185474450015647,
+        "response_bound_converged": false,
+        "response_interval_count": 32,
+        "response_evaluations": 62,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06,
+        "scoring_interval_limit": 32
+      },
+      "evaluated_candidates": 279,
+      "timed_out": true,
+      "vertex_distance_max_m": 995.0379014498485,
+      "public_cases": 72,
+      "direct_clear_cases": 37,
+      "largest_radius_case": {
+        "source_range_m": 1500,
+        "source_angle_deg": 1.005,
+        "second_error_deg": 1.005,
+        "radius_m": 92.6335836699689
+      },
+      "limitation": "finite conservative 1.005-degree scenarios, not simulator error distribution or official-case performance; second reception outer disk included"
+    }
+  ],
+  "saved_q2_evidence_audit": {
+    "algorithm_version": 3,
+    "acceptance_sha256": "98287568c5a9605139238020a5bdd8db5d8ac7e12c76d6a236e5f7fb26f7934e",
+    "audit_sha256": "cf06d1beb785eeb26d167dc8e1ff21bf31cfa5b4a1460b3737a04f262a7cdb2d",
+    "random_cases": 200,
+    "boundary_cases": 20,
+    "failures": 0,
+    "safety_violations": 0,
+    "truth_violations": 0,
+    "upper_bound_violations": 0,
+    "independent_search_passed": 10,
+    "saved_audit_failures": 0,
+    "limitation": "This audits the committed Q2 V3 summaries; q2_public_probes are the current-workspace execution check."
+  },
+  "analytic_constants": {
+    "strip152_outer_polygon": {
+      "circle_sides": 128,
+      "outer_radius_m": 1500.451908061953,
+      "cover_radius_bound_m": 18.027756377319946
+    },
+    "strip104": {
+      "points": 104,
+      "lateral_bound_m": 26.30948931332056,
+      "cover_radius_bound_m": 19.761148139178218,
+      "closed_route_m": 3052.8,
+      "per_source_bound_s": 924.5600000000001,
+      "serial_baseline_bound_s": 17012.96,
+      "serial_baseline_request_bound": 1806
+    },
+    "rectangle_grid": {
+      "max_cell_side_m": 28,
+      "cover_radius_bound_m": 19.79898987322333
+    },
+    "bad_pruning_counterexample": {
+      "source": [
+        1799.0,
+        0.0
+      ],
+      "clear_point": [
+        1805.0,
+        0.0
+      ],
+      "distance_m": 6.0
+    },
+    "stage_batch_with_152_fallback": {
+      "per_source_extra_route_cap_m": 4000,
+      "max_additional_measures": 3,
+      "max_optimized_clear_attempts": 8,
+      "virtual_bound_s": 33068.0,
+      "request_bound": 2750
+    }
+  }
+}
