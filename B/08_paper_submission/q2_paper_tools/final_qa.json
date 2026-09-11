@@ -1,0 +1,15 @@
+{
+  "content_verification": "passed",
+  "tests_passed": 31,
+  "saved_random_cases": 200,
+  "saved_boundary_cases": 20,
+  "new_figure_data": "same validated data redrawn with larger labels",
+  "equations": 11,
+  "tables": 2,
+  "figures": 2,
+  "size_bytes": 372871,
+  "latest_layout_verification": "passed: all five pages visually inspected after final Word PDF export and packaged renderer rasterization",
+  "pages": 5,
+  "output_sha256": "bd4a5d873d2e3a19fa21e6228dddf6400e08807aadb044e05f732d7907ea6a95",
+  "Q1_unchanged": true
+}

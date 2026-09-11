@@ -1,0 +1,5 @@
+﻿claim_id,location,claim,evidence,verification
+Q1-A,表5-1 图5-1,案例A直径圆覆盖,metrics.json cases[0],复算通过
+Q1-B,表5-1 图5-1,案例B直径圆不覆盖,metrics.json cases[1],复算通过
+Q1-R,5.5.1,40组交叉验证及数值差,metrics.json random_validation,保存记录统计校验通过
+Q1-T,5.5.1,18项测试通过,B/q1/tests/test_geometry.py,本次重新运行通过

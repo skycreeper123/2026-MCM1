@@ -1,0 +1,25 @@
+{
+  "preserved_parts": [
+    "[Content_Types].xml",
+    "_rels/.rels",
+    "docProps/app.xml",
+    "word/styles.xml",
+    "word/stylesWithEffects.xml",
+    "word/settings.xml",
+    "word/webSettings.xml",
+    "word/fontTable.xml",
+    "word/theme/theme1.xml",
+    "customXml/item1.xml",
+    "customXml/_rels/item1.xml.rels",
+    "customXml/itemProps1.xml",
+    "word/numbering.xml",
+    "word/footer1.xml",
+    "word/media/image1.png",
+    "docProps/thumbnail.jpeg"
+  ],
+  "equations": 11,
+  "tables": 2,
+  "figures": 2,
+  "Q1_unchanged_sha256": "103c7581149cf0b5425a8c3f2855fcd5a073e87785035d84caadf2782e416349",
+  "output_sha256": "bd4a5d873d2e3a19fa21e6228dddf6400e08807aadb044e05f732d7907ea6a95"
+}

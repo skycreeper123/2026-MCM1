@@ -1,0 +1,212 @@
+{
+  "scope": "Q2正文",
+  "verification": "自动复测与证据核对，不代替参赛队人工复核",
+  "status": "题目核心要求已完成，可进入正文撰写",
+  "summary": {
+    "random_cases": 200,
+    "boundary_cases": 20,
+    "failures": 0,
+    "common_old_median_radius_m": 47.52073137622591,
+    "common_new_median_radius_m": 46.97951295665757,
+    "mean_paired_improvement_m": 0.8286959995652171,
+    "median_paired_improvement_m": 0.5283109858921193,
+    "mean_improvement_bootstrap_95ci_m": [
+      0.7075223007404267,
+      0.9547926074897329
+    ],
+    "wilcoxon_one_sided_p": 1.6892111664074106e-27,
+    "improved_cases": 171,
+    "tied_within_005m_cases": 8,
+    "worse_cases": 21,
+    "largest_regression_m": 0.6485743101812957,
+    "old_converged_cases": 141,
+    "new_converged_cases": 220,
+    "old_max_gap_m": 4.182795702733957,
+    "new_max_gap_m": 0.35807123360635984,
+    "old_median_elapsed_s": 1.4455000000000382,
+    "new_median_elapsed_s": 5.030999999999949,
+    "safety_violations": 0,
+    "truth_violations": 0,
+    "upper_bound_violations": 0,
+    "max_independent_mec_difference_m": 5.411582293390893e-10,
+    "independent_direction_responses": 49077,
+    "near_responses": 40,
+    "stability_128_256_max_change_m": 1.400065727544117,
+    "per_seed_mean_improvement_m": {
+      "20260911": 0.7618603711975986,
+      "20260912": 0.8213967102740707,
+      "20260913": 0.8716988837414815,
+      "20260914": 0.7031989336654898,
+      "20260915": 0.9853250989474442
+    },
+    "physical_paired_cases": 193,
+    "physical_mean_improvement_m": 0.6379054118844489,
+    "physical_improved_cases": 140,
+    "physical_worse_cases": 45,
+    "independent_search_cases": 10,
+    "independent_search_passed": 10,
+    "independent_search_max_regret_m": 0.5555256945286828
+  },
+  "tests": {
+    "passed": 31,
+    "total": 31,
+    "fresh_run": true,
+    "source": "B/q2/tests"
+  },
+  "fresh_selected_point_rechecks": [
+    {
+      "case": "wide_fixed",
+      "radius_difference_m": 0.0,
+      "gap_m": 0.04272112261033101
+    },
+    {
+      "case": "narrow_fixed",
+      "radius_difference_m": 0.0,
+      "gap_m": 0.049289082689901065
+    }
+  ],
+  "maps": {
+    "wide_grid_check": {
+      "first": {
+        "position": {
+          "x": -1000.0,
+          "y": 0.0
+        },
+        "svd_deg": 0.5
+      },
+      "selected": {
+        "position": {
+          "x": -161.54105762027567,
+          "y": 544.7812512291937
+        },
+        "movement_distance_m": 999.8999998736732,
+        "movement_time_s": 199.97999997473465,
+        "objective_m": 55.878619207290306,
+        "worst_updated_cover_radius_m": 55.878619207290306,
+        "sampled_direction_radius_m": 55.835898084679975,
+        "response_bound_gap_m": 0.04272112261033101,
+        "response_bound_converged": true,
+        "response_interval_count": 70,
+        "response_evaluations": 138,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06,
+        "scoring_interval_limit": 256
+      },
+      "field": {
+        "spacing_m": 45.0,
+        "safe_area_approx_m2": 439229.4447063089,
+        "good_area_approx_m2": 14380.803529079461,
+        "sampled_min_radius_upper_m": 55.91011797656541
+      },
+      "components": 2
+    },
+    "wide_fixed": {
+      "first": {
+        "position": {
+          "x": -1000.0,
+          "y": 0.0
+        },
+        "svd_deg": 0.5
+      },
+      "selected": {
+        "position": {
+          "x": -161.54105762027567,
+          "y": 544.7812512291937
+        },
+        "movement_distance_m": 999.8999998736732,
+        "movement_time_s": 199.97999997473465,
+        "objective_m": 55.878619207290306,
+        "worst_updated_cover_radius_m": 55.878619207290306,
+        "sampled_direction_radius_m": 55.835898084679975,
+        "response_bound_gap_m": 0.04272112261033101,
+        "response_bound_converged": true,
+        "response_interval_count": 70,
+        "response_evaluations": 138,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06,
+        "scoring_interval_limit": 256
+      },
+      "field": {
+        "spacing_m": 30.0,
+        "safe_area_approx_m2": 439229.4447063089,
+        "good_area_approx_m2": 14412.040311947283,
+        "sampled_min_radius_upper_m": 55.91011797656541
+      },
+      "components": 2
+    },
+    "wide_information": {
+      "first": {
+        "position": {
+          "x": -1000.0,
+          "y": 0.0
+        },
+        "svd_deg": 0.5
+      },
+      "selected": {
+        "position": {
+          "x": -159.8393255653076,
+          "y": 542.3375704738258
+        },
+        "movement_distance_m": 999.9999996070046,
+        "movement_time_s": 199.99999992140093,
+        "objective_m": 55.87924403994192,
+        "worst_updated_cover_radius_m": 55.87924403994192,
+        "sampled_direction_radius_m": 55.836602516948844,
+        "response_bound_gap_m": 0.04264152299307966,
+        "response_bound_converged": true,
+        "response_interval_count": 70,
+        "response_evaluations": 138,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06,
+        "scoring_interval_limit": 256
+      },
+      "field": {
+        "spacing_m": 30.0,
+        "safe_area_approx_m2": 1210230.1267857915,
+        "good_area_approx_m2": 18134.620207885455,
+        "sampled_min_radius_upper_m": 55.921859745513665
+      },
+      "components": 2
+    },
+    "narrow_fixed": {
+      "first": {
+        "position": {
+          "x": 1790.0,
+          "y": -1400.0
+        },
+        "svd_deg": 89.3
+      },
+      "selected": {
+        "position": {
+          "x": 1593.7921250539077,
+          "y": -0.8174057102109007
+        },
+        "movement_distance_m": 1412.8727693442058,
+        "movement_time_s": 282.5745538688412,
+        "objective_m": 10.846143958286786,
+        "worst_updated_cover_radius_m": 10.846143958286786,
+        "sampled_direction_radius_m": 10.796854875596885,
+        "response_bound_gap_m": 0.049289082689901065,
+        "response_bound_converged": true,
+        "response_interval_count": 307,
+        "response_evaluations": 612,
+        "radius_bound_scope": "all_direction_responses_over_initial_outer_polygon",
+        "numerical_margin_m": 1e-06,
+        "scoring_interval_limit": 512
+      },
+      "field": {
+        "spacing_m": 40,
+        "safe_area_approx_m2": 2448648.6806841777,
+        "good_area_approx_m2": 4764.469939773611,
+        "sampled_min_radius_upper_m": 10.898431644937842
+      },
+      "components": 2
+    }
+  },
+  "verified": true,
+  "source_hashes": {
+    "paired_results.json": "7212d7efb676fcd2abf17487cda13f9c968f410b5d615e95c569588fcaa21405",
+    "visualization_data.json": "04519bb66ad2947beb81c7d29d5f10c7074db984a9d612db7a3d4771c8cbb6b9",
+    "independent_search.json": "95d22eb7e54ea0e287bd38d3f76e0b68c2cd15aa77fd181d66d8d98451e45386"
+  }
+}

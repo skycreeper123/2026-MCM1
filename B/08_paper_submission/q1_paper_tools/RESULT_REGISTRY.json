@@ -1,0 +1,164 @@
+{
+  "scope": "Q1 正文工作稿",
+  "verification": "自动复算与保存证据校验；不代表人工签字验收",
+  "geometry_sha256": "15421b46f487935c584053bf040a67d10c9f2865e2aee6dba1b7f818266617a6",
+  "records": [
+    {
+      "id": "Q1-A",
+      "verified": true,
+      "type": "synthetic",
+      "source": "B/q1/validation_results/metrics.json#/cases/0",
+      "result": {
+        "status": "BOUNDED",
+        "vertices": [
+          [
+            237.89391981624826,
+            -153.68621569101353
+          ],
+          [
+            238.335570436808,
+            -172.93475294864658
+          ],
+          [
+            259.1019886214183,
+            -166.2703039281835
+          ],
+          [
+            269.2826536508832,
+            -145.1037775255187
+          ],
+          [
+            269.3867650864829,
+            -136.4035716467393
+          ]
+        ],
+        "dimension": 2,
+        "area_m2": 625.9384921074169,
+        "diameter_m": 47.94480051564318,
+        "diameter_pair": [
+          [
+            238.335570436808,
+            -172.93475294864658
+          ],
+          [
+            269.3867650864829,
+            -136.4035716467393
+          ]
+        ],
+        "diameter_circle": {
+          "center": [
+            253.86116776164545,
+            -154.66916229769294
+          ],
+          "radius_m": 23.97240025782159,
+          "max_vertex_distance_m": 23.9724002578216,
+          "coverage_gap_m": 1.0658141036401503e-14,
+          "outside_vertex_indices": [],
+          "max_thales_dot_m2": 0.0
+        },
+        "diameter_circle_covers": true,
+        "minimum_enclosing_circle": {
+          "center": [
+            253.86116776164545,
+            -154.66916229769294
+          ],
+          "radius_m": 23.9724002578216,
+          "radius_to_half_diameter_ratio": 1.0000000000000004
+        },
+        "tolerance_m": 1e-07,
+        "error_deg": 1.0,
+        "observation_count": 6,
+        "region_model": "intersection_of_forward_bearing_wedges"
+      }
+    },
+    {
+      "id": "Q1-B",
+      "verified": true,
+      "type": "synthetic",
+      "source": "B/q1/validation_results/metrics.json#/cases/1",
+      "result": {
+        "status": "BOUNDED",
+        "vertices": [
+          [
+            237.81280330975434,
+            -158.91845213319266
+          ],
+          [
+            257.25949973414754,
+            -153.7032871939504
+          ],
+          [
+            250.9760953288609,
+            -141.65901308017595
+          ],
+          [
+            242.6670510991678,
+            -138.67968992501895
+          ],
+          [
+            239.0850725670082,
+            -139.77564471980645
+          ]
+        ],
+        "dimension": 2,
+        "area_m2": 258.39612574268637,
+        "diameter_m": 22.89735853196238,
+        "diameter_pair": [
+          [
+            257.25949973414754,
+            -153.7032871939504
+          ],
+          [
+            239.0850725670082,
+            -139.77564471980645
+          ]
+        ],
+        "diameter_circle": {
+          "center": [
+            248.17228615057786,
+            -146.7394659568784
+          ],
+          "radius_m": 11.44867926598119,
+          "max_vertex_distance_m": 15.988952092372113,
+          "coverage_gap_m": 4.5402728263909236,
+          "outside_vertex_indices": [
+            0
+          ],
+          "max_thales_dot_m2": 124.57433207686296
+        },
+        "diameter_circle_covers": false,
+        "minimum_enclosing_circle": {
+          "center": [
+            245.79962769730017,
+            -149.83558996577992
+          ],
+          "radius_m": 12.094947248736325,
+          "radius_to_half_diameter_ratio": 1.0564491298726018
+        },
+        "tolerance_m": 1e-07,
+        "error_deg": 1.0,
+        "observation_count": 6,
+        "region_model": "intersection_of_forward_bearing_wedges"
+      }
+    },
+    {
+      "id": "Q1-R",
+      "verified": true,
+      "type": "saved_cross_validation",
+      "source": "B/q1/validation_results/metrics.json",
+      "n": 40,
+      "seed": 20260910,
+      "diameter_error_m": 1.5099033134902129e-12,
+      "vertex_error_m": 2.1323859848397085e-12
+    },
+    {
+      "id": "Q1-T",
+      "verified": true,
+      "type": "unit_test",
+      "source": "B/q1/tests/test_geometry.py",
+      "tests_passed": 18,
+      "random_triangles": 200,
+      "minimum_circle_comparisons": 10
+    }
+  ]
+}

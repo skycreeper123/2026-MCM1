@@ -1,0 +1,6 @@
+﻿id,location,claim,source,verification
+Q2-S,6.7 表6-2 图6-2,200随机与20边界的配对结果,B/q2/validation_results_v3/paired_results.json,代码哈希及验收统计核对通过
+Q2-M,6.6 表6-1 图6-1,典型候选区域和推荐坐标,B/q2/validation_results_v3/visualization_data.json,全图节点安全核验且两推荐点评分复算
+Q2-T,6.7,31项单元测试通过,B/q2/tests,本轮运行31/31通过，含旧版失败边界回归
+Q2-G,6.7,10例独立空间网格复核,B/q2/validation_results_v3/independent_search.json,输入哈希及通过标准核对
+Q2-A,6.7,2377源位置与5421制图节点核验,B/q2/validation_results_v3/saved_evidence_audit.json,本轮phase check通过
