@@ -1,0 +1,23 @@
+{
+  "python": "3.12.14",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "tests_run": 42,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "paired_input_hash_matches": {
+    "geometry.py": true,
+    "localize.py": true,
+    "planner.py": true,
+    "runner.py": true,
+    "validation.py": true,
+    "__init__.py": true
+  },
+  "test_input_sha256": {
+    "tests\\test_global.py": "63d9e5eddc126d8239b34082d771f02bd5e27802ead1a6d3760ff2da9bf65a61",
+    "tests\\test_q3.py": "b7ce56a61f377ad43a4130be355ae481e72b2490767c5feadb1e3ed814f473cf",
+    "tests\\test_runner.py": "ec1a96445695af374dfd0114efc41096eca1f7d9ebe70897b7082871b9751975",
+    "tests\\__init__.py": "e7c1bd1156e43bba193687135d7ed2b2e168f0ec86551d8af01ef73ebed2a6d8"
+  }
+}

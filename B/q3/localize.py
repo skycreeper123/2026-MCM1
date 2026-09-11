@@ -1,6 +1,6 @@
-"""Cumulative localization and certified local clear plans for Q3 V2."""
+"""Conservative localization, covering certificates and completion costs for Q3."""
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 import math
 import time
 
@@ -30,9 +30,28 @@ class ClearPlan:
     completion_upper_s: float
     cell_size_m: tuple[float, float] | None = None
     orientation_deg: float | None = None
+    cover_certificate: dict | None = None
+
+    @property
+    def point_count(self):
+        return len(self.points)
+
+    @property
+    def entry_point(self):
+        return self.points[0]
+
+    @property
+    def exit_point(self):
+        return self.points[-1]
+
+    @property
+    def cover_radius_upper_m(self):
+        return self.cover_radius_m
 
     def as_dict(self):
-        return asdict(self)
+        return {**asdict(self), "point_count": self.point_count,
+                "entry_point": self.entry_point, "exit_point": self.exit_point,
+                "cover_radius_upper_m": self.cover_radius_upper_m}
 
 
 def _vertices(value):
@@ -129,6 +148,17 @@ def _plan_seconds(points, current_position, continuation_target, speed_mps,
     return route, route / speed_mps + action
 
 
+def reprice_cover_plan(plan, current_position, continuation_target, config):
+    """Reuse certified geometry while updating both traversal directions."""
+    choices = []
+    for points in (plan.points, tuple(reversed(plan.points))):
+        route, seconds = _plan_seconds(points, current_position, continuation_target,
+                                      config.speed_mps, config.failed_clear_duration_s,
+                                      config.successful_clear_duration_s)
+        choices.append(replace(plan, points=points, route_distance_m=route, completion_upper_s=seconds))
+    return min(choices, key=lambda p: p.completion_upper_s)
+
+
 def _rectangle_plan(vertices, orientation_deg, current_position, continuation_target,
                     cell_limit_m, clear_radius_m, numerical_margin_m,
                     speed_mps, failed_clear_duration_s, successful_clear_duration_s):
@@ -139,8 +169,8 @@ def _rectangle_plan(vertices, orientation_deg, current_position, continuation_ta
     projected_n = vertices @ n
     raw_length = float(projected_u.max() - projected_u.min())
     raw_width = float(projected_n.max() - projected_n.min())
-    count_u = max(1, math.ceil(raw_length / cell_limit_m))
-    count_n = max(1, math.ceil(raw_width / cell_limit_m))
+    count_u = max(1, math.ceil((raw_length + 2 * numerical_margin_m) / cell_limit_m))
+    count_n = max(1, math.ceil((raw_width + 2 * numerical_margin_m) / cell_limit_m))
     u0, u1 = float(projected_u.min() - numerical_margin_m), float(projected_u.max() + numerical_margin_m)
     n0, n1 = float(projected_n.min() - numerical_margin_m), float(projected_n.max() + numerical_margin_m)
     length, width = u1 - u0, n1 - n0
@@ -150,11 +180,17 @@ def _rectangle_plan(vertices, orientation_deg, current_position, continuation_ta
         return None
     us = [u0 + (index + 0.5) * size_u for index in range(count_u)]
     ns = [n0 + (index + 0.5) * size_n for index in range(count_n)]
-    points = []
-    for row, n_value in enumerate(ns):
-        values = us if row % 2 == 0 else reversed(us)
-        points.extend(tuple(u_value * u + n_value * n) for u_value in values)
-    variants = (tuple(points), tuple(reversed(points)))
+    variants = []
+    # Both sweep axes and all four corners; no centre is pruned outside P.
+    for transpose in (False, True):
+        for flip in (False, True):
+            outer, inner = (us, ns) if transpose else (ns, us)
+            points = []
+            for row, value in enumerate(outer):
+                values = inner if (row % 2 == 0) != flip else list(reversed(inner))
+                points.extend(tuple(value * u + v * n if transpose else v * u + value * n)
+                              for v in values)
+            variants.extend((tuple(points), tuple(reversed(points))))
     candidates = []
     for variant in variants:
         route, seconds = _plan_seconds(
@@ -164,6 +200,10 @@ def _rectangle_plan(vertices, orientation_deg, current_position, continuation_ta
         candidates.append(ClearPlan(
             "RECTANGLE_GRID", variant, True, cover_radius, route, seconds,
             (size_u, size_n), float(orientation_deg) % 180.0,
+            {"method": "ENCLOSING_RECTANGLE_CELL_HALF_DIAGONAL",
+             "bounds_un": (u0, u1, n0, n1), "counts_un": (count_u, count_n),
+             "orientation_deg": float(orientation_deg),
+             "radius_upper_m": cover_radius, "numerical_margin_m": numerical_margin_m},
         ))
     return min(candidates, key=lambda plan: (plan.completion_upper_s, plan.route_distance_m))
 
@@ -175,6 +215,8 @@ def build_cover_plan(vertices, current_position, continuation_target=None, max_p
                      successful_clear_duration_s=5.0):
     """Return the cheapest certified MEC/grid termination plan within ``max_points``."""
     vertices = _vertices(vertices)
+    if not 0 < cell_limit_m <= 28.0 or not 0 < clear_radius_m <= 19.9:
+        raise ValueError("cover geometry requires cells <= 28m and safe radius <= 19.9m")
     plans = []
     center, radius = verified_enclosing_circle(vertices)
     if radius + numerical_margin_m <= clear_radius_m and max_points >= 1:
@@ -186,7 +228,11 @@ def build_cover_plan(vertices, current_position, continuation_target=None, max_p
         plans.append(ClearPlan(
             "MEC_SINGLE", points, True, radius + numerical_margin_m,
             route, seconds,
+            cover_certificate={"method": "MEC_MAX_VERTEX_DISTANCE",
+                               "center": points[0], "radius_upper_m": radius + numerical_margin_m,
+                               "numerical_margin_m": numerical_margin_m},
         ))
+        return plans[0]
     orientations = [0.0]
     orientations.extend(float(value) for value in preferred_orientations_deg)
     for first, second in zip(vertices, np.roll(vertices, -1, axis=0)):
@@ -217,15 +263,154 @@ def _unused(point, used_positions, tolerance_m):
     return all(distance(point, old) > tolerance_m for old in used_positions)
 
 
+def spatial_candidate_subset(points, limit, witness, current, bearing_deg, continuation=None):
+    """Preserve witness, a route representative, both sides, then farthest points."""
+    if not points:
+        return []
+    witness, current = tuple(witness), tuple(current)
+    continuation = None if continuation is None else tuple(continuation)
+    selected = []
+    def retain(point):
+        if point not in selected and len(selected) < limit:
+            selected.append(point)
+    retain(min(points, key=lambda p: distance(p, witness)))
+    retain(min(points, key=lambda p: distance(p, continuation if continuation is not None else current)))
+    normal = (-math.sin(math.radians(bearing_deg)), math.cos(math.radians(bearing_deg)))
+    lateral = lambda p: (p[0]-witness[0])*normal[0] + (p[1]-witness[1])*normal[1]
+    retain(min(points, key=lateral))
+    retain(max(points, key=lateral))
+    while len(selected) < min(limit, len(points)):
+        retain(max((p for p in points if p not in selected),
+                   key=lambda p: min(distance(p, q) for q in selected)))
+    return selected
+
+
+def verify_cover_certificate(vertices, plan, safe_radius_m=19.9):
+    """Check the continuous certificate, including all rectangular cell centres."""
+    vertices = _vertices(vertices)
+    cert = plan.cover_certificate or {}
+    if not plan.guaranteed or not plan.points or plan.cover_radius_m > safe_radius_m:
+        return False
+    if cert.get("method") == "MEC_MAX_VERTEX_DISTANCE":
+        return (len(plan.points) == 1 and
+                np.linalg.norm(vertices - plan.points[0], axis=1).max() <= plan.cover_radius_m)
+    if cert.get("method") != "ENCLOSING_RECTANGLE_CELL_HALF_DIAGONAL":
+        return False
+    angle = math.radians(cert["orientation_deg"])
+    u, n = np.array([math.cos(angle), math.sin(angle)]), np.array([-math.sin(angle), math.cos(angle)])
+    u0, u1, n0, n1 = cert["bounds_un"]
+    nu, nn = cert["counts_un"]
+    if nu < 1 or nn < 1 or len(plan.points) != nu*nn:
+        return False
+    pu, pn = vertices @ u, vertices @ n
+    if pu.min() < u0 or pu.max() > u1 or pn.min() < n0 or pn.max() > n1:
+        return False
+    du, dn = (u1-u0)/nu, (n1-n0)/nn
+    if max(du, dn) > 28.0 or math.hypot(du/2, dn/2) > plan.cover_radius_m + 1e-10:
+        return False
+    actual = np.asarray(plan.points)
+    cells = set()
+    for a, b in zip(actual @ u, actual @ n):
+        i, j = round((a-u0)/du-0.5), round((b-n0)/dn-0.5)
+        if not (0 <= i < nu and 0 <= j < nn):
+            return False
+        if abs(a-(u0+(i+0.5)*du)) > 1e-6 or abs(b-(n0+(j+0.5)*dn)) > 1e-6:
+            return False
+        cells.add((i, j))
+    return len(cells) == nu*nn
+
+
+def _bearing_domain(vertices, candidate, error_deg):
+    relative = vertices - np.asarray(candidate)
+    if np.linalg.norm(relative, axis=1).min() <= 1e-7:
+        return 0.0, 360.0
+    angles = np.sort(np.degrees(np.arctan2(relative[:, 1], relative[:, 0])) % 360)
+    gaps = np.diff(np.r_[angles, angles[0] + 360])
+    k = int(np.argmax(gaps))
+    width = 360 - gaps[k]
+    if width >= 180 - 1e-8:
+        return 0.0, 360.0
+    start = angles[(k + 1) % len(angles)]
+    return float(start-error_deg-1e-8), float(start+width+error_deg+1e-8)
+
+
+def completion_upper_bound(region, candidate, continuation_target, config,
+                           current_position=None, error_deg=1.005,
+                           orientation_deg=0.0, deadline_monotonic=None):
+    """Certified detect-then-cover policy cost for all continuous responses.
+
+    Each bearing interval is covered by one widened wedge. A rectangle grid
+    covers that entire envelope. Unprocessed intervals retain the whole-region
+    plan, so a deadline cannot silently remove a possible response. The bound
+    describes this feasible policy, not the future adaptive controller's cost.
+    """
+    vertices = _vertices(region)
+    candidate = tuple(map(float, candidate))
+    current = candidate if current_position is None else tuple(map(float, current_position))
+    if not is_safe_candidate(candidate, vertices, config.minimum_receive_radius_m-0.1):
+        raise ValueError("completion bounds require a guaranteed reception candidate")
+    def envelope_plan(poly):
+        center, radius = verified_enclosing_circle(poly)
+        if radius + 1e-7 <= config.safe_clear_radius_m:
+            return build_cover_plan(poly, candidate, continuation_target, max_points=1,
+                                    speed_mps=config.speed_mps,
+                                    failed_clear_duration_s=config.failed_clear_duration_s,
+                                    successful_clear_duration_s=config.successful_clear_duration_s)
+        return _rectangle_plan(poly, orientation_deg, candidate, continuation_target,
+                               config.local_grid_cell_m, config.safe_clear_radius_m, 1e-7,
+                               config.speed_mps, config.failed_clear_duration_s,
+                               config.successful_clear_duration_s)
+    whole = envelope_plan(vertices)
+    if whole is None:
+        return None
+    lo, hi = _bearing_domain(vertices, candidate, error_deg)
+    boundaries = np.linspace(lo, hi, config.q2_response_intervals + 1)
+    costs, counts, radii, exit_points = [], [], [], []
+    unfinished = False
+    for a, b in zip(boundaries[:-1], boundaries[1:]):
+        if deadline_monotonic is not None and time.monotonic() >= deadline_monotonic:
+            unfinished = True
+            plan, poly = whole, vertices
+        else:
+            halfwidth = error_deg + (b-a)/2
+            if halfwidth >= 90:
+                poly = vertices
+            else:
+                A, rhs = bearing_halfplanes([_observation(candidate, (a+b)/2)], halfwidth)
+                poly = clip_convex_polygon(vertices, A, rhs)
+            if not len(poly):
+                continue
+            plan = envelope_plan(poly)
+            if plan is None:
+                return None
+        costs.append(plan.completion_upper_s)
+        counts.append(plan.point_count)
+        radii.append(verified_enclosing_circle(poly)[1] + 1e-6)
+        # Early success may leave from ANY point, not just the final grid point.
+        exit_points.extend(plan.points)
+        if unfinished:
+            break
+    near_cost = config.successful_clear_duration_s
+    if continuation_target is not None:
+        near_cost += distance(candidate, continuation_target) / config.speed_mps
+    return {"completion_upper_s": distance(current, candidate)/config.speed_mps
+            + config.measure_duration_s + max([near_cost] + costs),
+            "worst_cover_point_count": max([1] + counts),
+            "worst_updated_cover_radius_m": max([0.0] + radii),
+            "possible_exit_points": tuple([tuple(candidate)] + exit_points),
+            "response_interval_count": config.q2_response_intervals,
+            "whole_region_used_on_timeout": unfinished,
+            "completion_bound_scope": "continuous_direction_envelopes_and_near; feasible_policy"}
+
+
 def choose_detection_from_region(vertices, current_position, used_positions,
                                  anchor_bearing_deg, error_deg=1.005,
                                  continuation_target=None, q2_config=None,
-                                 deadline_monotonic=None, candidate_limit=12):
+                                 deadline_monotonic=None, candidate_limit=12,
+                                 completion_config=None):
     """Choose a safe new station from a cumulative outer polygon.
 
-    Ranking uses Q2 V3's continuous direction-response radius bound.  This is
-    the V2-local adapter; it does not claim the completion-time bound described
-    for the later ``V2_time_score`` stage.
+    V2 uses Q2's radius score; V3 uses certified detect-then-cover time.
     """
     started = time.monotonic()
     vertices = _vertices(vertices)
@@ -268,15 +453,23 @@ def choose_detection_from_region(vertices, current_position, used_positions,
     if not unique:
         return {"status": "NO_CANDIDATE", "reason": "NO_UNUSED_SAFE_WITNESS"}
     # Retain spatially varied points deterministically when callers lower the cap.
-    unique = unique[:max(1, int(candidate_limit))]
+    unique = spatial_candidate_subset(unique, max(1, int(candidate_limit)),
+                                      witness, current, anchor_bearing_deg, continuation_target)
     initial_radius = verified_enclosing_circle(vertices)[1]
     scores = []
     for point in unique:
         if deadline_monotonic is not None and time.monotonic() >= deadline_monotonic:
             break
-        bound = response_radius_bound(
-            vertices, point, error_deg, config, deadline_monotonic, initial_radius
-        )
+        if completion_config is None:
+            bound = response_radius_bound(
+                vertices, point, error_deg, config, deadline_monotonic, initial_radius
+            )
+        else:
+            bound = completion_upper_bound(vertices, point, continuation_target,
+                                           completion_config, current_position, error_deg,
+                                           anchor_bearing_deg, deadline_monotonic)
+            if bound is None:
+                continue
         move_distance = distance(current_position, point)
         move_time = move_distance / config.movement_speed_mps
         scores.append({
@@ -287,10 +480,13 @@ def choose_detection_from_region(vertices, current_position, used_positions,
                            + config.movement_weight_m_per_s * move_time,
             **bound,
         })
+        if completion_config is not None:
+            del scores[-1]["objective_m"]
+            scores[-1]["objective_s"] = bound["completion_upper_s"]
     if not scores:
         return {"status": "NO_CANDIDATE", "reason": "PLANNING_BUDGET_EXHAUSTED"}
     selected = min(scores, key=lambda row: (
-        row["objective_m"], row["movement_distance_m"],
+        row["objective_s"] if completion_config is not None else row["objective_m"], row["movement_distance_m"],
         row["position"]["x"], row["position"]["y"],
     ))
     return {
@@ -298,7 +494,8 @@ def choose_detection_from_region(vertices, current_position, used_positions,
         "selected": selected,
         "candidate_scores": scores,
         "safe_candidate_region": safe,
-        "selection_mode": "v2_local_cumulative_response_bound",
+        "selection_mode": ("v3_global_completion_upper_bound" if completion_config is not None
+                           else "v2_local_cumulative_response_bound"),
         "elapsed_s": time.monotonic() - started,
         "timed_out": deadline_monotonic is not None and time.monotonic() >= deadline_monotonic,
         "ranking_is_discrete_approximation": True,

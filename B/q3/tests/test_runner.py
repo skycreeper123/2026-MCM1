@@ -44,9 +44,9 @@ class FakeResponse:
 
 
 class RunnerValidationTests(unittest.TestCase):
-    def test_strategy_argument_is_explicit_and_defaults_to_v2_local(self):
+    def test_strategy_argument_is_explicit_and_defaults_to_v3_global(self):
         parser = build_parser()
-        self.assertEqual(parser.parse_args(["--self-check"]).strategy, "v2_local")
+        self.assertEqual(parser.parse_args(["--self-check"]).strategy, "v3_global")
         self.assertEqual(
             parser.parse_args(["--self-check", "--strategy", "b0_batch_fifo"]).strategy,
             "b0_batch_fifo",
