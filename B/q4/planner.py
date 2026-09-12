@@ -17,7 +17,7 @@ from .routing import RouteTask, optimize_service_route, task_route_cost
 
 @dataclass(frozen=True)
 class Q4Config:
-    strategy: str = "q4_adaptive_cooperative_v2"
+    strategy: str = "q4_batched_information_then_clear_v4"
     local_measurement_limit: int = 4
     local_distance_limit_m: float = 4000.0
     candidate_limit: int = 24
@@ -42,7 +42,7 @@ class Q4Config:
     exit_reserve_s: float = 30.0
 
     def __post_init__(self):
-        if self.strategy != "q4_adaptive_cooperative_v2":
+        if self.strategy != "q4_batched_information_then_clear_v4":
             raise ValueError("unsupported Q4 strategy")
         for name in ("local_measurement_limit", "candidate_limit", "response_intervals",
                      "refined_response_intervals", "belief_scenarios", "minimum_belief_scenarios",
@@ -97,6 +97,8 @@ class Q4Planner:
         self.revisit_considered = set()
         self.position, self.receiver_channel = (0.0, 0.0), 1
         self.station_cursor, self.services_here = 0, 0
+        self.station_batch_id = None
+        self.station_revisit_queue = []
         self.pending = None
         self.active_clear = None
         self.clear_index = 0
@@ -118,7 +120,11 @@ class Q4Planner:
                              "dynamic_candidates_used": 0, "sparse_covers": 0,
                              "sparse_cells_removed": 0, "clear_replans": 0,
                              "early_absent_channels": 0, "fallback_count": 0,
-                             "no_signal_by_purpose": {}})
+                             "no_signal_by_purpose": {},
+                             "station_information_batches": 0,
+                             "station_batch_candidates": 0,
+                             "station_batch_selected": 0,
+                             "deferred_clear_sources": 0})
 
     def _action(self, kind, position=None, channel=None, **kwargs):
         self.pending = Q4Action(self.next_id, kind, position, channel, **kwargs)
@@ -265,6 +271,66 @@ class Q4Planner:
                             purpose="LOCALIZE_PAIR_FIRST" if task.pair else "LOCALIZE_SINGLE",
                             reception=task.reception, reason="certified policy cost comparison")
 
+    def _build_station_information_batch(self, station_id, station, deadline):
+        """Rank zero-detour station revisits across all detected sources.
+
+        The whole batch is selected at one adaptive-round boundary.  It avoids
+        channel-order bias and prevents every response from triggering another
+        expensive cross-source policy search.
+        """
+        if self.station_batch_id == station_id:
+            return
+        self.station_batch_id = station_id
+        self.station_revisit_queue = []
+        self.metrics["station_information_batches"] += 1
+        next_station = (self.cover.stations[self.cover.route[self.station_cursor+1]]
+                        if self.station_cursor+1 < len(self.cover.route) else None)
+        ranked = []
+        # Large certified covers have the most to gain from another bearing, so
+        # evaluate them first if the real-time deadline truncates this round.
+        records = sorted(self._detected(),
+                         key=lambda record: (-self._backup(record).point_count,
+                                             record.channel))
+        for record in records:
+            key = station_id, record.channel
+            if (key in self.revisit_considered or station in record.used_positions or
+                    record.local_measurements >= self.config.local_measurement_limit):
+                continue
+            if time.monotonic() >= deadline:
+                break
+            self.revisit_considered.add(key)
+            certificate = classify_q4_reception(record, station)
+            if certificate == "GUARANTEED_NO_SIGNAL":
+                continue
+            backup = self._backup(record, next_station, optimize_order=True)
+            task = MeasureTask((station,), certificate, origin="station_batch")
+            bound = score_measure_policy(record, task, station, self.receiver_channel,
+                                         next_station, backup, self.config, deadline,
+                                         station=True)
+            self.metrics["station_batch_candidates"] += 1
+            if bound.eligible:
+                ranked.append((bound.expected_saving_s,
+                               int(self.receiver_channel == record.channel),
+                               record.channel, certificate, bound))
+        ranked.sort(reverse=True, key=lambda item: (item[0], item[1], -item[2]))
+        self.station_revisit_queue = ranked[:self.config.services_per_station]
+        self.metrics["station_batch_selected"] += len(self.station_revisit_queue)
+
+    def _station_information_action(self, station_id, station, deadline):
+        self._build_station_information_batch(station_id, station, deadline)
+        while self.station_revisit_queue:
+            _, _, channel, certificate, bound = self.station_revisit_queue.pop(0)
+            record = self.channels[channel]
+            if record.state != "DETECTED" or station in record.used_positions:
+                continue
+            self.last_decision = asdict(bound)
+            self.services_here += 1
+            return self._action("MEASURE", station, channel,
+                                purpose="STATION_REVISIT", station_id=station_id,
+                                reception=certificate,
+                                reason="batched cross-source information value")
+        return None
+
     def _remaining_route(self, deadline):
         stations = []
         for sid in self.cover.route[self.station_cursor+1:]:
@@ -305,37 +371,19 @@ class Q4Planner:
                 unknown = self._scan_channels(sid)
                 if unknown:
                     return self._action("MEASURE", station, unknown[0], purpose="DISCOVERY_SCAN", station_id=sid)
-                # Remeasures are 'on the way' only when actually at that station.
+                # During the discovery sweep, information is collected in a
+                # bounded cross-source batch at each station.  Except for near,
+                # clearance is deferred until the certified sweep ends; this
+                # avoids repeated excursions away from the discovery skeleton.
                 if self.position == station:
-                    for r in self._detected():
-                        key = sid, r.channel
-                        if (key in self.revisit_considered or station in r.used_positions or
-                                r.local_measurements >= self.config.local_measurement_limit or
-                                self.services_here >= self.config.services_per_station):
-                            continue
-                        self.revisit_considered.add(key)
-                        if time.monotonic() >= deadline:
-                            break
-                        cert = classify_q4_reception(r, station)
-                        if cert == "GUARANTEED_NO_SIGNAL":
-                            continue
-                        backup = self._backup(r)
-                        task = MeasureTask((station,), cert)
-                        bound = score_measure_policy(r, task, station, self.receiver_channel,
-                                                     None, backup, self.config, deadline, station=True)
-                        if bound.eligible:
-                            self.last_decision = asdict(bound)
-                            self.services_here += 1
-                            return self._action("MEASURE", station, r.channel, purpose="STATION_REVISIT",
-                                                station_id=sid, reception=cert)
-                if self._detected() and self.services_here < self.config.services_per_station:
-                    route = self._remaining_route(deadline)
-                    if route and route[0].kind == "CLEAR":
-                        self.services_here += 1
-                        continuation = next((t.points[0] for t in route[1:] if t.kind == "STATION"), None)
-                        return self._service(self.channels[route[0].channel], continuation, deadline)
+                    revisit = self._station_information_action(sid, station, deadline)
+                    if revisit is not None:
+                        return revisit
+                self.metrics["deferred_clear_sources"] += len(self._detected())
                 self.station_cursor += 1
                 self.services_here = 0
+                self.station_batch_id = None
+                self.station_revisit_queue = []
             detected = self._detected()
             if detected:
                 route = self._remaining_route(deadline)

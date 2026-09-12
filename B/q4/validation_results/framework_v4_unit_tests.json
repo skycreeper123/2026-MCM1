@@ -1,0 +1,18 @@
+{
+  "framework": "q4_batched_information_then_clear_v4",
+  "command": "python -m unittest discover -s B/q4/tests -v",
+  "tests_run": 43,
+  "failures": 0,
+  "errors": 0,
+  "elapsed_s": 22.958,
+  "result": "OK",
+  "coverage_notes": [
+    "continuous and exact discovery cover certificates",
+    "remaining-region and clear-cover certificates",
+    "near immediate-clear exception",
+    "ordinary clear deferral during discovery sweep",
+    "cross-source station batch ordering by expected saving",
+    "offline full-clear regressions",
+    "runner idempotency and completion semantics"
+  ]
+}

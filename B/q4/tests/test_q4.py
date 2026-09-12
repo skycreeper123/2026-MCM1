@@ -14,7 +14,7 @@ from B.q4.geometry import (SourceRecord, build_clear_plan, build_pair_probe,
                            min_polygon_distance_squared, update_positive_hull,
                            update_source_region)
 from B.q4.planner import Q4Config, Q4Planner
-from B.q4.policy import MeasureTask, score_measure_policy
+from B.q4.policy import BranchCostBound, MeasureTask, score_measure_policy
 from B.q4.routing import RouteTask, optimize_service_route, task_route_cost
 from B.q4.validation import Source, mixed_world, run_world, truth_in_region
 
@@ -211,24 +211,32 @@ class PlannerTests(unittest.TestCase):
         self.assertTrue(p._local_allowed(r, ((100, 0), (-100, 0))))
         self.assertFalse(p._local_allowed(r, ((100, 0), (-100, 0)), (3000, 0)))
 
-    def test_four_local_services_cannot_starve_next_discovery_station(self):
+    def test_scan_phase_defers_clear_and_advances_discovery_station(self):
         p = self.planner()
         p.channels[1] = record_at()
         for ch in range(2, 21):
             p.discovery_ledger[ch].add(0)
-        route = (RouteTask(("CLEAR", 1), ((500, 0),), "CLEAR", channel=1),
-                 RouteTask(("STATION", 6), (self.cover.stations[6],), "STATION", channels=(2,)))
-        def fake_service(record, continuation, deadline):
-            return p._action("MEASURE", (100+p.services_here, 0), 1, purpose="LOCALIZE_SINGLE")
-        with patch.object(p, "_remaining_route", return_value=route), patch.object(p, "_service", side_effect=fake_service):
-            for _ in range(4):
-                action = p.propose_action()
-                self.assertEqual(action.purpose, "LOCALIZE_SINGLE")
-                p.apply_measure_result(action, "no_signal")
-                self.assertEqual(p.station_cursor, 0)
+        with patch.object(p, "_remaining_route") as route:
             action = p.propose_action()
+        route.assert_not_called()
         self.assertEqual(action.purpose, "DISCOVERY_SCAN")
         self.assertEqual(action.station_id, self.cover.route[1])
+
+    def test_station_batch_ranks_sources_by_expected_saving_not_channel_order(self):
+        p = self.planner()
+        p.channels[1] = record_at(channel=1)
+        p.channels[2] = record_at(channel=2)
+        station_id = self.cover.route[1]
+        station = self.cover.stations[station_id]
+
+        def score(record, *args, **kwargs):
+            saving = 10.0 if record.channel == 1 else 30.0
+            return BranchCostBound(100, 90, 100, 100-saving, 100, saving,
+                                   None, True, 32, 0, True)
+
+        with patch("B.q4.planner.score_measure_policy", side_effect=score):
+            p._build_station_information_batch(station_id, station, math.inf)
+        self.assertEqual([item[2] for item in p.station_revisit_queue], [2, 1])
 
     def test_station_revisit_negative_does_not_advance_discovery(self):
         p = self.planner()
@@ -295,11 +303,16 @@ class PlannerTests(unittest.TestCase):
         self.assertEqual([t.key for t in route if t.kind == "STATION"], [t.key for t in stations])
         self.assertEqual(set(t.key for t in route), set(t.key for t in stations+[tasks[1]]))
 
-    def test_offline_ten_mixed_sources_full_clear_and_discovery_interleaving(self):
+    def test_offline_ten_mixed_sources_full_clear_after_information_sweep(self):
         result = run_world(mixed_world(11, 10), Q4Config(planning_total_s=0), self.cover)
         self.assertEqual(result["clearance_rate"], 1)
-        self.assertLess(result["first_clear_station_cursor"], 21)
+        # A near response is still cleared immediately, but ordinary detected
+        # sources are retained for the post-sweep clear phase.
+        self.assertGreater(result["metrics"]["deferred_clear_sources"], 0)
         self.assertEqual(sum(s == "ABSENT" for s in result["channel_states"].values()), 10)
+
+    def test_default_strategy_names_batched_information_framework(self):
+        self.assertEqual(Q4Config().strategy, "q4_batched_information_then_clear_v4")
 
     def test_offline_sixteen_mixed_sources_full_clear(self):
         result = run_world(mixed_world(29, 16), Q4Config(planning_total_s=0), self.cover)
