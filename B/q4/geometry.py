@@ -158,8 +158,6 @@ class SourceRecord:
     sparse_removed_cells: dict = field(default_factory=dict)
     sparse_processed_disks: int = 0
     clear_requests: int = 0
-    rollout_probes: int = 0
-    rollout_probe_hits: int = 0
     discovered_virtual_s: float | None = None
     cleared_virtual_s: float | None = None
 

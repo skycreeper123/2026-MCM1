@@ -2,7 +2,6 @@
 
 from .planner import Q4Action, Q4Config, Q4Planner
 from .belief import update_belief_scenarios
-from .belief_rollout import plan_belief_rollout_clear
 from .geometry import (build_clear_plan, build_pair_probe, classify_q4_reception,
                        load_and_verify_station_cover, update_positive_hull,
                        update_source_region, verify_remaining_cover_certificate)
@@ -10,6 +9,5 @@ from .geometry import (build_clear_plan, build_pair_probe, classify_q4_reception
 __all__ = ["Q4Action", "Q4Config", "Q4Planner", "build_clear_plan",
            "build_pair_probe", "classify_q4_reception",
            "load_and_verify_station_cover", "update_belief_scenarios",
-           "plan_belief_rollout_clear",
            "update_positive_hull", "update_source_region",
            "verify_remaining_cover_certificate"]

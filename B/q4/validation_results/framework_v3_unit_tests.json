@@ -1,9 +1,0 @@
-{
-  "strategy": "q4_certificate_shielded_rollout_v3",
-  "tests_run": 44,
-  "failures": 0,
-  "errors": 0,
-  "successful": true,
-  "elapsed_s": 24.259,
-  "scope": "full Q4 discovery including rollout expectation, P95 and completion-bound shields, miss update, and V2 certificate regressions"
-}
