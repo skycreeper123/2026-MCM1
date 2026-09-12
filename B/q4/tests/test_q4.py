@@ -124,7 +124,7 @@ class GeometryTests(unittest.TestCase):
         self.assertLessEqual(plan.point_count, 152)
         self.assertTrue(verify_cover_certificate(r.vertices, plan))
         with patch("B.q4.geometry.build_cover_plan", return_value=None):
-            strip = build_clear_plan(r, (0, 0))
+            strip = build_clear_plan(record_at(), (0, 0))
         self.assertEqual(strip.kind, "STRIP")
         self.assertEqual(strip.point_count, 152)
         self.assertLess(strip.cover_radius_m, 19.9)

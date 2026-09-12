@@ -386,6 +386,7 @@ def run_planner_offline(
             "actions_limited": exhausted_actions,
             "wall_time_s": time.perf_counter() - started_at,
             "planner_module": type(planner).__module__,
+            "planner_file": str(Path(sys.modules[type(planner).__module__].__file__).resolve()),
         }
     finally:
         if trace_file is not None:

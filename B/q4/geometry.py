@@ -17,6 +17,7 @@ from .verify_q4_framework import check_certificate, check_exact_geometry
 
 
 ROUTE = (0, 6, 7, 8, 1, 2, 3, 4, 5, 15, 16, 17, 18, 19, 20, 9, 10, 11, 12, 13, 14)
+CLEAR_ROUTE_RISK_CAP_RATIO = 1.25
 
 
 @dataclass(frozen=True)
@@ -156,6 +157,9 @@ class SourceRecord:
     base_clear_version: int = -1
     sparse_removed_cells: dict = field(default_factory=dict)
     sparse_processed_disks: int = 0
+    clear_requests: int = 0
+    discovered_virtual_s: float | None = None
+    cleared_virtual_s: float | None = None
 
 
 def update_positive_hull(record, observation):
@@ -325,8 +329,37 @@ def _sparsify_grid(record, plan):
                                       "remaining_version": record.remaining_version})
 
 
+def _filter_failed_strip(record, plan):
+    if not record.failed_clear_disks or plan.kind != "STRIP":
+        return plan
+    removed = tuple(p for p in plan.points if p in record.failed_clear_disks)
+    if not removed:
+        return plan
+    retained = tuple(p for p in plan.points if p not in record.failed_clear_disks)
+    if not retained:
+        raise ValueError("Failed-clear disks exclude the entire strip")
+    return replace(plan, kind="FILTERED_REMAINING_STRIP", points=retained,
+                   cover_certificate={"method": "FILTERED_REMAINING_STRIP",
+                                      "parent": plan.cover_certificate,
+                                      "removed_points": removed,
+                                      "failed_clear_disks": tuple(record.failed_clear_disks),
+                                      "remaining_version": record.remaining_version})
+
+
 def verify_remaining_cover_certificate(record, plan, safe_radius_m=19.9):
     cert = plan.cover_certificate or {}
+    if cert.get("method") == "FILTERED_REMAINING_STRIP":
+        parent = cert.get("parent", {})
+        if (cert.get("remaining_version") != record.remaining_version or
+                parent.get("method") != "FIRST_BEARING_STRIP" or
+                parent.get("half_width_deg") != 1.005):
+            return False
+        a = parent["anchor"]
+        expected = set(strip_clear_points((a["position"]["x"], a["position"]["y"]), a["svd_deg"]))
+        removed = set(map(tuple, cert.get("removed_points", ())))
+        retained = set(plan.points)
+        return (retained.isdisjoint(removed) and retained | removed == expected and
+                removed <= set(record.failed_clear_disks) and plan.cover_radius_m <= safe_radius_m)
     if cert.get("method") != "SPARSE_REMAINING_GRID":
         if cert.get("method") == "FIRST_BEARING_STRIP":
             return (plan.point_count > 0 and plan.cover_radius_m <= safe_radius_m and
@@ -396,6 +429,26 @@ def build_clear_route_variants(record, plan, current, continuation=None):
                  for v in dict.fromkeys(variants))
 
 
+def select_clear_route(record, plan, current, continuation=None):
+    variants = build_clear_route_variants(record, plan, current, continuation)
+    try:
+        from .belief import expected_clear_cost
+        # Expected early-hit time is the primary objective, but a posterior can
+        # be noisy in the tail.  Treat a 25% excess over the shortest certified
+        # completion bound as a hard risk veto instead of blending incompatible
+        # expected and worst-case quantities into one arbitrary score.
+        best_upper = min(candidate.completion_upper_s for candidate in variants)
+        admissible = tuple(candidate for candidate in variants
+                           if candidate.completion_upper_s
+                           <= CLEAR_ROUTE_RISK_CAP_RATIO*best_upper + 1e-9)
+        scored = [(expected_clear_cost(record, candidate, current, continuation), candidate)
+                  for candidate in admissible]
+        return min(scored, key=lambda row: (row[0] if row[0] is not None else row[1].completion_upper_s,
+                                            row[1].completion_upper_s))[1]
+    except (ValueError, ArithmeticError):
+        return min(variants, key=lambda candidate: candidate.completion_upper_s)
+
+
 def build_clear_plan(record, current, continuation=None):
     if record.anchor is None:
         raise ValueError("A direction anchor is required for non-near clearing")
@@ -422,15 +475,7 @@ def build_clear_plan(record, current, continuation=None):
         record.base_clear_plan, record.base_clear_version = plan, record.region_version
         record.sparse_removed_cells.clear()
         record.sparse_processed_disks = 0
-    plan = _sparsify_grid(record, plan)
+    plan = _filter_failed_strip(record, _sparsify_grid(record, plan))
     if not verify_remaining_cover_certificate(record, plan):
         raise ValueError("Independent P_remain cover verification failed")
-    variants = build_clear_route_variants(record, plan, current, continuation)
-    try:
-        from .belief import expected_clear_cost
-        scored = [(expected_clear_cost(record, candidate, current, continuation), candidate)
-                  for candidate in variants]
-        return min(scored, key=lambda row: (row[0] if row[0] is not None else row[1].completion_upper_s,
-                                            row[1].completion_upper_s))[1]
-    except (ValueError, ArithmeticError):
-        return min(variants, key=lambda candidate: candidate.completion_upper_s)
+    return select_clear_route(record, plan, current, continuation)

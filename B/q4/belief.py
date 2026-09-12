@@ -31,7 +31,7 @@ class BeliefState:
 
     @property
     def active(self):
-        return self.count >= self.minimum_count and self.weights.sum() > 0
+        return bool(self.count >= self.minimum_count and self.weights.sum() > 0)
 
     def summary(self):
         return {"count": self.count, "target_count": self.target_count,

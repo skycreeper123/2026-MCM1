@@ -1,0 +1,67 @@
+{
+  "problem": "q4",
+  "date": "2026-09-12",
+  "paired_groups": [
+    {"seed_start": 20261001, "runs": 4, "sources": 43},
+    {"seed_start": 20261101, "runs": 4, "sources": 54},
+    {"seed_start": 20261201, "runs": 4, "sources": 48}
+  ],
+  "planning_budget_per_action_s": 1.5,
+  "baseline_batch_points": 4,
+  "retained_batch_points": 8,
+  "baseline": {
+    "runs": 12,
+    "sources": 145,
+    "full_clear_count": 12,
+    "mean_virtual_time_s": 7486.25732518496,
+    "pooled_average_clear_time_s": 619.5523303601345,
+    "worst_virtual_time_s": 8904.93572753038,
+    "distance_m": 350530.43951109785,
+    "failed_clears": 916
+  },
+  "retained": {
+    "runs": 12,
+    "sources": 145,
+    "full_clear_count": 12,
+    "mean_virtual_time_s": 7428.354870591254,
+    "pooled_average_clear_time_s": 614.7604030834142,
+    "worst_virtual_time_s": 8525.736967581148,
+    "distance_m": 348241.29223547544,
+    "failed_clears": 837
+  },
+  "retained_change": {
+    "mean_virtual_time_percent": -0.7734499640950409,
+    "worst_virtual_time_percent": -4.258298673362746,
+    "distance_m": -2289.1472756224102,
+    "failed_clears": -79
+  },
+  "confirmation_original_seed_set": {
+    "seed_start": 20260912,
+    "runs": 12,
+    "sources": 161,
+    "full_clear_count": 12,
+    "batch4_mean_virtual_time_s": 7403.975152040778,
+    "batch8_mean_virtual_time_s": 7333.001804347795,
+    "mean_virtual_time_percent": -0.9585843582068295,
+    "batch4_worst_virtual_time_s": 8939.365818743958,
+    "batch8_worst_virtual_time_s": 8939.365818743958
+  },
+  "rejected_trials": [
+    {
+      "change": "clear route risk cap 1.25 -> 1.10",
+      "seed_start": 20261001,
+      "runs": 4,
+      "baseline_mean_virtual_time_s": 6996.517310563391,
+      "candidate_mean_virtual_time_s": 6998.709210861227,
+      "result": "reverted"
+    },
+    {
+      "change": "immediate rebuild after every failed clear even without posterior guidance",
+      "seed_start": 20261201,
+      "runs": 4,
+      "baseline_mean_virtual_time_s": 7845.656471363198,
+      "candidate_mean_virtual_time_s": 8053.442780321695,
+      "result": "reverted"
+    }
+  ]
+}

@@ -1,0 +1,1314 @@
+{
+  "simulator_schema_version": 2,
+  "problem": "q4",
+  "runs": 4,
+  "seed_start": 20261001,
+  "q3_implementation": "default",
+  "full_clear_count": 4,
+  "full_clear_rate": 1.0,
+  "cleared_sources": 43,
+  "total_sources": 43,
+  "overall_clear_ratio": 1.0,
+  "mean_virtual_time_s": 6998.709210861227,
+  "pooled_average_clear_time_s": 651.0427172894165,
+  "mean_run_average_clear_time_s": 651.3874079620372,
+  "worst_virtual_time_s": 7770.65886992115,
+  "total_wall_time_s": 76.91712430000007,
+  "error_count": 0,
+  "actions_limited_count": 0,
+  "errors": [],
+  "records": [
+    {
+      "problem": "q4",
+      "seed": 20261001,
+      "source_count": 11,
+      "simulator": {
+        "simulator_schema_version": 2,
+        "problem": "q4",
+        "seed": 20261001,
+        "source_count": 11,
+        "cleared_count": 11,
+        "clear_ratio": 1.0,
+        "missed_channels": [],
+        "virtual_time_s": 7601.528342984611,
+        "average_clear_time_s": 691.0480311804192,
+        "distance_m": 28397.641714923036,
+        "measure_count": 254,
+        "switch_count": 240,
+        "clear_count": 130,
+        "failed_clear_count": 119
+      },
+      "planner": {
+        "strategy": "q4_adaptive_cooperative_v2",
+        "cleared_count": 11,
+        "known_count": 11,
+        "channel_states": {
+          "1": "ABSENT",
+          "2": "CLEARED",
+          "3": "CLEARED",
+          "4": "CLEARED",
+          "5": "ABSENT",
+          "6": "ABSENT",
+          "7": "ABSENT",
+          "8": "ABSENT",
+          "9": "ABSENT",
+          "10": "CLEARED",
+          "11": "CLEARED",
+          "12": "CLEARED",
+          "13": "CLEARED",
+          "14": "CLEARED",
+          "15": "ABSENT",
+          "16": "CLEARED",
+          "17": "CLEARED",
+          "18": "ABSENT",
+          "19": "CLEARED",
+          "20": "ABSENT"
+        },
+        "completion": {
+          "complete": true,
+          "method": "CLEARED_OR_FULL_NETWORK_ABSENT",
+          "cleared": [
+            2,
+            3,
+            4,
+            10,
+            11,
+            12,
+            13,
+            14,
+            16,
+            17,
+            19
+          ],
+          "absent": [
+            1,
+            5,
+            6,
+            7,
+            8,
+            9,
+            15,
+            18,
+            20
+          ],
+          "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e"
+        },
+        "stop_reason": null,
+        "receiver_channel": 20,
+        "position": [
+          131.01288927962565,
+          321.5633094580916
+        ],
+        "station_cursor": 21,
+        "station_count": 21,
+        "station_certificate": {
+          "passed": true,
+          "floating": {
+            "passed": true,
+            "stations": 21,
+            "root_triangles": 28,
+            "leaf_triangles": 268,
+            "maximum_subdivision_depth": 5,
+            "max_provider_distance_m": 998.8993503354292,
+            "outer_polygon_inradius_m": 1800.485740202823,
+            "boundary_margin_m": 0.48574020282308084,
+            "range_margin_m": 1.100649664570824,
+            "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+          },
+          "exact": {
+            "passed": true,
+            "leaf_triangles": 268,
+            "arithmetic": "exact fractions of stored binary64 station coordinates",
+            "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+          },
+          "fallback": false
+        },
+        "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+        "metrics": {
+          "measurements": 254,
+          "switches": 240,
+          "clear_requests": 130,
+          "failed_clears": 119,
+          "successful_clears": 11,
+          "distance_m": 28397.641714923036,
+          "no_signal": 234,
+          "no_signal_revisits": 5,
+          "station_revisits": 13,
+          "pairs_started": 1,
+          "pairs_received": 1,
+          "local_measurements": 14,
+          "belief_updates": 144,
+          "belief_fallbacks": 0,
+          "dynamic_candidates_used": 0,
+          "sparse_covers": 114,
+          "sparse_cells_removed": 3370,
+          "clear_replans": 119,
+          "early_absent_channels": 0,
+          "fallback_count": 0,
+          "no_signal_by_purpose": {
+            "DISCOVERY_SCAN": 229,
+            "STATION_REVISIT": 5
+          }
+        },
+        "estimated_virtual_time_s": 7601.528342984608,
+        "average_clear_time_s": 691.0480311804189,
+        "clear_points_per_source": {
+          "mean": 11.818181818181818,
+          "p90": 27,
+          "max": 78
+        },
+        "discovery_to_clear_s": {
+          "p95": 7536.528342984608,
+          "max": 7536.528342984608
+        },
+        "planning_elapsed_s": 21.17200000000048,
+        "last_decision": {
+          "upper_s": 998.9542895818779,
+          "direction_upper_s": 277.866124385423,
+          "direct_upper_s": 992.9542895818779,
+          "expected_s": 317.30063341960414,
+          "direct_expected_s": 575.8356408160015,
+          "expected_saving_s": 258.53500739639736,
+          "response_probabilities": {
+            "near": 0.0,
+            "direction": 0.9453125,
+            "no_signal": 0.0546875
+          },
+          "includes_no_signal": true,
+          "intervals_total": 32,
+          "intervals_fallback": 0,
+          "eligible": true,
+          "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+        },
+        "fallback_route_estimate_s": 688.3791173301779,
+        "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+        "source_budgets": {
+          "2": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 1,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "3": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 1,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "4": {
+            "measurements": 2,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 2,
+            "failed_clear_disks": 77,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "10": {
+            "measurements": 1,
+            "marginal_detour_used_m": 11.242722936357609,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 2,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "11": {
+            "measurements": 2,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 2,
+            "failed_clear_disks": 26,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "12": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 1,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "13": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 2,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "14": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 1,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "16": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 2,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "17": {
+            "measurements": 2,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 2,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "19": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 4,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          }
+        }
+      },
+      "full_clear": true,
+      "actions_limited": false,
+      "wall_time_s": 22.382014700000582,
+      "planner_module": "B.q4.planner",
+      "planner_file": "F:\\ivo_zheng\\26_CUMCM\\B\\q4\\planner.py"
+    },
+    {
+      "problem": "q4",
+      "seed": 20261002,
+      "source_count": 11,
+      "simulator": {
+        "simulator_schema_version": 2,
+        "problem": "q4",
+        "seed": 20261002,
+        "source_count": 11,
+        "cleared_count": 11,
+        "clear_ratio": 1.0,
+        "missed_channels": [],
+        "virtual_time_s": 7770.65886992115,
+        "average_clear_time_s": 706.4235336291954,
+        "distance_m": 30243.294349605774,
+        "measure_count": 235,
+        "switch_count": 222,
+        "clear_count": 101,
+        "failed_clear_count": 90
+      },
+      "planner": {
+        "strategy": "q4_adaptive_cooperative_v2",
+        "cleared_count": 11,
+        "known_count": 11,
+        "channel_states": {
+          "1": "ABSENT",
+          "2": "CLEARED",
+          "3": "ABSENT",
+          "4": "ABSENT",
+          "5": "CLEARED",
+          "6": "CLEARED",
+          "7": "ABSENT",
+          "8": "CLEARED",
+          "9": "ABSENT",
+          "10": "ABSENT",
+          "11": "CLEARED",
+          "12": "CLEARED",
+          "13": "CLEARED",
+          "14": "ABSENT",
+          "15": "CLEARED",
+          "16": "ABSENT",
+          "17": "ABSENT",
+          "18": "CLEARED",
+          "19": "CLEARED",
+          "20": "CLEARED"
+        },
+        "completion": {
+          "complete": true,
+          "method": "CLEARED_OR_FULL_NETWORK_ABSENT",
+          "cleared": [
+            2,
+            5,
+            6,
+            8,
+            11,
+            12,
+            13,
+            15,
+            18,
+            19,
+            20
+          ],
+          "absent": [
+            1,
+            3,
+            4,
+            7,
+            9,
+            10,
+            14,
+            16,
+            17
+          ],
+          "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e"
+        },
+        "stop_reason": null,
+        "receiver_channel": 2,
+        "position": [
+          -943.9213353368013,
+          -96.56593829421612
+        ],
+        "station_cursor": 21,
+        "station_count": 21,
+        "station_certificate": {
+          "passed": true,
+          "floating": {
+            "passed": true,
+            "stations": 21,
+            "root_triangles": 28,
+            "leaf_triangles": 268,
+            "maximum_subdivision_depth": 5,
+            "max_provider_distance_m": 998.8993503354292,
+            "outer_polygon_inradius_m": 1800.485740202823,
+            "boundary_margin_m": 0.48574020282308084,
+            "range_margin_m": 1.100649664570824,
+            "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+          },
+          "exact": {
+            "passed": true,
+            "leaf_triangles": 268,
+            "arithmetic": "exact fractions of stored binary64 station coordinates",
+            "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+          },
+          "fallback": false
+        },
+        "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+        "metrics": {
+          "measurements": 235,
+          "switches": 222,
+          "clear_requests": 101,
+          "failed_clears": 90,
+          "successful_clears": 11,
+          "distance_m": 30243.294349605774,
+          "no_signal": 215,
+          "no_signal_revisits": 3,
+          "station_revisits": 12,
+          "pairs_started": 0,
+          "pairs_received": 0,
+          "local_measurements": 12,
+          "belief_updates": 113,
+          "belief_fallbacks": 0,
+          "dynamic_candidates_used": 0,
+          "sparse_covers": 85,
+          "sparse_cells_removed": 2067,
+          "clear_replans": 90,
+          "early_absent_channels": 0,
+          "fallback_count": 0,
+          "no_signal_by_purpose": {
+            "DISCOVERY_SCAN": 212,
+            "STATION_REVISIT": 3
+          }
+        },
+        "estimated_virtual_time_s": 7770.658869921155,
+        "average_clear_time_s": 706.423533629196,
+        "clear_points_per_source": {
+          "mean": 9.181818181818182,
+          "p90": 8,
+          "max": 64
+        },
+        "discovery_to_clear_s": {
+          "p95": 7380.643896090891,
+          "max": 7380.643896090891
+        },
+        "planning_elapsed_s": 20.67200000000048,
+        "last_decision": {
+          "upper_s": 1162.9032699356653,
+          "direction_upper_s": 277.05132321428175,
+          "direct_upper_s": 1156.9032699356653,
+          "expected_s": 306.46437613276515,
+          "direct_expected_s": 576.5113625374461,
+          "expected_saving_s": 270.0469864046809,
+          "response_probabilities": {
+            "near": 0.0,
+            "direction": 0.966796875,
+            "no_signal": 0.033203125
+          },
+          "includes_no_signal": true,
+          "intervals_total": 32,
+          "intervals_fallback": 0,
+          "eligible": true,
+          "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+        },
+        "fallback_route_estimate_s": 375.0022249739294,
+        "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+        "source_budgets": {
+          "2": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 6,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "5": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 4,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "6": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 0,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "8": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 1,
+            "failed_clear_disks": 2,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "11": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 1,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "12": {
+            "measurements": 2,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 2,
+            "failed_clear_disks": 63,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "13": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 7,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "15": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 3,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "18": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 1,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "19": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 1,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "20": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 2,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          }
+        }
+      },
+      "full_clear": true,
+      "actions_limited": false,
+      "wall_time_s": 20.869839400000274,
+      "planner_module": "B.q4.planner",
+      "planner_file": "F:\\ivo_zheng\\26_CUMCM\\B\\q4\\planner.py"
+    },
+    {
+      "problem": "q4",
+      "seed": 20261003,
+      "source_count": 10,
+      "simulator": {
+        "simulator_schema_version": 2,
+        "problem": "q4",
+        "seed": 20261003,
+        "source_count": 10,
+        "cleared_count": 10,
+        "clear_ratio": 1.0,
+        "missed_channels": [],
+        "virtual_time_s": 6662.091068847282,
+        "average_clear_time_s": 666.2091068847283,
+        "distance_m": 24825.455344236412,
+        "measure_count": 265,
+        "switch_count": 253,
+        "clear_count": 33,
+        "failed_clear_count": 23
+      },
+      "planner": {
+        "strategy": "q4_adaptive_cooperative_v2",
+        "cleared_count": 10,
+        "known_count": 10,
+        "channel_states": {
+          "1": "CLEARED",
+          "2": "CLEARED",
+          "3": "ABSENT",
+          "4": "ABSENT",
+          "5": "CLEARED",
+          "6": "ABSENT",
+          "7": "CLEARED",
+          "8": "ABSENT",
+          "9": "CLEARED",
+          "10": "CLEARED",
+          "11": "CLEARED",
+          "12": "ABSENT",
+          "13": "ABSENT",
+          "14": "ABSENT",
+          "15": "ABSENT",
+          "16": "CLEARED",
+          "17": "CLEARED",
+          "18": "ABSENT",
+          "19": "ABSENT",
+          "20": "CLEARED"
+        },
+        "completion": {
+          "complete": true,
+          "method": "CLEARED_OR_FULL_NETWORK_ABSENT",
+          "cleared": [
+            1,
+            2,
+            5,
+            7,
+            9,
+            10,
+            11,
+            16,
+            17,
+            20
+          ],
+          "absent": [
+            3,
+            4,
+            6,
+            8,
+            12,
+            13,
+            14,
+            15,
+            18,
+            19
+          ],
+          "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e"
+        },
+        "stop_reason": null,
+        "receiver_channel": 19,
+        "position": [
+          304.46258222154205,
+          173.94039563673772
+        ],
+        "station_cursor": 20,
+        "station_count": 21,
+        "station_certificate": {
+          "passed": true,
+          "floating": {
+            "passed": true,
+            "stations": 21,
+            "root_triangles": 28,
+            "leaf_triangles": 268,
+            "maximum_subdivision_depth": 5,
+            "max_provider_distance_m": 998.8993503354292,
+            "outer_polygon_inradius_m": 1800.485740202823,
+            "boundary_margin_m": 0.48574020282308084,
+            "range_margin_m": 1.100649664570824,
+            "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+          },
+          "exact": {
+            "passed": true,
+            "leaf_triangles": 268,
+            "arithmetic": "exact fractions of stored binary64 station coordinates",
+            "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+          },
+          "fallback": false
+        },
+        "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+        "metrics": {
+          "measurements": 265,
+          "switches": 253,
+          "clear_requests": 33,
+          "failed_clears": 23,
+          "successful_clears": 10,
+          "distance_m": 24825.455344236412,
+          "no_signal": 245,
+          "no_signal_revisits": 0,
+          "station_revisits": 10,
+          "pairs_started": 0,
+          "pairs_received": 0,
+          "local_measurements": 10,
+          "belief_updates": 43,
+          "belief_fallbacks": 0,
+          "dynamic_candidates_used": 0,
+          "sparse_covers": 17,
+          "sparse_cells_removed": 28,
+          "clear_replans": 23,
+          "early_absent_channels": 0,
+          "fallback_count": 0,
+          "no_signal_by_purpose": {
+            "DISCOVERY_SCAN": 245
+          }
+        },
+        "estimated_virtual_time_s": 6662.091068847282,
+        "average_clear_time_s": 666.2091068847283,
+        "clear_points_per_source": {
+          "mean": 3.3,
+          "p90": 5,
+          "max": 6
+        },
+        "discovery_to_clear_s": {
+          "p95": 6168.968150803983,
+          "max": 6168.968150803983
+        },
+        "planning_elapsed_s": 11.109999999998763,
+        "last_decision": {
+          "upper_s": 1009.5214575486655,
+          "direction_upper_s": 212.6245149108897,
+          "direct_upper_s": 1003.5214575486655,
+          "expected_s": 337.1396621980422,
+          "direct_expected_s": 452.4074355135932,
+          "expected_saving_s": 115.26777331555104,
+          "response_probabilities": {
+            "near": 0.0,
+            "direction": 0.84375,
+            "no_signal": 0.15625
+          },
+          "includes_no_signal": true,
+          "intervals_total": 32,
+          "intervals_fallback": 0,
+          "eligible": true,
+          "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+        },
+        "fallback_route_estimate_s": 5.0,
+        "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+        "source_budgets": {
+          "1": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 3,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "2": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 3,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "5": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 0,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "7": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 5,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "9": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 0,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "10": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 3,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "11": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 0,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "16": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 2,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "17": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 4,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "20": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 3,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          }
+        }
+      },
+      "full_clear": true,
+      "actions_limited": false,
+      "wall_time_s": 11.289098699999158,
+      "planner_module": "B.q4.planner",
+      "planner_file": "F:\\ivo_zheng\\26_CUMCM\\B\\q4\\planner.py"
+    },
+    {
+      "problem": "q4",
+      "seed": 20261004,
+      "source_count": 11,
+      "simulator": {
+        "simulator_schema_version": 2,
+        "problem": "q4",
+        "seed": 20261004,
+        "source_count": 11,
+        "cleared_count": 11,
+        "clear_ratio": 1.0,
+        "missed_channels": [],
+        "virtual_time_s": 5960.558561691865,
+        "average_clear_time_s": 541.8689601538059,
+        "distance_m": 21742.79280845933,
+        "measure_count": 250,
+        "switch_count": 238,
+        "clear_count": 34,
+        "failed_clear_count": 23
+      },
+      "planner": {
+        "strategy": "q4_adaptive_cooperative_v2",
+        "cleared_count": 11,
+        "known_count": 11,
+        "channel_states": {
+          "1": "ABSENT",
+          "2": "CLEARED",
+          "3": "CLEARED",
+          "4": "ABSENT",
+          "5": "ABSENT",
+          "6": "ABSENT",
+          "7": "CLEARED",
+          "8": "CLEARED",
+          "9": "CLEARED",
+          "10": "CLEARED",
+          "11": "CLEARED",
+          "12": "CLEARED",
+          "13": "CLEARED",
+          "14": "CLEARED",
+          "15": "CLEARED",
+          "16": "ABSENT",
+          "17": "ABSENT",
+          "18": "ABSENT",
+          "19": "ABSENT",
+          "20": "ABSENT"
+        },
+        "completion": {
+          "complete": true,
+          "method": "CLEARED_OR_FULL_NETWORK_ABSENT",
+          "cleared": [
+            2,
+            3,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "absent": [
+            1,
+            4,
+            5,
+            6,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e"
+        },
+        "stop_reason": null,
+        "receiver_channel": 20,
+        "position": [
+          -1660.426859439932,
+          600.6169062669385
+        ],
+        "station_cursor": 20,
+        "station_count": 21,
+        "station_certificate": {
+          "passed": true,
+          "floating": {
+            "passed": true,
+            "stations": 21,
+            "root_triangles": 28,
+            "leaf_triangles": 268,
+            "maximum_subdivision_depth": 5,
+            "max_provider_distance_m": 998.8993503354292,
+            "outer_polygon_inradius_m": 1800.485740202823,
+            "boundary_margin_m": 0.48574020282308084,
+            "range_margin_m": 1.100649664570824,
+            "scope": "continuous triangle containment and vertex-distance certificate; floating point"
+          },
+          "exact": {
+            "passed": true,
+            "leaf_triangles": 268,
+            "arithmetic": "exact fractions of stored binary64 station coordinates",
+            "scope": "disk containment, noncrossing mesh, dyadic subdivision, provider hull containment, squared distances <= 999^2"
+          },
+          "fallback": false
+        },
+        "network_id": "1ac09a10cc67f5c4d93b35cc6f8a435ef5aa1965e7c42e8b4012ddbdcc1cde4e",
+        "metrics": {
+          "measurements": 250,
+          "switches": 238,
+          "clear_requests": 34,
+          "failed_clears": 23,
+          "successful_clears": 11,
+          "distance_m": 21742.79280845933,
+          "no_signal": 228,
+          "no_signal_revisits": 0,
+          "station_revisits": 9,
+          "pairs_started": 2,
+          "pairs_received": 2,
+          "local_measurements": 11,
+          "belief_updates": 45,
+          "belief_fallbacks": 0,
+          "dynamic_candidates_used": 0,
+          "sparse_covers": 20,
+          "sparse_cells_removed": 50,
+          "clear_replans": 23,
+          "early_absent_channels": 0,
+          "fallback_count": 0,
+          "no_signal_by_purpose": {
+            "DISCOVERY_SCAN": 228
+          }
+        },
+        "estimated_virtual_time_s": 5960.558561691866,
+        "average_clear_time_s": 541.868960153806,
+        "clear_points_per_source": {
+          "mean": 3.090909090909091,
+          "p90": 5,
+          "max": 8
+        },
+        "discovery_to_clear_s": {
+          "p95": 3965.932087837047,
+          "max": 3965.932087837047
+        },
+        "planning_elapsed_s": 22.218000000000757,
+        "last_decision": {
+          "upper_s": 943.719785441841,
+          "direction_upper_s": 206.27379842634892,
+          "direct_upper_s": 937.719785441841,
+          "expected_s": 394.95626776039086,
+          "direct_expected_s": 520.0111199136614,
+          "expected_saving_s": 125.05485215327059,
+          "response_probabilities": {
+            "near": 0.0,
+            "direction": 0.744140625,
+            "no_signal": 0.255859375
+          },
+          "includes_no_signal": true,
+          "intervals_total": 32,
+          "intervals_fallback": 0,
+          "eligible": true,
+          "scope": "finite measure-then-certified-clear policy; not arbitrary future replanning"
+        },
+        "fallback_route_estimate_s": 25.03268618747793,
+        "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
+        "source_budgets": {
+          "2": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 3,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "3": {
+            "measurements": 1,
+            "marginal_detour_used_m": 10.233656120319665,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 7,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "7": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 4,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "8": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 2,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "9": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 1,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "10": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 0,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "11": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 1,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "12": {
+            "measurements": 1,
+            "marginal_detour_used_m": 31.494058578294243,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 3,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "13": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 0,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "14": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 0,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          },
+          "15": {
+            "measurements": 1,
+            "marginal_detour_used_m": 0.0,
+            "reserved_detour_m": 0.0,
+            "uncertain_no_signal_streak": 0,
+            "failed_clear_disks": 2,
+            "belief": {
+              "count": 512,
+              "target_count": 512,
+              "minimum_count": 24,
+              "active": true,
+              "effective_sample_size": 512.0
+            }
+          }
+        }
+      },
+      "full_clear": true,
+      "actions_limited": false,
+      "wall_time_s": 22.376171500000055,
+      "planner_module": "B.q4.planner",
+      "planner_file": "F:\\ivo_zheng\\26_CUMCM\\B\\q4\\planner.py"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "tests_run": 45,
+  "failures": 0,
+  "errors": 0,
+  "successful": true,
+  "elapsed_s": 53.89099999999962,
+  "scope": "Q4 V2 tests plus reused Q3 transport regression",
+  "latest_q4_regression": {
+    "tests_run": 41,
+    "failures": 0,
+    "errors": 0,
+    "successful": true,
+    "elapsed_s": 32.218,
+    "note": "full Q4 discovery rerun after retaining an eight-point geometry batch only when posterior guidance has fallen back"
+  }
+}

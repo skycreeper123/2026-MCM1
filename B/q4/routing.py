@@ -47,6 +47,19 @@ def optimize_service_route(stations, clears, current, receiver_channel,
         base = [x for x in route if x.key != task.key]
         candidates = [base[:i]+[task]+base[i:] for i in range(len(base)+1)]
         route = min(candidates, key=cost)
+    # Adjacent exchanges may move a clear across a station while preserving the
+    # relative order of all mandatory discovery stations.
+    station_order = [t.key for t in stations]
+    changed = True
+    while changed and time.monotonic() < deadline:
+        changed = False
+        for i in range(len(route)-1):
+            trial = route[:i]+[route[i+1], route[i]]+route[i+2:]
+            if [t.key for t in trial if t.kind == "STATION"] != station_order:
+                continue
+            value = cost(trial)
+            if value+1e-9 < cost(route):
+                route, changed = trial, True
     # Only reverse stretches containing clears: no discovery duty reordered.
     best = cost(route)
     for i in range(len(route)):

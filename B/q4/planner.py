@@ -8,7 +8,7 @@ from B.q3.localize import ClearPlan
 from .geometry import (SourceRecord, build_clear_plan, classify_q4_reception,
                        load_and_verify_station_cover, update_positive_hull,
                        update_source_region, update_cover_after_failed_clear,
-                       reprice)
+                       reprice, select_clear_route)
 from .belief import update_belief_scenarios
 from .policy import (MeasureTask, candidate_tasks, marginal_detour,
                      score_measure_policy)
@@ -17,6 +17,7 @@ from .routing import RouteTask, optimize_service_route, task_route_cost
 
 @dataclass(frozen=True)
 class Q4Config:
+    strategy: str = "q4_adaptive_cooperative_v2"
     local_measurement_limit: int = 4
     local_distance_limit_m: float = 4000.0
     candidate_limit: int = 24
@@ -29,7 +30,7 @@ class Q4Config:
     direct_clear_points: int = 4
     large_region_points: int = 30
     uncertain_no_signal_limit: int = 2
-    clear_batch_points: int = 4
+    clear_batch_points: int = 8
     planning_call_s: float = 1.5
     planning_total_s: float = 60.0
     guaranteed_saving_s: float = 1.0
@@ -41,6 +42,8 @@ class Q4Config:
     exit_reserve_s: float = 30.0
 
     def __post_init__(self):
+        if self.strategy != "q4_adaptive_cooperative_v2":
+            raise ValueError("unsupported Q4 strategy")
         for name in ("local_measurement_limit", "candidate_limit", "response_intervals",
                      "refined_response_intervals", "belief_scenarios", "minimum_belief_scenarios",
                      "dynamic_candidate_limit", "direct_clear_points", "large_region_points",
@@ -97,11 +100,13 @@ class Q4Planner:
         self.pending = None
         self.active_clear = None
         self.clear_index = 0
+        self.clear_batch_failures = 0
         self.pair_channel = None
         self.next_id, self.applied = 1, {}
         self.stop_reason, self.exited = None, False
         self.planning_elapsed_s = 0.0
         self.clear_cache = {}
+        self.clear_route_cache = {}
         self.last_fallback_route = ()
         self.last_decision = None
         self.detour_reservation = None
@@ -112,12 +117,18 @@ class Q4Planner:
         self.metrics.update({"belief_updates": 0, "belief_fallbacks": 0,
                              "dynamic_candidates_used": 0, "sparse_covers": 0,
                              "sparse_cells_removed": 0, "clear_replans": 0,
-                             "early_absent_channels": 0})
+                             "early_absent_channels": 0, "fallback_count": 0,
+                             "no_signal_by_purpose": {}})
 
     def _action(self, kind, position=None, channel=None, **kwargs):
         self.pending = Q4Action(self.next_id, kind, position, channel, **kwargs)
         self.next_id += 1
         return self.pending
+
+    def _virtual_time(self):
+        m = self.metrics
+        return (m["distance_m"]/5 + 5*m["measurements"] + m["switches"]
+                + 3*m["failed_clears"] + 5*m["successful_clears"])
 
     def _detected(self):
         return [r for r in self.channels.values() if r.state == "DETECTED"]
@@ -135,18 +146,28 @@ class Q4Planner:
             order.insert(0, self.receiver_channel)
         return order
 
-    def _backup(self, record, continuation=None):
+    def _backup(self, record, continuation=None, optimize_order=False):
         key = (record.channel, record.region_version, record.remaining_version)
         if key not in self.clear_cache:
             self.clear_cache[key] = build_clear_plan(record, self.position)
-        return reprice(self.clear_cache[key], self.position, continuation)
+        if not optimize_order:
+            return reprice(self.clear_cache[key], self.position, continuation)
+        route_key = (key, id(record.belief), tuple(self.position),
+                     tuple(continuation) if continuation is not None else None)
+        if route_key not in self.clear_route_cache:
+            self.clear_route_cache[route_key] = select_clear_route(
+                record, self.clear_cache[key], self.position, continuation)
+        return self.clear_route_cache[route_key]
 
     def _start_clear(self, record, plan):
         record.clear_certificate = plan.as_dict()
         self.active_clear, self.clear_index = (record.channel, plan), 0
+        self.clear_batch_failures = 0
         if plan.kind == "SPARSE_REMAINING_GRID":
             self.metrics["sparse_covers"] += 1
             self.metrics["sparse_cells_removed"] += len(plan.cover_certificate["removed_cells"])
+        if "STRIP" in plan.kind:
+            self.metrics["fallback_count"] += 1
         return self._clear_action()
 
     def _absence_certified(self, channel):
@@ -158,6 +179,10 @@ class Q4Planner:
         return None
 
     def _update_belief(self, record):
+        if self.planning_elapsed_s >= self.config.planning_total_s:
+            record.belief = None
+            self.metrics["belief_fallbacks"] += 1
+            return
         belief = update_belief_scenarios(record, self.config.belief_scenarios,
                                          self.config.minimum_belief_scenarios)
         self.metrics["belief_updates"] += 1
@@ -191,7 +216,7 @@ class Q4Planner:
                 record.local_travel_m+record.reserved_detour_m+detour <= self.config.local_distance_limit_m)
 
     def _service(self, record, continuation, deadline):
-        backup = self._backup(record, continuation)
+        backup = self._backup(record, continuation, optimize_order=True)
         # A single certified clear or an exhausted search budget needs no probe.
         if (backup.point_count <= self.config.direct_clear_points or time.monotonic() >= deadline
                 or record.local_measurements >= self.config.local_measurement_limit):
@@ -380,11 +405,13 @@ class Q4Planner:
             self.metrics["station_revisits"] += 1
         if result == "no_signal":
             self.metrics["no_signal"] += 1
+            by_purpose = self.metrics["no_signal_by_purpose"]
+            by_purpose[action.purpose] = by_purpose.get(action.purpose, 0)+1
             if action.purpose != "DISCOVERY_SCAN":
                 self.metrics["no_signal_revisits"] += 1
             if action.reception in {"POSITIVE_HULL", "PAIR_SECOND_GUARANTEED"}:
                 self.stop_reason = "INCONSISTENCY: guaranteed reception returned no_signal"
-            elif action.purpose != "DISCOVERY_SCAN":
+            elif action.purpose != "DISCOVERY_SCAN" and not action.purpose.startswith("LOCALIZE_PAIR"):
                 r.consecutive_uncertain_no_signal += 1
             if action.purpose == "DISCOVERY_SCAN":
                 self.discovery_ledger[action.channel].add(action.station_id)
@@ -395,8 +422,11 @@ class Q4Planner:
                                              "station_count": len(self.discovery_ledger[action.channel])}
                     self.metrics["early_absent_channels"] += int(method == "LEAF_PROVIDER_SETS")
             elif r.vertices is not None:
+                update_start = time.monotonic()
                 self._update_belief(r)
+                self.planning_elapsed_s += time.monotonic()-update_start
             return
+        was_unknown = r.state == "UNKNOWN"
         r.state = "DETECTED"
         if action.purpose != "DISCOVERY_SCAN":
             r.consecutive_uncertain_no_signal = 0
@@ -411,10 +441,14 @@ class Q4Planner:
             self.active_clear, self.clear_index = (r.channel, plan), 0
         else:
             try:
+                update_start = time.monotonic()
                 update_source_region(r, obs)
                 self._update_belief(r)
+                self.planning_elapsed_s += time.monotonic()-update_start
             except (ValueError, ArithmeticError) as exc:
                 self.stop_reason = f"INCONSISTENCY: {exc}"
+        if was_unknown and r.discovered_virtual_s is None:
+            r.discovered_virtual_s = self._virtual_time()
         if self._known_count() > 16:
             self.stop_reason = "INCONSISTENCY: more than 16 distinct source channels"
 
@@ -424,24 +458,40 @@ class Q4Planner:
         if not self._accept(action, result):
             return
         self.metrics["clear_requests"] += 1
+        record = self.channels[action.channel]
+        record.clear_requests += 1
         # Deliberately do NOT modify receiver_channel here.
         if result == "success":
-            self.channels[action.channel].state = "CLEARED"
+            record.state = "CLEARED"
             self.metrics["successful_clears"] += 1
+            record.cleared_virtual_s = self._virtual_time()
             self.active_clear = None
+            self.clear_batch_failures = 0
         else:
             self.metrics["failed_clears"] += 1
-            record = self.channels[action.channel]
             plan = self.active_clear[1]
             if plan.kind == "NEAR" or plan.point_count == 1:
                 self.stop_reason = "INCONSISTENCY: certified clear plan exhausted"
                 self.active_clear = None
             else:
+                update_start = time.monotonic()
                 update_cover_after_failed_clear(record, action.position)
                 self._update_belief(record)
-                self.metrics["clear_replans"] += 1
-                self.active_clear = None
-                self.clear_index = 0
+                self.planning_elapsed_s += time.monotonic()-update_start
+                self.clear_index += 1
+                self.clear_batch_failures += 1
+                if self.clear_index >= plan.point_count:
+                    self.stop_reason = "INCONSISTENCY: certified clear plan exhausted"
+                    self.active_clear = None
+                # A failed clearance invalidates the posterior ordering.  Rebuild
+                # immediately while belief guidance is active; only the
+                # geometry-only fallback may continue a bounded batch.
+                elif ((record.belief is not None and record.belief.active)
+                      or self.clear_batch_failures >= self.config.clear_batch_points):
+                    self.metrics["clear_replans"] += 1
+                    self.active_clear = None
+                    self.clear_index = 0
+                    self.clear_batch_failures = 0
 
     def has_completion_certificate(self):
         return not self.stop_reason and check_completion(self.channels, self.discovery_ledger, self.cover)["complete"]
@@ -458,8 +508,12 @@ class Q4Planner:
 
     def summary(self):
         m = self.metrics
-        virtual = m["distance_m"]/5 + 5*m["measurements"]+m["switches"]+3*m["failed_clears"]+5*m["successful_clears"]
-        return {"strategy": "q4_adaptive_cooperative_v2", "cleared_count": m["successful_clears"],
+        virtual = self._virtual_time()
+        clear_counts = sorted(r.clear_requests for r in self.channels.values() if r.state == "CLEARED")
+        latencies = sorted(r.cleared_virtual_s-r.discovered_virtual_s for r in self.channels.values()
+                           if r.cleared_virtual_s is not None and r.discovered_virtual_s is not None)
+        percentile = lambda values, q: (values[min(len(values)-1, math.ceil(q*len(values))-1)] if values else None)
+        return {"strategy": self.config.strategy, "cleared_count": m["successful_clears"],
                 "known_count": self._known_count(), "channel_states": {ch: r.state for ch, r in self.channels.items()},
                 "completion": check_completion(self.channels, self.discovery_ledger, self.cover),
                 "stop_reason": self.stop_reason, "receiver_channel": self.receiver_channel,
@@ -468,6 +522,11 @@ class Q4Planner:
                 "network_id": self.cover.network_id, "metrics": dict(m),
                 "estimated_virtual_time_s": virtual,
                 "average_clear_time_s": virtual/m["successful_clears"] if m["successful_clears"] else None,
+                "clear_points_per_source": {"mean": sum(clear_counts)/len(clear_counts) if clear_counts else None,
+                                            "p90": percentile(clear_counts, .9),
+                                            "max": max(clear_counts) if clear_counts else None},
+                "discovery_to_clear_s": {"p95": percentile(latencies, .95),
+                                         "max": max(latencies) if latencies else None},
                 "planning_elapsed_s": self.planning_elapsed_s, "last_decision": self.last_decision,
                 "fallback_route_estimate_s": task_route_cost(self.last_fallback_route, self.position, self.receiver_channel),
                 "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
