@@ -21,6 +21,9 @@ class BeliefState:
     target_count: int
     minimum_count: int
     generated: int
+    observation_count: int = 0
+    region_version: int = -1
+    remaining_version: int = -1
 
     @property
     def count(self):
@@ -96,7 +99,8 @@ def update_belief_scenarios(record, target_count=512, minimum_count=24):
     """
     if record.vertices is None:
         record.belief = BeliefState(np.empty((0, 2)), np.empty(0), np.empty(0, bool),
-                                    np.empty(0), np.empty(0), target_count, minimum_count, 0)
+                                    np.empty(0), np.empty(0), target_count, minimum_count, 0,
+                                    len(record.observations), record.region_version, record.remaining_version)
         return record.belief
     seed = (record.channel*1_000_003 + record.region_version*10_007 +
             record.remaining_version*101 + len(record.observations)) & 0xffffffff
@@ -111,12 +115,22 @@ def update_belief_scenarios(record, target_count=512, minimum_count=24):
             indices = np.flatnonzero(mask)
             weights = old.weights[indices]
             weights = weights/weights.sum()
-            take = min(target_count//2, max(len(indices), minimum_count))
+            clear_only_update = (old.observation_count == len(record.observations)
+                                 and old.region_version == record.region_version)
+            take = target_count if clear_only_update else min(target_count//2, max(len(indices), minimum_count))
             chosen = rng.choice(indices, take, replace=True, p=weights)
             # Local rejuvenation is attempted below as fresh conditional draws;
             # unchanged resamples preserve strict observation consistency.
             accepted.append((old.positions[chosen], old.radii_m[chosen],
                              old.directional[chosen], old.emit_deg[chosen]))
+            if clear_only_update:
+                positions, radii = old.positions[chosen], old.radii_m[chosen]
+                directional, emit = old.directional[chosen], old.emit_deg[chosen]
+                weights = np.full(len(positions), 1/len(positions))
+                record.belief = BeliefState(positions, radii, directional, emit, weights,
+                                            target_count, minimum_count, 0, len(record.observations),
+                                            record.region_version, record.remaining_version)
+                return record.belief
     have = sum(len(x[0]) for x in accepted)
     attempts = 0
     while have < target_count and attempts < 24:
@@ -141,7 +155,8 @@ def update_belief_scenarios(record, target_count=512, minimum_count=24):
         directional, emit = np.empty(0, bool), np.empty(0)
     weights = np.full(len(positions), 1/len(positions)) if len(positions) else np.empty(0)
     record.belief = BeliefState(positions, radii, directional, emit, weights,
-                                target_count, minimum_count, generated)
+                                target_count, minimum_count, generated, len(record.observations),
+                                record.region_version, record.remaining_version)
     return record.belief
 
 
@@ -181,12 +196,11 @@ def expected_clear_cost(record, plan, current, continuation=None):
     for i, point in enumerate(points):
         travelled += float(np.linalg.norm(point-previous))
         cumulative[i], previous = travelled, point
-    costs = np.empty(belief.count)
-    for i, source in enumerate(belief.positions):
-        hit = np.flatnonzero(np.linalg.norm(points-source, axis=1) <= 20)
-        if not len(hit):
-            return None
-        k = int(hit[0])
-        connector = math.dist(tuple(points[k]), continuation)/5 if continuation is not None else 0
-        costs[i] = cumulative[k]/5 + 3*k + 5 + connector
+    hit_matrix = np.linalg.norm(belief.positions[:, None, :]-points[None, :, :], axis=2) <= 20
+    if not np.all(np.any(hit_matrix, axis=1)):
+        return None
+    first = np.argmax(hit_matrix, axis=1)
+    connectors = (np.linalg.norm(points-np.asarray(continuation), axis=1)/5
+                  if continuation is not None else np.zeros(len(points)))
+    costs = cumulative[first]/5 + 3*first + 5 + connectors[first]
     return float(np.sum(costs*belief.weights))

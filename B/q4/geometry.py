@@ -152,6 +152,8 @@ class SourceRecord:
     dynamic_cache_target: tuple | None = None
     dynamic_cache_version: int = -1
     absence_certificate: dict | None = None
+    base_clear_plan: object = None
+    base_clear_version: int = -1
 
 
 def update_positive_hull(record, observation):
@@ -389,11 +391,12 @@ def build_clear_route_variants(record, plan, current, continuation=None):
 def build_clear_plan(record, current, continuation=None):
     if record.anchor is None:
         raise ValueError("A direction anchor is required for non-near clearing")
-    plan = None
+    plan = record.base_clear_plan if record.base_clear_version == record.region_version else None
     try:
         if record.vertices is not None:
-            plan = build_cover_plan(record.vertices, current, continuation, max_points=152,
-                                    preferred_orientations_deg=(record.anchor["svd_deg"],))
+            if plan is None:
+                plan = build_cover_plan(record.vertices, current, continuation, max_points=152,
+                                        preferred_orientations_deg=(record.anchor["svd_deg"],))
             if plan is not None and not verify_cover_certificate(record.vertices, plan):
                 plan = None
     except (ValueError, ArithmeticError, np.linalg.LinAlgError):
@@ -407,6 +410,8 @@ def build_clear_plan(record, current, continuation=None):
         plan = ClearPlan("STRIP", points, True, radius, 0, 0,
                          cover_certificate={"method": "FIRST_BEARING_STRIP", "anchor": a,
                                             "half_width_deg": 1.005, "radius_m": radius})
+    if record.base_clear_version != record.region_version:
+        record.base_clear_plan, record.base_clear_version = plan, record.region_version
     plan = _sparsify_grid(record, plan)
     if not verify_remaining_cover_certificate(record, plan):
         raise ValueError("Independent P_remain cover verification failed")
