@@ -3,6 +3,7 @@ import time
 import unittest
 
 from B.q4.belief import response_probabilities, update_belief_scenarios
+from B.q4.belief_rollout import plan_belief_rollout_clear
 from B.q4.geometry import (CLEAR_ROUTE_RISK_CAP_RATIO, build_clear_plan,
                            build_clear_route_variants, load_and_verify_station_cover,
                            select_clear_route, update_cover_after_failed_clear,
@@ -88,6 +89,37 @@ class Q4V2Tests(unittest.TestCase):
 
     def test_probability_fallback_clear_batch_default_is_eight(self):
         self.assertEqual(Q4Config().clear_batch_points, 8)
+
+    def test_certificate_shielded_rollout_improves_expected_cost_with_bounded_tail(self):
+        record = record_at()
+        update_belief_scenarios(record)
+        plan = build_clear_plan(record, (0.0, 0.0))
+        result = plan_belief_rollout_clear(
+            record, plan, (0.0, 0.0), deadline_monotonic=time.monotonic()+5)
+        self.assertIsNotNone(result.decision)
+        decision = result.decision
+        self.assertLess(decision.expected_s, decision.direct_expected_s)
+        self.assertLessEqual(decision.tail_s, 1.25*decision.direct_tail_s)
+        self.assertLessEqual(decision.completion_upper_s, 1.5*decision.direct_upper_s)
+        self.assertGreater(decision.first_hit_probability, 0)
+
+    def test_failed_rollout_probe_updates_remaining_region_without_false_inconsistency(self):
+        planner = Q4Planner(Q4Config(), self.cover)
+        record = planner.channels[1] = record_at()
+        update_belief_scenarios(record)
+        plan = build_clear_plan(record, planner.position)
+        result = plan_belief_rollout_clear(
+            record, plan, planner.position, deadline_monotonic=time.monotonic()+5)
+        action = planner._start_rollout_clear(record, result.decision)
+        planner.apply_clear_result(action, "no_target_in_range")
+        self.assertIsNone(planner.stop_reason)
+        self.assertEqual(record.state, "DETECTED")
+        self.assertEqual(record.failed_clear_disks, [action.position])
+        self.assertEqual(planner.metrics["rollout_probe_misses"], 1)
+        self.assertIsNone(planner.active_clear)
+
+    def test_rollout_v3_strategy_is_explicit(self):
+        self.assertEqual(Q4Config().strategy, "q4_certificate_shielded_rollout_v3")
 
     def test_leaf_absence_certificate_is_bound_to_network(self):
         planner = Q4Planner(Q4Config(planning_total_s=0), self.cover)

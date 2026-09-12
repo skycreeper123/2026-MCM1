@@ -10,6 +10,7 @@ from .geometry import (SourceRecord, build_clear_plan, classify_q4_reception,
                        update_source_region, update_cover_after_failed_clear,
                        reprice, select_clear_route)
 from .belief import update_belief_scenarios
+from .belief_rollout import plan_belief_rollout_clear
 from .policy import (MeasureTask, candidate_tasks, marginal_detour,
                      score_measure_policy)
 from .routing import RouteTask, optimize_service_route, task_route_cost
@@ -17,7 +18,7 @@ from .routing import RouteTask, optimize_service_route, task_route_cost
 
 @dataclass(frozen=True)
 class Q4Config:
-    strategy: str = "q4_adaptive_cooperative_v2"
+    strategy: str = "q4_certificate_shielded_rollout_v3"
     local_measurement_limit: int = 4
     local_distance_limit_m: float = 4000.0
     candidate_limit: int = 24
@@ -31,6 +32,11 @@ class Q4Config:
     large_region_points: int = 30
     uncertain_no_signal_limit: int = 2
     clear_batch_points: int = 8
+    rollout_horizon: int = 2
+    rollout_candidate_limit: int = 8
+    rollout_beam_width: int = 8
+    rollout_upper_ratio: float = 1.5
+    rollout_tail_ratio: float = 1.25
     planning_call_s: float = 1.5
     planning_total_s: float = 60.0
     guaranteed_saving_s: float = 1.0
@@ -42,12 +48,13 @@ class Q4Config:
     exit_reserve_s: float = 30.0
 
     def __post_init__(self):
-        if self.strategy != "q4_adaptive_cooperative_v2":
+        if self.strategy != "q4_certificate_shielded_rollout_v3":
             raise ValueError("unsupported Q4 strategy")
         for name in ("local_measurement_limit", "candidate_limit", "response_intervals",
                      "refined_response_intervals", "belief_scenarios", "minimum_belief_scenarios",
                      "dynamic_candidate_limit", "direct_clear_points", "large_region_points",
-                     "uncertain_no_signal_limit", "clear_batch_points", "services_per_station",
+                     "uncertain_no_signal_limit", "clear_batch_points", "rollout_horizon",
+                     "rollout_candidate_limit", "rollout_beam_width", "services_per_station",
                      "route_depth", "route_width"):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, int) or value < 1:
@@ -56,6 +63,9 @@ class Q4Config:
                      "guaranteed_saving_s", "uncertain_saving_s", "uncertain_extra_s", "exit_reserve_s"):
             if not math.isfinite(getattr(self, name)) or getattr(self, name) < 0:
                 raise ValueError(f"{name} must be finite and nonnegative")
+        for name in ("rollout_upper_ratio", "rollout_tail_ratio"):
+            if not math.isfinite(getattr(self, name)) or getattr(self, name) < 1:
+                raise ValueError(f"{name} must be finite and at least one")
 
 
 @dataclass(frozen=True)
@@ -109,6 +119,7 @@ class Q4Planner:
         self.clear_route_cache = {}
         self.last_fallback_route = ()
         self.last_decision = None
+        self.last_rollout = None
         self.detour_reservation = None
         self.metrics = {"measurements": 0, "switches": 0, "clear_requests": 0,
                         "failed_clears": 0, "successful_clears": 0, "distance_m": 0.0,
@@ -118,7 +129,10 @@ class Q4Planner:
                              "dynamic_candidates_used": 0, "sparse_covers": 0,
                              "sparse_cells_removed": 0, "clear_replans": 0,
                              "early_absent_channels": 0, "fallback_count": 0,
-                             "no_signal_by_purpose": {}})
+                             "no_signal_by_purpose": {}, "rollout_searches": 0,
+                             "rollout_candidates": 0, "rollout_sequences": 0,
+                             "rollout_timeouts": 0, "rollout_probes": 0,
+                             "rollout_probe_hits": 0, "rollout_probe_misses": 0})
 
     def _action(self, kind, position=None, channel=None, **kwargs):
         self.pending = Q4Action(self.next_id, kind, position, channel, **kwargs)
@@ -169,6 +183,14 @@ class Q4Planner:
         if "STRIP" in plan.kind:
             self.metrics["fallback_count"] += 1
         return self._clear_action()
+
+    def _start_rollout_clear(self, record, decision):
+        self.last_rollout = asdict(decision)
+        record.rollout_probes += 1
+        self.metrics["rollout_probes"] += 1
+        return self._action("CLEAR", decision.point, record.channel,
+                            purpose="BELIEF_ROLLOUT_CLEAR",
+                            reason="certificate-shielded finite-horizon rollout")
 
     def _absence_certified(self, channel):
         evidence = self.discovery_ledger[channel]
@@ -221,6 +243,20 @@ class Q4Planner:
         if (backup.point_count <= self.config.direct_clear_points or time.monotonic() >= deadline
                 or record.local_measurements >= self.config.local_measurement_limit):
             return self._start_clear(record, backup)
+        rollout_search = plan_belief_rollout_clear(
+            record, backup, self.position, continuation,
+            horizon=self.config.rollout_horizon,
+            candidate_limit=self.config.rollout_candidate_limit,
+            beam_width=self.config.rollout_beam_width,
+            minimum_saving_s=self.config.guaranteed_saving_s,
+            upper_ratio=self.config.rollout_upper_ratio,
+            tail_ratio=self.config.rollout_tail_ratio,
+            deadline_monotonic=deadline)
+        self.metrics["rollout_searches"] += 1
+        self.metrics["rollout_candidates"] += rollout_search.candidates_evaluated
+        self.metrics["rollout_sequences"] += rollout_search.sequences_evaluated
+        self.metrics["rollout_timeouts"] += int(rollout_search.timed_out)
+        rollout = rollout_search.decision
         future = [self.cover.stations[i] for i in self.cover.route[self.station_cursor+1:]]
         tasks = candidate_tasks(record, self.position, continuation, backup, future,
                                 self.config.candidate_limit, deadline,
@@ -239,7 +275,8 @@ class Q4Planner:
             if bound.eligible and (selected is None or bound.expected_s < selected[1].expected_s):
                 selected = task, bound
         if selected is None:
-            return self._start_clear(record, backup)
+            return (self._start_rollout_clear(record, rollout) if rollout is not None
+                    else self._start_clear(record, backup))
         task, bound = selected
         if time.monotonic() < deadline and self.config.refined_response_intervals > self.config.response_intervals:
             refined = score_measure_policy(record, task, self.position, self.receiver_channel,
@@ -248,7 +285,10 @@ class Q4Planner:
             if refined.eligible:
                 bound = refined
             else:
-                return self._start_clear(record, backup)
+                return (self._start_rollout_clear(record, rollout) if rollout is not None
+                        else self._start_clear(record, backup))
+        if rollout is not None and rollout.expected_s+1e-9 < bound.expected_s:
+            return self._start_rollout_clear(record, rollout)
         self.last_decision = asdict(bound)
         detour = marginal_detour(self.position, task.points, continuation)
         record.reserved_detour_m += detour
@@ -460,15 +500,29 @@ class Q4Planner:
         self.metrics["clear_requests"] += 1
         record = self.channels[action.channel]
         record.clear_requests += 1
+        rollout_probe = action.purpose == "BELIEF_ROLLOUT_CLEAR"
         # Deliberately do NOT modify receiver_channel here.
         if result == "success":
             record.state = "CLEARED"
             self.metrics["successful_clears"] += 1
             record.cleared_virtual_s = self._virtual_time()
+            if rollout_probe:
+                record.rollout_probe_hits += 1
+                record.clear_certificate = {"method": "CONFIRMED_BELIEF_ROLLOUT_CLEAR",
+                                            "decision": self.last_rollout}
+                self.metrics["rollout_probe_hits"] += 1
             self.active_clear = None
             self.clear_batch_failures = 0
         else:
             self.metrics["failed_clears"] += 1
+            if rollout_probe:
+                self.metrics["rollout_probe_misses"] += 1
+                update_start = time.monotonic()
+                update_cover_after_failed_clear(record, action.position)
+                self._update_belief(record)
+                self.planning_elapsed_s += time.monotonic()-update_start
+                self.metrics["clear_replans"] += 1
+                return
             plan = self.active_clear[1]
             if plan.kind == "NEAR" or plan.point_count == 1:
                 self.stop_reason = "INCONSISTENCY: certified clear plan exhausted"
@@ -528,6 +582,7 @@ class Q4Planner:
                 "discovery_to_clear_s": {"p95": percentile(latencies, .95),
                                          "max": max(latencies) if latencies else None},
                 "planning_elapsed_s": self.planning_elapsed_s, "last_decision": self.last_decision,
+                "last_rollout": self.last_rollout,
                 "fallback_route_estimate_s": task_route_cost(self.last_fallback_route, self.position, self.receiver_channel),
                 "fallback_route_scope": "last planning snapshot; reprice after every action, not a total-run bound",
                 "source_budgets": {ch: {"measurements": r.local_measurements,
@@ -535,6 +590,8 @@ class Q4Planner:
                                         "reserved_detour_m": r.reserved_detour_m,
                                         "uncertain_no_signal_streak": r.consecutive_uncertain_no_signal,
                                         "failed_clear_disks": len(r.failed_clear_disks),
+                                        "rollout_probes": r.rollout_probes,
+                                        "rollout_probe_hits": r.rollout_probe_hits,
                                         "belief": r.belief.summary() if r.belief is not None else None}
                                    for ch, r in self.channels.items() if r.anchor is not None}}
 
