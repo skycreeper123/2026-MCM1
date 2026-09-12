@@ -1,0 +1,60 @@
+Q3 V5 | strategy=v5_dynamic | planner=D:\2026 MCM1\2026-MCM1\B\Q3 V5\planner.py
+case=00 v3_global cleared=10 average=464.782s failures=14 fallback=0
+case=00 v5_dynamic cleared=10 average=448.119s failures=2 fallback=0
+case=01 v3_global cleared=11 average=396.536s failures=4 fallback=0
+case=01 v5_dynamic cleared=11 average=314.557s failures=4 fallback=0
+{
+  "aggregate": {
+    "v3_global": {
+      "case_count": 2,
+      "source_count": 21,
+      "clear_rate": 1.0,
+      "mean_average_clear_time_s": 430.6588178305026,
+      "weighted_average_clear_time_s": 429.0339122158976,
+      "p95_average_clear_time_s": 461.3695339465377,
+      "max_average_clear_time_s": 464.78183573720827,
+      "p95_source_service_time_s": 3452.5590150336047,
+      "max_source_service_time_s": 4039.021707613403,
+      "virtual_time_s": 9009.71215653385,
+      "distance_m": 37398.56078266924,
+      "failed_clear_count": 18,
+      "fallback_source_count": 0,
+      "fallback_clear_count": 0,
+      "measure_count": 234,
+      "localize_measure_count": 40,
+      "opportunistic_revisit_count": 0,
+      "localization_inbound_distance_m": 17785.420769200566,
+      "planning_time_s": 8.889999999999873,
+      "wall_time_s": 13.292867200000273,
+      "safety_checks": 40,
+      "truth_checks": 60,
+      "certificate_checks": 38
+    },
+    "v5_dynamic": {
+      "case_count": 2,
+      "source_count": 21,
+      "clear_rate": 1.0,
+      "mean_average_clear_time_s": 381.337787161615,
+      "weighted_average_clear_time_s": 378.15774370658954,
+      "p95_average_clear_time_s": 441.44060846159647,
+      "max_average_clear_time_s": 448.11869971715,
+      "p95_source_service_time_s": 3784.5388783860617,
+      "max_source_service_time_s": 4085.1869971714996,
+      "virtual_time_s": 7941.31261783838,
+      "distance_m": 32146.563089191906,
+      "failed_clear_count": 6,
+      "fallback_source_count": 0,
+      "fallback_clear_count": 0,
+      "measure_count": 234,
+      "localize_measure_count": 20,
+      "opportunistic_revisit_count": 20,
+      "localization_inbound_distance_m": 11140.973975032208,
+      "planning_time_s": 9.581000000000586,
+      "wall_time_s": 14.344769499999984,
+      "safety_checks": 20,
+      "truth_checks": 60,
+      "certificate_checks": 26
+    }
+  },
+  "performance_acceptance": true
+}

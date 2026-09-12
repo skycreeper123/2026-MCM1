@@ -1,0 +1,32 @@
+{
+  "version": "Q3 V5",
+  "strategy": "v5_dynamic",
+  "source": "D:\\2026 MCM1\\2026-MCM1\\B\\q3(改良)\\q3\\optimization_trials\\02_dynamic_candidates",
+  "date": "2026-09-12",
+  "source_hashes": {
+    "geometry.py": "75989eec0ae1e5167967266a5651359fdaa59ea20798e042617aaddb7dd0c146",
+    "localize.py": "8d473b9dd714a57ffcf6f483ea37f46bd4f4d64cb8d9f18a31c70f45a253d46f",
+    "planner.py": "f5ccdb9a12adfd6368b8bd7e46a5b581e842eb8d180ae7bc0631277f68c62e39",
+    "runner.py": "e25984983ea6292ba075ca7dd7772ae13087ee8b87f6c375e7fdaaae72d6903c",
+    "validation.py": "0caba7a92f4b0b96eef2623e80bc8845a6bcf86194178e28a0986e3cb19de0a8",
+    "__init__.py": "c10cff2912ce7820d575db11223af0dba38a9fa93317cb97cedf7ad0c7057818",
+    "tests\\test_dynamic_candidates.py": "d55c6cdb52b967f919375344f46d546d1b94a29dc93a880ca0cbf7fc8b20f0b0",
+    "tests\\test_global.py": "9ae23a703a15f621344548194b0369cfe4c68c439d116980f55808f1395e3ea4",
+    "tests\\test_q3.py": "b7ce56a61f377ad43a4130be355ae481e72b2490767c5feadb1e3ed814f473cf",
+    "tests\\test_runner.py": "304c9e3a081a8e3ab37eb4259e14276fbd1109c1c3fd8790aeba1a4649e8d55b",
+    "tests\\__init__.py": "e7c1bd1156e43bba193687135d7ed2b2e168f0ec86551d8af01ef73ebed2a6d8"
+  },
+  "original_v4_hashes": {
+    "geometry.py": "75989eec0ae1e5167967266a5651359fdaa59ea20798e042617aaddb7dd0c146",
+    "localize.py": "e61a775e7b134283a246db75f825955f543d79b47be287a268c89afac8a9e7c3",
+    "planner.py": "e1a4ab4e0ad1b0b8c63e19169dda19186e77241e8aa25e4a172a0204e3ef9f6d",
+    "runner.py": "e25984983ea6292ba075ca7dd7772ae13087ee8b87f6c375e7fdaaae72d6903c",
+    "validation.py": "0caba7a92f4b0b96eef2623e80bc8845a6bcf86194178e28a0986e3cb19de0a8",
+    "__init__.py": "c10cff2912ce7820d575db11223af0dba38a9fa93317cb97cedf7ad0c7057818",
+    "tests\\test_global.py": "9ae23a703a15f621344548194b0369cfe4c68c439d116980f55808f1395e3ea4",
+    "tests\\test_q3.py": "b7ce56a61f377ad43a4130be355ae481e72b2490767c5feadb1e3ed814f473cf",
+    "tests\\test_runner.py": "304c9e3a081a8e3ab37eb4259e14276fbd1109c1c3fd8790aeba1a4649e8d55b",
+    "tests\\__init__.py": "e7c1bd1156e43bba193687135d7ed2b2e168f0ec86551d8af01ef73ebed2a6d8"
+  },
+  "changes": "Promote dynamic candidates only; rename v4_cooperative to v5_dynamic in the isolated release."
+}

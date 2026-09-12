@@ -25,6 +25,7 @@ class StationCover:
     route: tuple
     network_id: str
     certificate: dict
+    provider_sets: tuple = ()
 
 
 def _fallback_cover(reason):
@@ -58,7 +59,7 @@ def _fallback_cover(reason):
     return StationCover(v, tuple(route), "q4-lattice31-" + hashlib.sha256(repr(v).encode()).hexdigest(),
                         {"passed": True, "fallback": True, "reason": reason,
                          "method": "exact affine triangular lattice; next excluded shell 2970m",
-                         "max_provider_distance_m": 990.000001})
+                         "max_provider_distance_m": 990.000001}, ())
 
 
 def load_and_verify_station_cover(path=None, allow_fallback=True):
@@ -71,8 +72,18 @@ def load_and_verify_station_cover(path=None, allow_fallback=True):
             raise ValueError("Unexpected physical model in station certificate")
         floating, exact = check_certificate(cert), check_exact_geometry(cert)
         v = tuple(tuple(map(float, p)) for p in cert["stations_m"])
+        providers = []
+        def collect(node):
+            if "providers" in node:
+                providers.append(frozenset(map(int, node["providers"])))
+            else:
+                for child in node["children"]:
+                    collect(child)
+        for tree in cert["trees"]:
+            collect(tree)
         return StationCover(v, ROUTE, hashlib.sha256(repr(v).encode()).hexdigest(),
-                            {"passed": True, "floating": floating, "exact": exact, "fallback": False})
+                            {"passed": True, "floating": floating, "exact": exact, "fallback": False},
+                            tuple(providers))
     except (OSError, ValueError, KeyError, TypeError, AssertionError, IndexError) as exc:
         if not allow_fallback:
             raise ValueError("Station coverage certificate failed") from exc
@@ -124,13 +135,23 @@ class SourceRecord:
     positive_points: list = field(default_factory=list)
     hull: tuple = ()
     region_version: int = 0
+    remaining_version: int = 0
     hull_version: int = 0
     used_positions: set = field(default_factory=set)
     local_measurements: int = 0
-    local_travel_m: float = 0.0
+    local_travel_m: float = 0.0  # positive marginal detour actually settled
+    reserved_detour_m: float = 0.0
+    consecutive_uncertain_no_signal: int = 0
     last_local_position: tuple | None = None
     clear_certificate: object = None
     pending_pair: object = None
+    failed_clear_disks: list = field(default_factory=list)
+    belief: object = None
+    dynamic_candidates: tuple = ()
+    dynamic_cache_origin: tuple | None = None
+    dynamic_cache_target: tuple | None = None
+    dynamic_cache_version: int = -1
+    absence_certificate: dict | None = None
 
 
 def update_positive_hull(record, observation):
@@ -239,6 +260,132 @@ def reprice(plan, current, continuation=None):
                    completion_upper_s=length/5 + 3*(len(points)-1)+5)
 
 
+def remaining_contains(record, point):
+    """Membership in P_plus minus all certified failed-clear disks."""
+    return (record.vertices is not None and hull_contains(exact_hull(record.vertices), point)
+            and all(sum((a-b)**2 for a, b in zip(rational_point(point), rational_point(center))) > 20**2
+                    for center in record.failed_clear_disks))
+
+
+def update_cover_after_failed_clear(record, point):
+    point = tuple(map(float, point))
+    if point not in record.failed_clear_disks:
+        record.failed_clear_disks.append(point)
+        record.remaining_version += 1
+    return record.remaining_version
+
+
+def _grid_cell_corners(center, certificate):
+    angle = math.radians(certificate["orientation_deg"])
+    u, n = (math.cos(angle), math.sin(angle)), (-math.sin(angle), math.cos(angle))
+    u0, u1, n0, n1 = certificate["bounds_un"]
+    nu, nn = certificate["counts_un"]
+    du, dn = (u1-u0)/nu, (n1-n0)/nn
+    return tuple((center[0]+su*du*u[0]/2+sn*dn*n[0]/2,
+                  center[1]+su*du*u[1]/2+sn*dn*n[1]/2)
+                 for su in (-1, 1) for sn in (-1, 1))
+
+
+def _inside_failed_disk(corners, center):
+    q, limit = rational_point(center), Fraction(20)**2
+    return all(sum((a-b)**2 for a, b in zip(rational_point(p), q)) <= limit for p in corners)
+
+
+def _sparsify_grid(record, plan):
+    if not record.failed_clear_disks or plan.kind != "RECTANGLE_GRID":
+        return plan
+    parent = dict(plan.cover_certificate)
+    retained, removed = [], []
+    for point in plan.points:
+        corners = _grid_cell_corners(point, parent)
+        witness = next((disk for disk in record.failed_clear_disks
+                        if _inside_failed_disk(corners, disk)), None)
+        if witness is None:
+            retained.append(point)
+        else:
+            removed.append({"center": point, "failed_disk": witness})
+    if not removed:
+        return plan
+    if not retained:
+        raise ValueError("Failed-clear disks exclude the entire certified region")
+    return replace(plan, kind="SPARSE_REMAINING_GRID", points=tuple(retained),
+                   cover_certificate={"method": "SPARSE_REMAINING_GRID",
+                                      "parent": parent, "removed_cells": removed,
+                                      "failed_clear_disks": tuple(record.failed_clear_disks),
+                                      "remaining_version": record.remaining_version})
+
+
+def verify_remaining_cover_certificate(record, plan, safe_radius_m=19.9):
+    cert = plan.cover_certificate or {}
+    if cert.get("method") != "SPARSE_REMAINING_GRID":
+        if cert.get("method") == "FIRST_BEARING_STRIP":
+            return (plan.point_count > 0 and plan.cover_radius_m <= safe_radius_m and
+                    cert.get("half_width_deg") == 1.005)
+        return verify_cover_certificate(record.vertices, plan, safe_radius_m)
+    if (cert.get("remaining_version") != record.remaining_version or
+            tuple(map(tuple, cert.get("failed_clear_disks", ()))) != tuple(record.failed_clear_disks)):
+        return False
+    parent = cert.get("parent", {})
+    if parent.get("method") != "ENCLOSING_RECTANGLE_CELL_HALF_DIAGONAL":
+        return False
+    angle = math.radians(parent["orientation_deg"])
+    u, n = np.array([math.cos(angle), math.sin(angle)]), np.array([-math.sin(angle), math.cos(angle)])
+    u0, u1, n0, n1 = parent["bounds_un"]
+    nu, nn = parent["counts_un"]
+    du, dn = (u1-u0)/nu, (n1-n0)/nn
+    if max(du, dn) > 28 or math.hypot(du/2, dn/2) > safe_radius_m:
+        return False
+    expected = {(i, j) for i in range(nu) for j in range(nn)}
+    def index(point):
+        a, b = np.asarray(point)@u, np.asarray(point)@n
+        i, j = round((a-u0)/du-0.5), round((b-n0)/dn-0.5)
+        return (i, j) if (i, j) in expected else None
+    retained = [index(p) for p in plan.points]
+    removed = cert.get("removed_cells", ())
+    removed_indices = [index(row["center"]) for row in removed]
+    if (None in retained or None in removed_indices or len(set(retained)) != len(retained)
+            or len(set(removed_indices)) != len(removed_indices)
+            or set(retained) & set(removed_indices)
+            or set(retained) | set(removed_indices) != expected):
+        return False
+    disks = set(record.failed_clear_disks)
+    for row in removed:
+        disk = tuple(row["failed_disk"])
+        if disk not in disks or not _inside_failed_disk(_grid_cell_corners(row["center"], parent), disk):
+            return False
+    return True
+
+
+def build_clear_route_variants(record, plan, current, continuation=None):
+    """Reorder one certified point set by route and soft hit likelihood."""
+    if len(plan.points) <= 1:
+        return (reprice(plan, current, continuation),)
+    points = tuple(plan.points)
+    variants = [points, points[::-1]]
+    remaining, nearest, here = list(points), [], current
+    while remaining:
+        point = min(remaining, key=lambda p: (math.dist(here, p), p))
+        nearest.append(point)
+        remaining.remove(point)
+        here = point
+    variants.extend((tuple(nearest), tuple(reversed(nearest))))
+    try:
+        from .belief import hit_probabilities
+        probability = dict(zip(points, hit_probabilities(record, points)))
+        remaining, priority, here = list(points), [], current
+        while remaining:
+            point = max(remaining, key=lambda p: (probability[p]/(1e-6+math.dist(here, p)/5),
+                                                   -math.dist(here, p)))
+            priority.append(point)
+            remaining.remove(point)
+            here = point
+        variants.extend((tuple(priority), tuple(reversed(priority))))
+    except (ValueError, ArithmeticError):
+        pass
+    return tuple(reprice(replace(plan, points=v), current, continuation)
+                 for v in dict.fromkeys(variants))
+
+
 def build_clear_plan(record, current, continuation=None):
     if record.anchor is None:
         raise ValueError("A direction anchor is required for non-near clearing")
@@ -260,4 +407,15 @@ def build_clear_plan(record, current, continuation=None):
         plan = ClearPlan("STRIP", points, True, radius, 0, 0,
                          cover_certificate={"method": "FIRST_BEARING_STRIP", "anchor": a,
                                             "half_width_deg": 1.005, "radius_m": radius})
-    return reprice(plan, current, continuation)
+    plan = _sparsify_grid(record, plan)
+    if not verify_remaining_cover_certificate(record, plan):
+        raise ValueError("Independent P_remain cover verification failed")
+    variants = build_clear_route_variants(record, plan, current, continuation)
+    try:
+        from .belief import expected_clear_cost
+        scored = [(expected_clear_cost(record, candidate, current, continuation), candidate)
+                  for candidate in variants]
+        return min(scored, key=lambda row: (row[0] if row[0] is not None else row[1].completion_upper_s,
+                                            row[1].completion_upper_s))[1]
+    except (ValueError, ArithmeticError):
+        return min(variants, key=lambda candidate: candidate.completion_upper_s)

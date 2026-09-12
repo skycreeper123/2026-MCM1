@@ -1,0 +1,30 @@
+{
+  "problem": "q3",
+  "runs": 1,
+  "seed_start": 20260912,
+  "strategy": "v5_dynamic",
+  "q3_implementation": "v5",
+  "full_clear_count": 0,
+  "full_clear_rate": 0.0,
+  "cleared_sources": 0,
+  "total_sources": 10,
+  "overall_clear_ratio": 0.0,
+  "errors": [
+    {
+      "problem": "q3",
+      "seed": 20260912,
+      "source_count": 10,
+      "full_clear": false,
+      "error": "ImportError: \n\nIMPORTANT: PLEASE READ THIS FOR ADVICE ON HOW TO SOLVE THIS ISSUE!\n\nImporting the numpy C-extensions failed. This error can happen for\nmany reasons, often due to issues with your setup or how NumPy was\ninstalled.\nThe following compiled module files exist, but seem incompatible\nwith with either python 'cpython-310' or the platform 'win32':\n\n  * _multiarray_umath.cp312-win_amd64.lib\n  * _multiarray_umath.cp312-win_amd64.pyd\n\nWe have compiled some common reasons and troubleshooting tips at:\n\n    https://numpy.org/devdocs/user/troubleshooting-importerror.html\n\nPlease note and check the following:\n\n  * The Python version is: Python 3.10 from \"C:\\Users\\ivo_z\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\"\n  * The NumPy version is: \"2.5.3\"\n\nand make sure that they are the versions you expect.\n\nPlease carefully study the information and documentation linked above.\nThis is unlikely to be a NumPy issue but will be caused by a bad install\nor environment on your machine.\n\nOriginal error was: No module named 'numpy._core._multiarray_umath'\n"
+    }
+  ],
+  "records": [
+    {
+      "problem": "q3",
+      "seed": 20260912,
+      "source_count": 10,
+      "full_clear": false,
+      "error": "ImportError: \n\nIMPORTANT: PLEASE READ THIS FOR ADVICE ON HOW TO SOLVE THIS ISSUE!\n\nImporting the numpy C-extensions failed. This error can happen for\nmany reasons, often due to issues with your setup or how NumPy was\ninstalled.\nThe following compiled module files exist, but seem incompatible\nwith with either python 'cpython-310' or the platform 'win32':\n\n  * _multiarray_umath.cp312-win_amd64.lib\n  * _multiarray_umath.cp312-win_amd64.pyd\n\nWe have compiled some common reasons and troubleshooting tips at:\n\n    https://numpy.org/devdocs/user/troubleshooting-importerror.html\n\nPlease note and check the following:\n\n  * The Python version is: Python 3.10 from \"C:\\Users\\ivo_z\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\"\n  * The NumPy version is: \"2.5.3\"\n\nand make sure that they are the versions you expect.\n\nPlease carefully study the information and documentation linked above.\nThis is unlikely to be a NumPy issue but will be caused by a bad install\nor environment on your machine.\n\nOriginal error was: No module named 'numpy._core._multiarray_umath'\n"
+    }
+  ]
+}

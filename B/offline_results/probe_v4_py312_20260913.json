@@ -1,0 +1,30 @@
+{
+  "problem": "q3",
+  "runs": 1,
+  "seed_start": 20260913,
+  "strategy": "v4_cooperative",
+  "q3_implementation": "default",
+  "full_clear_count": 0,
+  "full_clear_rate": 0.0,
+  "cleared_sources": 0,
+  "total_sources": 10,
+  "overall_clear_ratio": 0.0,
+  "errors": [
+    {
+      "problem": "q3",
+      "seed": 20260913,
+      "source_count": 10,
+      "full_clear": false,
+      "error": "ModuleNotFoundError: No module named 'scipy'"
+    }
+  ],
+  "records": [
+    {
+      "problem": "q3",
+      "seed": 20260913,
+      "source_count": 10,
+      "full_clear": false,
+      "error": "ModuleNotFoundError: No module named 'scipy'"
+    }
+  ]
+}

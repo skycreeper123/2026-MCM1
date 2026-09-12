@@ -9,8 +9,7 @@ import time
 
 import numpy as np
 
-from B.q3.localize import verify_cover_certificate
-from .geometry import load_and_verify_station_cover
+from .geometry import load_and_verify_station_cover, verify_remaining_cover_certificate
 from .planner import Q4Config, Q4Planner
 
 
@@ -99,7 +98,7 @@ def run_world(sources, config=None, cover=None, max_actions=6000):
             plan = planner.active_clear[1]
             key = (action.channel, id(plan))
             if key not in audited_plans:
-                if plan.kind not in {"STRIP", "NEAR"} and not verify_cover_certificate(record.vertices, plan):
+                if plan.kind not in {"NEAR"} and not verify_remaining_cover_certificate(record, plan):
                     raise AssertionError("Invalid clear certificate")
                 if source is None or min(math.dist(source.position, p) for p in plan.points) > 20:
                     raise AssertionError("Clear plan does not cover true source")

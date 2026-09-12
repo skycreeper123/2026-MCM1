@@ -13,6 +13,7 @@ from B.q3.localize import (_bearing_domain, _rectangle_plan, build_cover_plan,
                           verify_cover_certificate)
 from .geometry import (PairTask, build_pair_probe, classify_q4_reception,
                        hull_candidates, reprice)
+from .belief import expected_clear_cost, response_probabilities
 
 
 @dataclass(frozen=True)
@@ -20,6 +21,7 @@ class MeasureTask:
     points: tuple
     reception: str
     pair: PairTask | None = None
+    origin: str = "static"
 
 
 @dataclass(frozen=True)
@@ -27,6 +29,10 @@ class BranchCostBound:
     upper_s: float
     direction_upper_s: float
     direct_upper_s: float
+    expected_s: float
+    direct_expected_s: float
+    expected_saving_s: float
+    response_probabilities: dict | None
     includes_no_signal: bool
     intervals_total: int
     intervals_fallback: int
@@ -77,46 +83,74 @@ def _direction_cost(record, point, continuation, backup, intervals, deadline):
 
 
 def score_measure_policy(record, task, current, receiver_channel, continuation,
-                         backup, config, deadline_monotonic=math.inf, station=False):
+                         backup, config, deadline_monotonic=math.inf, station=False,
+                         response_intervals=None):
     direct = reprice(backup, current, continuation).completion_upper_s
+    direct_expected = expected_clear_cost(record, backup, current, continuation)
+    if direct_expected is None:
+        direct_expected = direct
     s = task.points[0]
     switch = int(receiver_channel != record.channel)
     overhead = (0 if station else math.dist(current, s)/5) + 5 + switch
+    intervals = response_intervals or config.response_intervals
     positive, unfinished = _direction_cost(record, s, continuation, backup,
-                                           config.response_intervals, deadline_monotonic)
+                                           intervals, deadline_monotonic)
     direction = overhead + positive
     guaranteed = task.reception in {"POSITIVE_HULL", "PAIR_AT_LEAST_ONE"}
-    total_intervals = config.response_intervals
+    total_intervals = intervals
+    probabilities = response_probabilities(record, s)
+    near_cost = 5 + (math.dist(s, continuation)/5 if continuation is not None else 0)
+    no_signal_cost = reprice(backup, s, continuation).completion_upper_s
+    if probabilities is None:
+        probabilities = ({"near": 0.0, "direction": 1.0, "no_signal": 0.0}
+                         if guaranteed else {"near": 0.0, "direction": 0.5, "no_signal": 0.5})
+    if guaranteed:
+        positive_mass = probabilities["near"]+probabilities["direction"]
+        probabilities = ({"near": probabilities["near"]/positive_mass,
+                          "direction": probabilities["direction"]/positive_mass,
+                          "no_signal": 0.0} if positive_mass > 0 else
+                         {"near": 0.0, "direction": 1.0, "no_signal": 0.0})
     if task.pair is not None:
         other = task.points[1]
         positive2, unfinished2 = _direction_cost(record, other, continuation, backup,
-                                                config.response_intervals, deadline_monotonic)
+                                                intervals, deadline_monotonic)
         negative = math.dist(s, other)/5 + 5 + positive2
         upper = overhead + max(positive, negative)
+        expected = overhead + probabilities["near"]*near_cost + probabilities["direction"]*positive + probabilities["no_signal"]*negative
         unfinished += unfinished2
         total_intervals *= 2
     elif guaranteed:
         upper = direction
+        expected = overhead + probabilities["near"]*near_cost + probabilities["direction"]*positive
     else:
-        upper = overhead + max(positive, reprice(backup, s, continuation).completion_upper_s)
+        upper = overhead + max(positive, no_signal_cost)
+        expected = overhead + probabilities["near"]*near_cost + probabilities["direction"]*positive + probabilities["no_signal"]*no_signal_cost
+    saving = direct_expected-expected
     if station:
-        # Incoming discovery leg belongs to the fixed skeleton, not this remeasure.
-        direct = reprice(backup, s, continuation).completion_upper_s
-        eligible = direction <= direct-1
+        eligible = saving >= config.guaranteed_saving_s and upper <= direct+config.uncertain_extra_s
     elif guaranteed:
-        eligible = upper <= direct-config.guaranteed_saving_s
+        eligible = saving >= config.guaranteed_saving_s and upper <= direct+config.uncertain_extra_s
     else:
-        eligible = (direction <= direct-config.uncertain_saving_s and
+        eligible = (saving >= config.uncertain_saving_s and
+                    direction <= direct-config.uncertain_saving_s and
                     upper <= direct+config.uncertain_extra_s)
-    return BranchCostBound(upper, direction, direct, not guaranteed or task.pair is not None,
+    return BranchCostBound(upper, direction, direct, expected, direct_expected, saving,
+                           probabilities, not guaranteed or task.pair is not None,
                            total_intervals, unfinished, eligible)
 
 
+def marginal_detour(current, points, continuation=None):
+    path = (current,)+tuple(points)+(() if continuation is None else (continuation,))
+    with_task = sum(math.dist(a, b) for a, b in zip(path, path[1:]))
+    without = math.dist(current, continuation) if continuation is not None else 0.0
+    return max(0.0, with_task-without)
+
+
 def candidate_tasks(record, current, continuation, backup, future_stations, limit=24,
-                    deadline_monotonic=math.inf):
+                    deadline_monotonic=math.inf, dynamic_candidates=()):
     guaranteed = list(hull_candidates(record))
     center = tuple(map(float, np.mean(record.vertices, axis=0)))
-    pool = guaranteed + [current, center, backup.entry_point] + list(future_stations)
+    pool = guaranteed + list(dynamic_candidates) + [center, backup.entry_point] + list(future_stations)
     # Reuse Q2's distance-intersection witness/bounding box as a candidate
     # generator ONLY; orientation/reception is certified separately below.
     safe_region = safe_candidate_region(record.vertices, 999.9)
@@ -139,7 +173,8 @@ def candidate_tasks(record, current, continuation, backup, future_stations, limi
     for p in pool:
         certificate = classify_q4_reception(record, p)
         if certificate != "GUARANTEED_NO_SIGNAL":
-            tasks.append(MeasureTask((p,), certificate))
+            origin = "dynamic_route" if p in dynamic_candidates else ("future_station" if p in future_stations else "static")
+            tasks.append(MeasureTask((p,), certificate, origin=origin))
     pairs = []
     for midpoint in record.positive_points + guaranteed:
         if time.monotonic() >= deadline_monotonic:
@@ -153,7 +188,8 @@ def candidate_tasks(record, current, continuation, backup, future_stations, limi
                 if pair is not None and pair.points not in {p.points for p in pairs}:
                     pairs.append(pair)
     pairs.sort(key=lambda pair: (math.dist(current, pair.points[0])+math.dist(*pair.points), pair.points))
-    tasks.extend(MeasureTask(pair.points, pair.certificate, pair) for pair in pairs[:limit-len(tasks)])
+    tasks.extend(MeasureTask(pair.points, pair.certificate, pair, "symmetric_pair")
+                 for pair in pairs[:limit-len(tasks)])
     # Evaluate reception-guaranteed candidates before uncertain probes.
     tasks.sort(key=lambda t: (t.reception not in {"POSITIVE_HULL", "PAIR_AT_LEAST_ONE"},
                               math.dist(current, t.points[0])))

@@ -1,0 +1,14 @@
+{
+  "problem": "q4",
+  "runs": 12,
+  "seed_start": 20260912,
+  "q3_implementation": "default",
+  "full_clear_count": 12,
+  "full_clear_rate": 1.0,
+  "cleared_sources": 161,
+  "total_sources": 161,
+  "overall_clear_ratio": 1.0,
+  "mean_virtual_time_s": 8202.068366777,
+  "worst_virtual_time_s": 9385.55495574177,
+  "errors": []
+}

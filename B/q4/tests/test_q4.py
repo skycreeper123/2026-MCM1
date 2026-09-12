@@ -208,7 +208,8 @@ class PlannerTests(unittest.TestCase):
         self.assertFalse(p._local_allowed(r, ((100, 0), (-100, 0))))
         r.local_measurements = 0
         p.position = (3000, 0)
-        self.assertFalse(p._local_allowed(r, ((100, 0), (-100, 0))))
+        self.assertTrue(p._local_allowed(r, ((100, 0), (-100, 0))))
+        self.assertFalse(p._local_allowed(r, ((100, 0), (-100, 0)), (3000, 0)))
 
     def test_four_local_services_cannot_starve_next_discovery_station(self):
         p = self.planner()
@@ -280,6 +281,8 @@ class PlannerTests(unittest.TestCase):
         self.assertFalse(p.has_completion_certificate())
         for ch in p.channels:
             p.discovery_ledger[ch].add(20)
+            p.channels[ch].absence_certificate = {"method": "FULL_NETWORK",
+                                                   "network_id": p.cover.network_id}
         self.assertTrue(p.has_completion_certificate())
 
     def test_route_preserves_duties_and_clear_channel_semantics(self):

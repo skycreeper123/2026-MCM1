@@ -1,0 +1,2901 @@
+{
+  "simulator_schema_version": 2,
+  "problem": "q3",
+  "runs": 1,
+  "seed_start": 20260914,
+  "strategy": "v4_cooperative",
+  "q3_implementation": "default",
+  "full_clear_count": 1,
+  "full_clear_rate": 1.0,
+  "cleared_sources": 13,
+  "total_sources": 13,
+  "overall_clear_ratio": 1.0,
+  "mean_virtual_time_s": 4104.777802006368,
+  "pooled_average_clear_time_s": 315.75213861587446,
+  "mean_run_average_clear_time_s": 315.75213861587446,
+  "worst_virtual_time_s": 4104.777802006368,
+  "total_wall_time_s": 7.684950900000331,
+  "error_count": 0,
+  "actions_limited_count": 0,
+  "errors": [],
+  "records": [
+    {
+      "problem": "q3",
+      "seed": 20260914,
+      "source_count": 13,
+      "simulator": {
+        "simulator_schema_version": 2,
+        "problem": "q3",
+        "seed": 20260914,
+        "source_count": 13,
+        "cleared_count": 13,
+        "clear_ratio": 1.0,
+        "missed_channels": [],
+        "virtual_time_s": 4104.777802006368,
+        "average_clear_time_s": 315.75213861587446,
+        "distance_m": 17183.889010031857,
+        "measure_count": 89,
+        "switch_count": 83,
+        "clear_count": 38,
+        "failed_clear_count": 25
+      },
+      "planner": {
+        "strategy": "v4_cooperative",
+        "session_status": "EXITED",
+        "planner_phase": "ROUTE_EXECUTION",
+        "completion_reason": "ALL_CHANNELS_RESOLVED",
+        "completion_certificate": true,
+        "channel_counts": {
+          "UNKNOWN": 0,
+          "DETECTED": 0,
+          "CLEARED": 13,
+          "ABSENT": 7
+        },
+        "cleared_count": 13,
+        "virtual_time_s": 4104.777802006368,
+        "average_clear_time_s": 315.75213861587446,
+        "distance_m": 17183.889010031857,
+        "measure_count": 89,
+        "coverage_measure_count": 69,
+        "localize_measure_count": 1,
+        "opportunistic_revisit_count": 19,
+        "localization_inbound_distance_m": 1231.2972061191092,
+        "switch_count": 83,
+        "clear_attempt_count": 38,
+        "failed_clear_count": 25,
+        "cover_clear_count": 38,
+        "fallback_clear_count": 0,
+        "planning_time_s": 1.9869999999991705,
+        "fallback_source_count": 0,
+        "fallback_reasons": {},
+        "local_cover_plan_point_counts": [
+          3,
+          4,
+          1,
+          2,
+          1,
+          2,
+          2,
+          2,
+          29,
+          2,
+          3,
+          4,
+          1
+        ],
+        "pending_sources": [],
+        "task_selection_count": 14,
+        "latest_planned_region_order": [
+          14
+        ],
+        "final_region_visit_order": [
+          16,
+          12,
+          13,
+          11,
+          4,
+          19,
+          9,
+          1,
+          5,
+          18,
+          20,
+          15,
+          14
+        ],
+        "route_plan_history": [
+          {
+            "selected_channel": 16,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              16,
+              12,
+              15,
+              14,
+              20,
+              18,
+              5,
+              1,
+              9,
+              19,
+              4,
+              13,
+              11
+            ],
+            "route_upper_s": 2269.3324568113912,
+            "region_versions": {
+              "16": 2,
+              "12": 2,
+              "15": 2,
+              "14": 3,
+              "20": 2,
+              "18": 2,
+              "5": 1,
+              "1": 3,
+              "9": 3,
+              "19": 2,
+              "4": 2,
+              "13": 3,
+              "11": 2
+            }
+          },
+          {
+            "selected_channel": 12,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              12,
+              13,
+              11,
+              4,
+              19,
+              9,
+              1,
+              5,
+              14,
+              15,
+              20,
+              18
+            ],
+            "route_upper_s": 2246.986817168084,
+            "region_versions": {
+              "12": 2,
+              "13": 3,
+              "11": 2,
+              "4": 2,
+              "19": 2,
+              "9": 3,
+              "1": 3,
+              "5": 1,
+              "14": 3,
+              "15": 2,
+              "20": 2,
+              "18": 2
+            }
+          },
+          {
+            "selected_channel": 13,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              13,
+              11,
+              4,
+              19,
+              9,
+              1,
+              5,
+              14,
+              15,
+              20,
+              18
+            ],
+            "route_upper_s": 2115.5932668112205,
+            "region_versions": {
+              "13": 3,
+              "11": 2,
+              "4": 2,
+              "19": 2,
+              "9": 3,
+              "1": 3,
+              "5": 1,
+              "14": 3,
+              "15": 2,
+              "20": 2,
+              "18": 2
+            }
+          },
+          {
+            "selected_channel": 11,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              11,
+              19,
+              4,
+              20,
+              15,
+              14,
+              18,
+              9,
+              1,
+              5
+            ],
+            "route_upper_s": 1941.8193240340588,
+            "region_versions": {
+              "11": 2,
+              "19": 2,
+              "4": 2,
+              "20": 2,
+              "15": 2,
+              "14": 3,
+              "18": 2,
+              "9": 3,
+              "1": 3,
+              "5": 1
+            }
+          },
+          {
+            "selected_channel": 4,
+            "selected_kind": "LOCALIZE",
+            "region_order": [
+              4,
+              19,
+              9,
+              1,
+              5,
+              18,
+              20,
+              15,
+              14
+            ],
+            "route_upper_s": 1641.078929278098,
+            "region_versions": {
+              "4": 2,
+              "19": 2,
+              "9": 3,
+              "1": 3,
+              "5": 1,
+              "18": 2,
+              "20": 2,
+              "15": 2,
+              "14": 3
+            }
+          },
+          {
+            "selected_channel": 4,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              4,
+              19,
+              9,
+              1,
+              5,
+              18,
+              20,
+              15,
+              14
+            ],
+            "route_upper_s": 1388.7491436661933,
+            "region_versions": {
+              "4": 3,
+              "19": 2,
+              "9": 3,
+              "1": 3,
+              "5": 1,
+              "18": 2,
+              "20": 2,
+              "15": 2,
+              "14": 3
+            }
+          },
+          {
+            "selected_channel": 19,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              19,
+              9,
+              1,
+              5,
+              18,
+              20,
+              15,
+              14
+            ],
+            "route_upper_s": 1381.8316142096653,
+            "region_versions": {
+              "19": 2,
+              "9": 3,
+              "1": 3,
+              "5": 1,
+              "18": 2,
+              "20": 2,
+              "15": 2,
+              "14": 3
+            }
+          },
+          {
+            "selected_channel": 9,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              9,
+              1,
+              5,
+              18,
+              20,
+              15,
+              14
+            ],
+            "route_upper_s": 1285.1825277639969,
+            "region_versions": {
+              "9": 3,
+              "1": 3,
+              "5": 1,
+              "18": 2,
+              "20": 2,
+              "15": 2,
+              "14": 3
+            }
+          },
+          {
+            "selected_channel": 1,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              1,
+              5,
+              18,
+              20,
+              15,
+              14
+            ],
+            "route_upper_s": 1023.918979150392,
+            "region_versions": {
+              "1": 3,
+              "5": 1,
+              "18": 2,
+              "20": 2,
+              "15": 2,
+              "14": 3
+            }
+          },
+          {
+            "selected_channel": 5,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              5,
+              18,
+              20,
+              15,
+              14
+            ],
+            "route_upper_s": 978.9056258545888,
+            "region_versions": {
+              "5": 1,
+              "18": 2,
+              "20": 2,
+              "15": 2,
+              "14": 3
+            }
+          },
+          {
+            "selected_channel": 18,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              18,
+              20,
+              15,
+              14
+            ],
+            "route_upper_s": 662.2270080076321,
+            "region_versions": {
+              "18": 2,
+              "20": 2,
+              "15": 2,
+              "14": 3
+            }
+          },
+          {
+            "selected_channel": 20,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              20,
+              15,
+              14
+            ],
+            "route_upper_s": 407.0007388263926,
+            "region_versions": {
+              "20": 2,
+              "15": 2,
+              "14": 3
+            }
+          },
+          {
+            "selected_channel": 15,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              15,
+              14
+            ],
+            "route_upper_s": 269.440294266415,
+            "region_versions": {
+              "15": 2,
+              "14": 3
+            }
+          },
+          {
+            "selected_channel": 14,
+            "selected_kind": "CLEAR",
+            "region_order": [
+              14
+            ],
+            "route_upper_s": 145.13869435912764,
+            "region_versions": {
+              "14": 3
+            }
+          }
+        ],
+        "source_diagnostics": {
+          "1": {
+            "fixed_station_direction_count": 3,
+            "fixed_direction_station_ids": [
+              0,
+              3,
+              4
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 3,
+            "revisit_measure_count": 2,
+            "revisit_no_signal_station_ids": [],
+            "initial_region_radius_m": 750.2327926256442,
+            "final_region_radius_m": 20.817043443234724,
+            "initial_region_area_m2": 39475.08882359485,
+            "final_region_area_m2": 334.52687650255393,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT",
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.2327926256442,
+                  "area_m2": 39475.08882359485,
+                  "major_extent_m": 1500.4096723951184,
+                  "minor_extent_m": 52.62234620467361,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1120.489772245278,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 35.12969795614433,
+                  "area_m2": 1515.0337855605176,
+                  "major_extent_m": 69.40744142435113,
+                  "minor_extent_m": 40.730641560933364,
+                  "certified_clear_points": 4,
+                  "completion_upper_s": 211.03524849546903,
+                  "quality_sufficient": false
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 3,
+                  "position": [
+                    -574.9999999999998,
+                    995.9292143521045
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 905.8829489306507,
+                  "crossing_angle_deg": 68.2066965863471,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 4,
+                  "baseline_completion_upper_s": 1219.1589990676969,
+                  "predicted_completion_upper_s": 253.23674855084678,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 959.9222505168501
+                }
+              },
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 35.12969795614433,
+                  "area_m2": 1515.0337855605176,
+                  "major_extent_m": 69.40744142435113,
+                  "minor_extent_m": 40.730641560933364,
+                  "certified_clear_points": 4,
+                  "completion_upper_s": 211.03524849546903,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 20.817043443234724,
+                  "area_m2": 334.52687650255393,
+                  "major_extent_m": 41.62477938408665,
+                  "minor_extent_m": 10.637140760963959,
+                  "certified_clear_points": 2,
+                  "completion_upper_s": 64.95698542635623,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 1150.0,
+                "decision": {
+                  "station_id": 4,
+                  "position": [
+                    -1150.0,
+                    1.4083438190194562e-13
+                  ],
+                  "region_version": 2,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                  "guaranteed_receive": true,
+                  "center_range_m": 274.45701263517816,
+                  "crossing_angle_deg": 74.45832096455094,
+                  "baseline_clear_points": 4,
+                  "predicted_clear_points": 2,
+                  "baseline_completion_upper_s": 358.2001231565281,
+                  "predicted_completion_upper_s": 352.38733239132404,
+                  "measurement_and_switch_cost_s": 5.0,
+                  "net_saving_s": 5.812790765204056
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2260.2296289266355,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1827.8483038242089,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 905.8829489306507,
+                "crossing_angle_deg": 68.2066965863471,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 4,
+                "baseline_completion_upper_s": 1219.1589990676969,
+                "predicted_completion_upper_s": 253.23674855084678,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 959.9222505168501
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 2,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 274.45701263517816,
+                "crossing_angle_deg": 74.45832096455094,
+                "baseline_clear_points": 4,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 358.2001231565281,
+                "predicted_completion_upper_s": 352.38733239132404,
+                "measurement_and_switch_cost_s": 5.0,
+                "net_saving_s": 5.812790765204056
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 3,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1399.6386626342492,
+                "crossing_angle_deg": 51.62874364704888,
+                "baseline_clear_points": 2,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 722.7710548422456,
+                "predicted_completion_upper_s": 722.7710548422456,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -6.0
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 3,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2155.3390825586816,
+                "minimum_region_range_m": 2139.9297665888616
+              }
+            ],
+            "service_time_s": 3223.4677940465995
+          },
+          "4": {
+            "fixed_station_direction_count": 2,
+            "fixed_direction_station_ids": [
+              0,
+              2
+            ],
+            "adaptive_direction_count": 1,
+            "total_direction_count": 3,
+            "revisit_measure_count": 1,
+            "revisit_no_signal_station_ids": [],
+            "initial_region_radius_m": 750.2413792522194,
+            "final_region_radius_m": 9.587647282634308,
+            "initial_region_area_m2": 39470.86229721552,
+            "final_region_area_m2": 6.383995158801554,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT",
+              "ADAPTIVE_SAFE_POINT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.2413792522194,
+                  "area_m2": 39470.86229721552,
+                  "major_extent_m": 1500.1094940985172,
+                  "minor_extent_m": 52.627444564856276,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1064.0411258774102,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 23.16449701863504,
+                  "area_m2": 825.1917986825574,
+                  "major_extent_m": 42.32613210485992,
+                  "minor_extent_m": 24.488442281359426,
+                  "certified_clear_points": 2,
+                  "completion_upper_s": 135.14314186226017,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 2,
+                  "position": [
+                    575.0000000000001,
+                    995.9292143521044
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 620.3240797333849,
+                  "crossing_angle_deg": 87.12085360755788,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 2,
+                  "baseline_completion_upper_s": 1218.5201746900668,
+                  "predicted_completion_upper_s": 238.00352990274752,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 974.5166447873194
+                }
+              },
+              {
+                "origin": "ADAPTIVE_SAFE_POINT",
+                "station_id": null,
+                "position": [
+                  -48.26629018582641,
+                  1058.627538589124
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 23.16449701863504,
+                  "area_m2": 825.1917986825574,
+                  "major_extent_m": 42.32613210485992,
+                  "minor_extent_m": 24.488442281359426,
+                  "certified_clear_points": 2,
+                  "completion_upper_s": 256.10407888359157,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 9.587647282634308,
+                  "area_m2": 6.383995158801554,
+                  "major_extent_m": 19.172461793165397,
+                  "minor_extent_m": 0.6692403828518446,
+                  "certified_clear_points": 1,
+                  "completion_upper_s": 6.917529456528002,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 1231.2972061191092,
+                "decision": {
+                  "completion_upper_s": 259.57589092568537,
+                  "predicted_continuous_radius_upper_m": 11.582249509317768,
+                  "worst_cover_point_count": 1,
+                  "selection_mode": "v4_cooperative_completion_upper_bound",
+                  "quality_before": {
+                    "radius_m": 23.16449701863504,
+                    "area_m2": 825.1917986825574,
+                    "major_extent_m": 42.32613210485992,
+                    "minor_extent_m": 24.488442281359426,
+                    "certified_clear_points": 2,
+                    "completion_upper_s": 256.4025594402033,
+                    "quality_sufficient": false
+                  },
+                  "planned_region_order": [
+                    4,
+                    19,
+                    9,
+                    1,
+                    5,
+                    18,
+                    20,
+                    15,
+                    14
+                  ]
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1557.8004482084632,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 620.3240797333849,
+                "crossing_angle_deg": 87.12085360755788,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 1218.5201746900668,
+                "predicted_completion_upper_s": 238.00352990274752,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 974.5166447873194
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 530.6201019580617,
+                "crossing_angle_deg": 85.84973420559622,
+                "baseline_clear_points": 2,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 422.95939873816207,
+                "predicted_completion_upper_s": 428.87272182944906,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -6.913323091286998
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1527.8182665952227,
+                "minimum_region_range_m": 1508.241196120877
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2120.713781635919,
+                "minimum_region_range_m": 2107.0340359357433
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2146.6146063881524,
+                "minimum_region_range_m": 2129.084688924566
+              }
+            ],
+            "service_time_s": 2829.2379888278874
+          },
+          "5": {
+            "fixed_station_direction_count": 1,
+            "fixed_direction_station_ids": [
+              4
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 1,
+            "revisit_measure_count": 1,
+            "revisit_no_signal_station_ids": [
+              5
+            ],
+            "initial_region_radius_m": 401.87895504350007,
+            "final_region_radius_m": 401.87895504350007,
+            "initial_region_area_m2": 11135.259762750007,
+            "final_region_area_m2": 11135.259762750007,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "response": "no_signal",
+                "before": {
+                  "radius_m": 401.87895504350007,
+                  "area_m2": 11135.259762750007,
+                  "major_extent_m": 803.6206692186822,
+                  "minor_extent_m": 27.960028762957748,
+                  "certified_clear_points": 29,
+                  "completion_upper_s": 473.43486725104515,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 401.87895504350007,
+                  "area_m2": 11135.259762750007,
+                  "major_extent_m": 803.6206692186822,
+                  "minor_extent_m": 27.960028762957748,
+                  "certified_clear_points": 29,
+                  "completion_upper_s": 473.43486725104515,
+                  "quality_sufficient": false
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 5,
+                  "position": [
+                    -575.0000000000005,
+                    -995.9292143521043
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 1146.070841892407,
+                  "crossing_angle_deg": 75.37044442278801,
+                  "baseline_clear_points": 29,
+                  "predicted_clear_points": 2,
+                  "baseline_completion_upper_s": 884.9048312216293,
+                  "predicted_completion_upper_s": 684.7347094152303,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 194.17012180639892
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1146.070841892407,
+                "crossing_angle_deg": 75.37044442278801,
+                "baseline_clear_points": 29,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 884.9048312216293,
+                "predicted_completion_upper_s": 684.7347094152303,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 194.17012180639892
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2218.5764695976823,
+                "minimum_region_range_m": 1991.8584287042086
+              }
+            ],
+            "service_time_s": 2200.7964842425276
+          },
+          "9": {
+            "fixed_station_direction_count": 3,
+            "fixed_direction_station_ids": [
+              0,
+              3,
+              4
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 3,
+            "revisit_measure_count": 2,
+            "revisit_no_signal_station_ids": [],
+            "initial_region_radius_m": 750.2553069727898,
+            "final_region_radius_m": 20.422233751579483,
+            "initial_region_area_m2": 39473.13257051981,
+            "final_region_area_m2": 445.2388811833225,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT",
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.2553069727898,
+                  "area_m2": 39473.13257051981,
+                  "major_extent_m": 1500.3684006042904,
+                  "minor_extent_m": 52.62437593425374,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1104.2141198713225,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 26.812988923941095,
+                  "area_m2": 1077.2524462395813,
+                  "major_extent_m": 51.43102928934485,
+                  "minor_extent_m": 35.36397859199456,
+                  "certified_clear_points": 4,
+                  "completion_upper_s": 183.18500241512695,
+                  "quality_sufficient": false
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 3,
+                  "position": [
+                    -574.9999999999998,
+                    995.9292143521045
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 821.6462261578843,
+                  "crossing_angle_deg": 70.15602420196814,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 4,
+                  "baseline_completion_upper_s": 1221.7266268324051,
+                  "predicted_completion_upper_s": 254.08785699153276,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 961.6387698408723
+                }
+              },
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 26.812988923941095,
+                  "area_m2": 1077.2524462395813,
+                  "major_extent_m": 51.43102928934485,
+                  "minor_extent_m": 35.36397859199456,
+                  "certified_clear_points": 4,
+                  "completion_upper_s": 91.09935231919518,
+                  "quality_sufficient": true
+                },
+                "after": {
+                  "radius_m": 20.422233751579483,
+                  "area_m2": 445.2388811833225,
+                  "major_extent_m": 39.20733840270391,
+                  "minor_extent_m": 12.846658094519587,
+                  "certified_clear_points": 2,
+                  "completion_upper_s": 79.3860219463628,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 4,
+                  "position": [
+                    -1150.0,
+                    1.4083438190194562e-13
+                  ],
+                  "region_version": 2,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                  "guaranteed_receive": true,
+                  "center_range_m": 346.4447012573465,
+                  "crossing_angle_deg": 82.27171891386189,
+                  "baseline_clear_points": 4,
+                  "predicted_clear_points": 2,
+                  "baseline_completion_upper_s": 365.4244505778398,
+                  "predicted_completion_upper_s": 362.3923998545266,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 2.032050723313205
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2248.0693720682084,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1772.1783546225804,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 821.6462261578843,
+                "crossing_angle_deg": 70.15602420196814,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 4,
+                "baseline_completion_upper_s": 1221.7266268324051,
+                "predicted_completion_upper_s": 254.08785699153276,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 961.6387698408723
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 2,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 346.4447012573465,
+                "crossing_angle_deg": 82.27171891386189,
+                "baseline_clear_points": 4,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 365.4244505778398,
+                "predicted_completion_upper_s": 362.3923998545266,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 2.032050723313205
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 3,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1371.9437792760166,
+                "crossing_angle_deg": 54.81763430488354,
+                "baseline_clear_points": 2,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 694.0172793652355,
+                "predicted_completion_upper_s": 694.0172793652355,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -6.0
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 3,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2042.0147818425264,
+                "minimum_region_range_m": 2034.4331335579664
+              }
+            ],
+            "service_time_s": 3134.460737330408
+          },
+          "11": {
+            "fixed_station_direction_count": 2,
+            "fixed_direction_station_ids": [
+              1,
+              2
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 2,
+            "revisit_measure_count": 1,
+            "revisit_no_signal_station_ids": [],
+            "initial_region_radius_m": 684.9343031137525,
+            "final_region_radius_m": 29.063151219410145,
+            "initial_region_area_m2": 31968.100177001674,
+            "final_region_area_m2": 1021.481274610851,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 684.9343031137525,
+                  "area_m2": 31968.100177001674,
+                  "major_extent_m": 1369.7594940458862,
+                  "minor_extent_m": 47.16217513563438,
+                  "certified_clear_points": 98,
+                  "completion_upper_s": 933.7233743644222,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 29.063151219410145,
+                  "area_m2": 1021.481274610851,
+                  "major_extent_m": 55.83573938481322,
+                  "minor_extent_m": 26.856589795081625,
+                  "certified_clear_points": 2,
+                  "completion_upper_s": 139.9900402492446,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 2,
+                  "position": [
+                    575.0000000000001,
+                    995.9292143521044
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 602.5175337893927,
+                  "crossing_angle_deg": 86.37339769746913,
+                  "baseline_clear_points": 98,
+                  "predicted_clear_points": 2,
+                  "baseline_completion_upper_s": 1335.0282474566125,
+                  "predicted_completion_upper_s": 484.18593575486176,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 844.8423117017508
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 602.5175337893927,
+                "crossing_angle_deg": 86.37339769746913,
+                "baseline_clear_points": 98,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 1335.0282474566125,
+                "predicted_completion_upper_s": 484.18593575486176,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 844.8423117017508
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1774.4161275699414,
+                "minimum_region_range_m": 1750.9485926681891
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2628.609813501085,
+                "minimum_region_range_m": 2600.897100664115
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2817.7603564168417,
+                "minimum_region_range_m": 2789.641463492859
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2282.3059266672876,
+                "minimum_region_range_m": 2258.4703910739836
+              }
+            ],
+            "service_time_s": 2202.0610181475377
+          },
+          "12": {
+            "fixed_station_direction_count": 2,
+            "fixed_direction_station_ids": [
+              0,
+              1
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 2,
+            "revisit_measure_count": 1,
+            "revisit_no_signal_station_ids": [],
+            "initial_region_radius_m": 750.2418671250546,
+            "final_region_radius_m": 32.98436000727173,
+            "initial_region_area_m2": 39470.887964636495,
+            "final_region_area_m2": 1443.481301068794,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.2418671250546,
+                  "area_m2": 39470.887964636495,
+                  "major_extent_m": 1500.1122372486504,
+                  "minor_extent_m": 52.62746163943184,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1126.496968722562,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 32.98436000727173,
+                  "area_m2": 1443.481301068794,
+                  "major_extent_m": 65.96867944054243,
+                  "minor_extent_m": 43.76250285181884,
+                  "certified_clear_points": 4,
+                  "completion_upper_s": 232.17005193108685,
+                  "quality_sufficient": false
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 1,
+                  "position": [
+                    1150.0,
+                    0.0
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 1025.694468133028,
+                  "crossing_angle_deg": 69.16731780592698,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 4,
+                  "baseline_completion_upper_s": 1370.937722562786,
+                  "predicted_completion_upper_s": 593.5245643575423,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 771.4131582052436
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1025.694468133028,
+                "crossing_angle_deg": 69.16731780592698,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 4,
+                "baseline_completion_upper_s": 1370.937722562786,
+                "predicted_completion_upper_s": 593.5245643575423,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 771.4131582052436
+              },
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1862.068148066291,
+                "minimum_region_range_m": 1829.7113892727548
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2187.916856095359,
+                "minimum_region_range_m": 2160.4549894411507
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1929.143858526123,
+                "minimum_region_range_m": 1909.3139831267256
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1156.083692233717,
+                "crossing_angle_deg": 62.916064859072264,
+                "baseline_clear_points": 4,
+                "predicted_clear_points": 4,
+                "baseline_completion_upper_s": 277.7303125176423,
+                "predicted_completion_upper_s": 277.34413989070646,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -5.613827373064169
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 129.79646491939064,
+                "crossing_angle_deg": 32.98920159272754,
+                "baseline_clear_points": 4,
+                "predicted_clear_points": 4,
+                "baseline_completion_upper_s": 49.45347584773456,
+                "predicted_completion_upper_s": 54.368961722425624,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -5.915485874691065
+              }
+            ],
+            "service_time_s": 2069.012885120963
+          },
+          "13": {
+            "fixed_station_direction_count": 3,
+            "fixed_direction_station_ids": [
+              0,
+              1,
+              2
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 3,
+            "revisit_measure_count": 2,
+            "revisit_no_signal_station_ids": [],
+            "initial_region_radius_m": 750.2260534006595,
+            "final_region_radius_m": 10.56438659150548,
+            "initial_region_area_m2": 39476.20084756974,
+            "final_region_area_m2": 89.52669993336895,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT",
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.2260534006595,
+                  "area_m2": 39476.20084756974,
+                  "major_extent_m": 1500.433126568401,
+                  "minor_extent_m": 52.621192695267425,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 990.4487377813069,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 47.67747756443238,
+                  "area_m2": 1008.6726368253294,
+                  "major_extent_m": 95.35349598346022,
+                  "minor_extent_m": 21.143291705878198,
+                  "certified_clear_points": 4,
+                  "completion_upper_s": 136.06955807437936,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 1,
+                  "position": [
+                    1150.0,
+                    0.0
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 246.34714009087799,
+                  "crossing_angle_deg": 89.74261912711518,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 2,
+                  "baseline_completion_upper_s": 1215.7152464202711,
+                  "predicted_completion_upper_s": 241.15437347468202,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 968.5608729455892
+                }
+              },
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 47.67747756443238,
+                  "area_m2": 1008.6726368253294,
+                  "major_extent_m": 95.35349598346022,
+                  "minor_extent_m": 21.143291705878198,
+                  "certified_clear_points": 4,
+                  "completion_upper_s": 200.15652669667458,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 10.56438659150548,
+                  "area_m2": 89.52669993336895,
+                  "major_extent_m": 20.470470623389975,
+                  "minor_extent_m": 8.904377748831966,
+                  "certified_clear_points": 1,
+                  "completion_upper_s": 179.04299108377623,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 2,
+                  "position": [
+                    575.0000000000001,
+                    995.9292143521044
+                  ],
+                  "region_version": 2,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                  "guaranteed_receive": true,
+                  "center_range_m": 868.90091560169,
+                  "crossing_angle_deg": 78.67352408234683,
+                  "baseline_clear_points": 4,
+                  "predicted_clear_points": 1,
+                  "baseline_completion_upper_s": 486.30130291963917,
+                  "predicted_completion_upper_s": 482.166231003141,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 3.135071916498191
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 246.34714009087799,
+                "crossing_angle_deg": 89.74261912711518,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 1215.7152464202711,
+                "predicted_completion_upper_s": 241.15437347468202,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 968.5608729455892
+              },
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 868.90091560169,
+                "crossing_angle_deg": 78.67352408234683,
+                "baseline_clear_points": 4,
+                "predicted_clear_points": 1,
+                "baseline_completion_upper_s": 486.30130291963917,
+                "predicted_completion_upper_s": 482.166231003141,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 3.135071916498191
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 3,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1480.0983943149997,
+                "crossing_angle_deg": 48.19591278971302,
+                "baseline_clear_points": 1,
+                "predicted_clear_points": 1,
+                "baseline_completion_upper_s": 657.4689737583006,
+                "predicted_completion_upper_s": 657.4689737583006,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -6.0
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 3,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1777.3861900389154,
+                "minimum_region_range_m": 1770.6190105291225
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 3,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1641.6156272226892,
+                "minimum_region_range_m": 1633.952874199461
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 3,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1123.5175365143273,
+                "crossing_angle_deg": 75.33232991389815,
+                "baseline_clear_points": 1,
+                "predicted_clear_points": 1,
+                "baseline_completion_upper_s": 229.85395870200264,
+                "predicted_completion_upper_s": 229.85395870200264,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -6.0
+              }
+            ],
+            "service_time_s": 2270.3707202378746
+          },
+          "14": {
+            "fixed_station_direction_count": 3,
+            "fixed_direction_station_ids": [
+              0,
+              4,
+              5
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 3,
+            "revisit_measure_count": 2,
+            "revisit_no_signal_station_ids": [],
+            "initial_region_radius_m": 750.2336693581786,
+            "final_region_radius_m": 19.23788816124249,
+            "initial_region_area_m2": 39470.456672874105,
+            "final_region_area_m2": 129.30895659024827,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT",
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.2336693581786,
+                  "area_m2": 39470.456672874105,
+                  "major_extent_m": 1500.0543780041824,
+                  "minor_extent_m": 52.6271747332068,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1126.2986482748192,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 40.670831659824884,
+                  "area_m2": 1890.4271481465548,
+                  "major_extent_m": 81.24278839048193,
+                  "minor_extent_m": 46.18910464775021,
+                  "certified_clear_points": 6,
+                  "completion_upper_s": 277.9121389072139,
+                  "quality_sufficient": false
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 4,
+                  "position": [
+                    -1150.0,
+                    1.4083438190194562e-13
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 1155.4483277708346,
+                  "crossing_angle_deg": 64.01286632635808,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 6,
+                  "baseline_completion_upper_s": 1196.1625777881525,
+                  "predicted_completion_upper_s": 298.7663086743415,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 891.3962691138111
+                }
+              },
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 40.670831659824884,
+                  "area_m2": 1890.4271481465548,
+                  "major_extent_m": 81.24278839048193,
+                  "minor_extent_m": 46.18910464775021,
+                  "certified_clear_points": 6,
+                  "completion_upper_s": 58.264806107428,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 19.23788816124249,
+                  "area_m2": 129.30895659024827,
+                  "major_extent_m": 38.4704251047208,
+                  "minor_extent_m": 4.1739324967939915,
+                  "certified_clear_points": 1,
+                  "completion_upper_s": 25.108916134437543,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 5,
+                  "position": [
+                    -575.0000000000005,
+                    -995.9292143521043
+                  ],
+                  "region_version": 2,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                  "guaranteed_receive": true,
+                  "center_range_m": 102.29025990375462,
+                  "crossing_angle_deg": 63.99848863869741,
+                  "baseline_clear_points": 6,
+                  "predicted_clear_points": 2,
+                  "baseline_completion_upper_s": 263.5780899609117,
+                  "predicted_completion_upper_s": 243.50795326656075,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 19.070136694350964
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1819.3259222810486,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2148.2966434327195,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1904.6615136334867,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1155.4483277708346,
+                "crossing_angle_deg": 64.01286632635808,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 6,
+                "baseline_completion_upper_s": 1196.1625777881525,
+                "predicted_completion_upper_s": 298.7663086743415,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 891.3962691138111
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 2,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 102.29025990375462,
+                "crossing_angle_deg": 63.99848863869741,
+                "baseline_clear_points": 6,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 263.5780899609117,
+                "predicted_completion_upper_s": 243.50795326656075,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 19.070136694350964
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 3,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1049.6222236717208,
+                "crossing_angle_deg": 64.15071894146368,
+                "baseline_clear_points": 1,
+                "predicted_clear_points": 1,
+                "baseline_completion_upper_s": 214.93043081878363,
+                "predicted_completion_upper_s": 214.93043081878363,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -6.0
+              }
+            ],
+            "service_time_s": 4021.777802006368
+          },
+          "15": {
+            "fixed_station_direction_count": 2,
+            "fixed_direction_station_ids": [
+              0,
+              5
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 2,
+            "revisit_measure_count": 2,
+            "revisit_no_signal_station_ids": [
+              1
+            ],
+            "initial_region_radius_m": 750.2314188859438,
+            "final_region_radius_m": 20.643788345339605,
+            "initial_region_area_m2": 39470.33827353991,
+            "final_region_area_m2": 831.582830757543,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT",
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "response": "no_signal",
+                "before": {
+                  "radius_m": 750.2314188859438,
+                  "area_m2": 39470.33827353991,
+                  "major_extent_m": 1500.0245288932763,
+                  "minor_extent_m": 52.627095970688885,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1126.3190949958948,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 750.2314188859438,
+                  "area_m2": 39470.33827353991,
+                  "major_extent_m": 1500.0245288932763,
+                  "minor_extent_m": 52.627095970688885,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1126.3190949958948,
+                  "quality_sufficient": false
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 1,
+                  "position": [
+                    1150.0,
+                    0.0
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 1328.7858678745354,
+                  "crossing_angle_deg": 57.10907855140428,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 6,
+                  "baseline_completion_upper_s": 1372.2063003645546,
+                  "predicted_completion_upper_s": 698.8976012379422,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 667.3086991266124
+                }
+              },
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.2314188859438,
+                  "area_m2": 39470.33827353991,
+                  "major_extent_m": 1500.0245288932763,
+                  "minor_extent_m": 52.627095970688885,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1109.7515723336692,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 20.643788345339605,
+                  "area_m2": 831.582830757543,
+                  "major_extent_m": 35.0022967245291,
+                  "minor_extent_m": 32.957300439746916,
+                  "certified_clear_points": 4,
+                  "completion_upper_s": 181.062630045522,
+                  "quality_sufficient": false
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 5,
+                  "position": [
+                    -575.0000000000005,
+                    -995.9292143521043
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 817.5028962501863,
+                  "crossing_angle_deg": 77.78942867532373,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 4,
+                  "baseline_completion_upper_s": 1222.646729967111,
+                  "predicted_completion_upper_s": 249.99028598764912,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 966.6564439794619
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1328.7858678745354,
+                "crossing_angle_deg": 57.10907855140428,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 6,
+                "baseline_completion_upper_s": 1372.2063003645546,
+                "predicted_completion_upper_s": 698.8976012379422,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 667.3086991266124
+              },
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1994.1641514668395,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2129.2063320680854,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1696.8587936860924,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 817.5028962501863,
+                "crossing_angle_deg": 77.78942867532373,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 4,
+                "baseline_completion_upper_s": 1222.646729967111,
+                "predicted_completion_upper_s": 249.99028598764912,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 966.6564439794619
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 410.08791353533076,
+                "crossing_angle_deg": 50.574855706395226,
+                "baseline_clear_points": 4,
+                "predicted_clear_points": 4,
+                "baseline_completion_upper_s": 102.62878321649727,
+                "predicted_completion_upper_s": 107.64771829457011,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -6.018935078072843
+              }
+            ],
+            "service_time_s": 3871.6391076472405
+          },
+          "16": {
+            "fixed_station_direction_count": 2,
+            "fixed_direction_station_ids": [
+              0,
+              1
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 2,
+            "revisit_measure_count": 1,
+            "revisit_no_signal_station_ids": [],
+            "initial_region_radius_m": 750.226838901251,
+            "final_region_radius_m": 37.65869566095729,
+            "initial_region_area_m2": 39475.94243757194,
+            "final_region_area_m2": 1455.5722482672427,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.226838901251,
+                  "area_m2": 39475.94243757194,
+                  "major_extent_m": 1500.4276767596389,
+                  "minor_extent_m": 52.621460727338544,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1072.273542901519,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 37.65869566095729,
+                  "area_m2": 1455.5722482672427,
+                  "major_extent_m": 73.83365001004563,
+                  "minor_extent_m": 32.63491047942867,
+                  "certified_clear_points": 3,
+                  "completion_upper_s": 168.05519831391058,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 1,
+                  "position": [
+                    1150.0,
+                    0.0
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 681.3160757417958,
+                  "crossing_angle_deg": 74.75176819361448,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 2,
+                  "baseline_completion_upper_s": 1294.8041892863143,
+                  "predicted_completion_upper_s": 482.5959848677032,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 806.2082044186111
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 681.3160757417958,
+                "crossing_angle_deg": 74.75176819361448,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 1294.8041892863143,
+                "predicted_completion_upper_s": 482.5959848677032,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 806.2082044186111
+              },
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1831.7196535525388,
+                "minimum_region_range_m": 1794.792257221669
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2424.9393509508113,
+                "minimum_region_range_m": 2392.1334019461956
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2372.748507755119,
+                "minimum_region_range_m": 2351.675892367051
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1689.498783586255,
+                "minimum_region_range_m": 1672.1674623439646
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 573.8224230198089,
+                "crossing_angle_deg": 58.991083908206804,
+                "baseline_clear_points": 3,
+                "predicted_clear_points": 4,
+                "baseline_completion_upper_s": 132.9161816564037,
+                "predicted_completion_upper_s": 141.5249845225439,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -9.608802866140195
+              }
+            ],
+            "service_time_s": 1932.2539363153674
+          },
+          "18": {
+            "fixed_station_direction_count": 2,
+            "fixed_direction_station_ids": [
+              0,
+              3
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 2,
+            "revisit_measure_count": 1,
+            "revisit_no_signal_station_ids": [],
+            "initial_region_radius_m": 750.2637368329786,
+            "final_region_radius_m": 20.17544487830942,
+            "initial_region_area_m2": 39472.03854930673,
+            "final_region_area_m2": 657.3024378331247,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.2637368329786,
+                  "area_m2": 39472.03854930673,
+                  "major_extent_m": 1500.2074758133292,
+                  "minor_extent_m": 52.628227029835784,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1126.3432575775105,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 20.17544487830942,
+                  "area_m2": 657.3024378331247,
+                  "major_extent_m": 36.084747279196925,
+                  "minor_extent_m": 19.004060932845086,
+                  "certified_clear_points": 2,
+                  "completion_upper_s": 215.41856227715533,
+                  "quality_sufficient": false
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 3,
+                  "position": [
+                    -574.9999999999998,
+                    995.9292143521045
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 1121.6538102191569,
+                  "crossing_angle_deg": 65.34973840006623,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 6,
+                  "baseline_completion_upper_s": 1194.2537600121232,
+                  "predicted_completion_upper_s": 287.8529604192669,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 900.4007995928563
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2149.539796905039,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1885.758386876383,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1121.6538102191569,
+                "crossing_angle_deg": 65.34973840006623,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 6,
+                "baseline_completion_upper_s": 1194.2537600121232,
+                "predicted_completion_upper_s": 287.8529604192669,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 900.4007995928563
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 627.0990042401575,
+                "crossing_angle_deg": 4.464676695456319,
+                "baseline_clear_points": 2,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 330.3425390677813,
+                "predicted_completion_upper_s": 335.5895412054205,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -6.247002137639242
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 975.0683956240886,
+                "crossing_angle_deg": 84.52742830313775,
+                "baseline_clear_points": 2,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 498.6077585668265,
+                "predicted_completion_upper_s": 503.70744892778146,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -6.09969036095498
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1467.7661265991162,
+                "crossing_angle_deg": 43.99161127690061,
+                "baseline_clear_points": 2,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 303.78569950317774,
+                "predicted_completion_upper_s": 303.78569950317774,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": -6.0
+              }
+            ],
+            "service_time_s": 3619.0726450168486
+          },
+          "19": {
+            "fixed_station_direction_count": 2,
+            "fixed_direction_station_ids": [
+              2,
+              3
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 2,
+            "revisit_measure_count": 1,
+            "revisit_no_signal_station_ids": [],
+            "initial_region_radius_m": 750.2259540309749,
+            "final_region_radius_m": 20.514001287601122,
+            "initial_region_area_m2": 39476.44504870684,
+            "final_region_area_m2": 531.4652674499666,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.2259540309749,
+                  "area_m2": 39476.44504870684,
+                  "major_extent_m": 1500.438276477889,
+                  "minor_extent_m": 52.6209394112772,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 908.398900484333,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 20.514001287601122,
+                  "area_m2": 531.4652674499666,
+                  "major_extent_m": 38.754742330007744,
+                  "minor_extent_m": 16.31202666501066,
+                  "certified_clear_points": 2,
+                  "completion_upper_s": 95.35142205566778,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 1150.0,
+                "decision": {
+                  "station_id": 3,
+                  "position": [
+                    -574.9999999999998,
+                    995.9292143521045
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 421.90775276237565,
+                  "crossing_angle_deg": 82.54317683854512,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 2,
+                  "baseline_completion_upper_s": 1353.126743990193,
+                  "predicted_completion_upper_s": 409.2438006041486,
+                  "measurement_and_switch_cost_s": 5.0,
+                  "net_saving_s": 938.8829433860444
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 421.90775276237565,
+                "crossing_angle_deg": 82.54317683854512,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 1353.126743990193,
+                "predicted_completion_upper_s": 409.2438006041486,
+                "measurement_and_switch_cost_s": 5.0,
+                "net_saving_s": 938.8829433860444
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1577.7264301594478,
+                "minimum_region_range_m": 1558.764922372561
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2365.6148425857878,
+                "minimum_region_range_m": 2347.879837770734
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2529.2172371079787,
+                "minimum_region_range_m": 2513.780291997028
+              }
+            ],
+            "service_time_s": 2205.703174490031
+          },
+          "20": {
+            "fixed_station_direction_count": 2,
+            "fixed_direction_station_ids": [
+              0,
+              5
+            ],
+            "adaptive_direction_count": 0,
+            "total_direction_count": 2,
+            "revisit_measure_count": 2,
+            "revisit_no_signal_station_ids": [
+              4
+            ],
+            "initial_region_radius_m": 750.2360712246258,
+            "final_region_radius_m": 39.61951880409788,
+            "initial_region_area_m2": 39474.74718259409,
+            "final_region_area_m2": 793.9946756539284,
+            "localization_point_sources": [
+              "FIXED_STATION_REVISIT",
+              "FIXED_STATION_REVISIT"
+            ],
+            "localization_events": [
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "response": "no_signal",
+                "before": {
+                  "radius_m": 750.2360712246258,
+                  "area_m2": 39474.74718259409,
+                  "major_extent_m": 1500.4024657372013,
+                  "minor_extent_m": 52.622700632060386,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1126.393133900828,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 750.2360712246258,
+                  "area_m2": 39474.74718259409,
+                  "major_extent_m": 1500.4024657372013,
+                  "minor_extent_m": 52.622700632060386,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1126.393133900828,
+                  "quality_sufficient": false
+                },
+                "inbound_distance_m": 0.0,
+                "decision": {
+                  "station_id": 4,
+                  "position": [
+                    -1150.0,
+                    1.4083438190194562e-13
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 1457.789254972844,
+                  "crossing_angle_deg": 51.14062136524518,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 8,
+                  "baseline_completion_upper_s": 1235.7225693430635,
+                  "predicted_completion_upper_s": 412.40606811517193,
+                  "measurement_and_switch_cost_s": 6.0,
+                  "net_saving_s": 817.3165012278915
+                }
+              },
+              {
+                "origin": "FIXED_STATION_REVISIT",
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "response": "direction",
+                "before": {
+                  "radius_m": 750.2360712246258,
+                  "area_m2": 39474.74718259409,
+                  "major_extent_m": 1500.4024657372013,
+                  "minor_extent_m": 52.622700632060386,
+                  "certified_clear_points": 108,
+                  "completion_upper_s": 1126.393133900828,
+                  "quality_sufficient": false
+                },
+                "after": {
+                  "radius_m": 39.61951880409788,
+                  "area_m2": 793.9946756539284,
+                  "major_extent_m": 79.04336926754027,
+                  "minor_extent_m": 18.403254901504646,
+                  "certified_clear_points": 3,
+                  "completion_upper_s": 166.4148553694547,
+                  "quality_sufficient": true
+                },
+                "inbound_distance_m": 1149.9999999999998,
+                "decision": {
+                  "station_id": 5,
+                  "position": [
+                    -575.0000000000005,
+                    -995.9292143521043
+                  ],
+                  "region_version": 1,
+                  "selected": true,
+                  "reason": "POSITIVE_NET_VALUE",
+                  "basis": "CENTROID_DIRECTION_SCENARIO",
+                  "guaranteed_receive": false,
+                  "center_range_m": 389.78163988840106,
+                  "crossing_angle_deg": 84.00324263032786,
+                  "baseline_clear_points": 108,
+                  "predicted_clear_points": 2,
+                  "baseline_completion_upper_s": 1220.6198171128353,
+                  "predicted_completion_upper_s": 242.86035526349306,
+                  "measurement_and_switch_cost_s": 5.0,
+                  "net_saving_s": 972.7594618493423
+                }
+              }
+            ],
+            "revisit_decisions": [
+              {
+                "station_id": 1,
+                "position": [
+                  1150.0,
+                  0.0
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 1746.808467026244,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 2,
+                "position": [
+                  575.0000000000001,
+                  995.9292143521044
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2241.552945079541,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 3,
+                "position": [
+                  -574.9999999999998,
+                  995.9292143521045
+                ],
+                "region_version": 1,
+                "selected": false,
+                "reason": "LOW_RECEPTION_VALUE",
+                "guaranteed_receive": false,
+                "center_range_m": 2135.7585189610304,
+                "minimum_region_range_m": 1150.0
+              },
+              {
+                "station_id": 4,
+                "position": [
+                  -1150.0,
+                  1.4083438190194562e-13
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 1457.789254972844,
+                "crossing_angle_deg": 51.14062136524518,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 8,
+                "baseline_completion_upper_s": 1235.7225693430635,
+                "predicted_completion_upper_s": 412.40606811517193,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 817.3165012278915
+              },
+              {
+                "station_id": 5,
+                "position": [
+                  -575.0000000000005,
+                  -995.9292143521043
+                ],
+                "region_version": 1,
+                "selected": true,
+                "reason": "POSITIVE_NET_VALUE",
+                "basis": "CENTROID_DIRECTION_SCENARIO",
+                "guaranteed_receive": false,
+                "center_range_m": 389.78163988840106,
+                "crossing_angle_deg": 84.00324263032786,
+                "baseline_clear_points": 108,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 1220.6198171128353,
+                "predicted_completion_upper_s": 242.86035526349306,
+                "measurement_and_switch_cost_s": 5.0,
+                "net_saving_s": 972.7594618493423
+              },
+              {
+                "station_id": 6,
+                "position": [
+                  575.0000000000001,
+                  -995.9292143521044
+                ],
+                "region_version": 2,
+                "selected": false,
+                "reason": "INSUFFICIENT_NET_VALUE",
+                "basis": "GUARANTEED_CONTINUOUS_BOUND",
+                "guaranteed_receive": true,
+                "center_range_m": 866.4469775712531,
+                "crossing_angle_deg": 59.654784960453725,
+                "baseline_clear_points": 3,
+                "predicted_clear_points": 2,
+                "baseline_completion_upper_s": 192.04363322701082,
+                "predicted_completion_upper_s": 190.9095098700962,
+                "measurement_and_switch_cost_s": 6.0,
+                "net_saving_s": 0.13412335691461408
+              }
+            ],
+            "service_time_s": 3739.081325667785
+          }
+        },
+        "source_service_times_s": {
+          "1": 3223.4677940465995,
+          "4": 2829.2379888278874,
+          "5": 2200.7964842425276,
+          "9": 3134.460737330408,
+          "11": 2202.0610181475377,
+          "12": 2069.012885120963,
+          "13": 2270.3707202378746,
+          "14": 4021.777802006368,
+          "15": 3871.6391076472405,
+          "16": 1932.2539363153674,
+          "18": 3619.0726450168486,
+          "19": 2205.703174490031,
+          "20": 3739.081325667785
+        },
+        "p95_source_service_time_s": 3931.6945853908915,
+        "max_source_service_time_s": 4021.777802006368,
+        "batch_channels": [],
+        "current_position": [
+          -474.6349703875899,
+          -1001.9353390133158
+        ],
+        "current_channel": 4
+      },
+      "full_clear": true,
+      "actions_limited": false,
+      "wall_time_s": 7.684950900000331,
+      "planner_module": "B.q3.planner"
+    }
+  ]
+}
