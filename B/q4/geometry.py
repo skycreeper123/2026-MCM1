@@ -258,10 +258,13 @@ def hull_candidates(record):
 
 def reprice(plan, current, continuation=None):
     choices = (plan.points, plan.points[::-1])
-    points = min(choices, key=lambda ps: plan_route_distance(ps, current, continuation))
-    length = plan_route_distance(points, current, continuation)
+    def length(points):
+        path = (tuple(current),)+tuple(points)+(() if continuation is None else (tuple(continuation),))
+        return sum(math.dist(a, b) for a, b in zip(path, path[1:]))
+    points = min(choices, key=length)
+    route_length = length(points)
     return replace(plan, points=points, route_distance_m=route_length,
-                   completion_upper_s=length/5 + 3*(len(points)-1)+5)
+                   completion_upper_s=route_length/5 + 3*(len(points)-1)+5)
 
 
 def remaining_contains(record, point):
@@ -291,6 +294,8 @@ def _grid_cell_corners(center, certificate):
 
 
 def _inside_failed_disk(corners, center):
+    if any(math.dist(p, center) > 20 for p in corners):
+        return False
     q, limit = rational_point(center), Fraction(20)**2
     return all(sum((a-b)**2 for a, b in zip(rational_point(p), q)) <= limit for p in corners)
 
