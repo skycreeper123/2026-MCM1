@@ -154,6 +154,8 @@ class SourceRecord:
     absence_certificate: dict | None = None
     base_clear_plan: object = None
     base_clear_version: int = -1
+    sparse_removed_cells: dict = field(default_factory=dict)
+    sparse_processed_disks: int = 0
 
 
 def update_positive_hull(record, observation):
@@ -258,7 +260,7 @@ def reprice(plan, current, continuation=None):
     choices = (plan.points, plan.points[::-1])
     points = min(choices, key=lambda ps: plan_route_distance(ps, current, continuation))
     length = plan_route_distance(points, current, continuation)
-    return replace(plan, points=points, route_distance_m=length,
+    return replace(plan, points=points, route_distance_m=route_length,
                    completion_upper_s=length/5 + 3*(len(points)-1)+5)
 
 
@@ -297,15 +299,16 @@ def _sparsify_grid(record, plan):
     if not record.failed_clear_disks or plan.kind != "RECTANGLE_GRID":
         return plan
     parent = dict(plan.cover_certificate)
-    retained, removed = [], []
-    for point in plan.points:
-        corners = _grid_cell_corners(point, parent)
-        witness = next((disk for disk in record.failed_clear_disks
-                        if _inside_failed_disk(corners, disk)), None)
-        if witness is None:
-            retained.append(point)
-        else:
-            removed.append({"center": point, "failed_disk": witness})
+    # Same P_plus uses the same certified base grid. Process each new failed
+    # disk once instead of rechecking every old disk against every cell.
+    for disk in record.failed_clear_disks[record.sparse_processed_disks:]:
+        for point in plan.points:
+            if point not in record.sparse_removed_cells and _inside_failed_disk(_grid_cell_corners(point, parent), disk):
+                record.sparse_removed_cells[point] = disk
+    record.sparse_processed_disks = len(record.failed_clear_disks)
+    retained = [point for point in plan.points if point not in record.sparse_removed_cells]
+    removed = [{"center": point, "failed_disk": disk}
+               for point, disk in record.sparse_removed_cells.items()]
     if not removed:
         return plan
     if not retained:
@@ -412,6 +415,8 @@ def build_clear_plan(record, current, continuation=None):
                                             "half_width_deg": 1.005, "radius_m": radius})
     if record.base_clear_version != record.region_version:
         record.base_clear_plan, record.base_clear_version = plan, record.region_version
+        record.sparse_removed_cells.clear()
+        record.sparse_processed_disks = 0
     plan = _sparsify_grid(record, plan)
     if not verify_remaining_cover_certificate(record, plan):
         raise ValueError("Independent P_remain cover verification failed")
